@@ -1,0 +1,151 @@
+<div class="flex">
+  <!-- Sidebar -->
+  <div
+    [ngClass]="{
+      'w-64': !isCollapsed,
+      'w-16': isCollapsed
+    }"
+    class="h-screen bg-white shadow-md transition-all duration-300 fixed left-0 top-0 z-40"
+  >
+    <!-- Toggle + Logo -->
+    <div class="flex items-center justify-between px-4 py-3 border-b">
+      <h2 *ngIf="!isCollapsed" class="text-lg font-bold">📚 Book App</h2>
+      <button
+        (click)="toggleSidebar()"
+        class="text-gray-600 hover:text-blue-600"
+      >
+        <i
+          class="pi"
+          [ngClass]="isCollapsed ? 'pi-angle-right' : 'pi-angle-left'"
+        ></i>
+      </button>
+    </div>
+
+    <!-- Sidebar Links -->
+    <ul class="mt-4 space-y-2">
+      <li>
+        <a routerLink="/" class="flex items-center px-4 py-2 hover:bg-blue-100">
+          <i class="pi pi-home text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">Home</span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/books"
+          class="flex items-center px-4 py-2 hover:bg-blue-100"
+        >
+          <i class="pi pi-book text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">All Books</span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/add-book"
+          class="flex items-center px-4 py-2 hover:bg-blue-100"
+        >
+          <i class="pi pi-plus text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">Add Book</span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/wishlist"
+          class="flex items-center px-4 py-2 hover:bg-blue-100"
+        >
+          <i class="pi pi-shopping-cart text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">Wishlist</span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/quotes"
+          class="flex items-center px-4 py-2 hover:bg-blue-100"
+        >
+          <i class="pi pi-comment text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">Quotes</span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/analytics"
+          class="flex items-center px-4 py-2 hover:bg-blue-100"
+        >
+          <i class="pi pi-chart-line text-lg"></i>
+          <span *ngIf="!isCollapsed" class="ml-3">Analytics</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content Container (Top Nav + Router Content) -->
+  <div
+    [ngClass]="{
+      'ml-64': !isCollapsed,
+      'ml-16': isCollapsed
+    }"
+    class="flex-1 transition-all duration-300"
+  >
+    <!-- Top Nav -->
+    <div
+      class="px-4 py-3 shadow-md flex items-center justify-end gap-4 bg-gray-50"
+    >
+      <!-- Dark Mode Button -->
+      <button
+        (click)="toggleDarkMode()"
+        class="text-gray-600 hover:text-black dark:text-gray-200 dark:hover:text-white"
+        title="Toggle Dark Mode"
+      >
+        <i class="pi pi-moon"></i>
+      </button>
+
+      <!-- Notification Bell -->
+      <button
+        class="relative text-gray-600 hover:text-black dark:text-gray-200 dark:hover:text-white"
+        title="Notifications"
+      >
+        <i class="pi pi-bell text-xl"></i>
+        <span
+          class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1"
+          *ngIf="notificationsCount > 0"
+        >
+          {{ notificationsCount }}
+        </span>
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div class="relative" (clickOutside)="closeProfileMenu()">
+        <button
+          (click)="toggleProfileMenu()"
+          class="flex items-center gap-2 text-gray-700 hover:text-black dark:text-gray-200 dark:hover:text-white"
+        >
+          <i class="pi pi-user text-xl"></i>
+          <span *ngIf="!isCollapsed">Hi, Ayasha</span>
+          <i class="pi pi-chevron-down"></i>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div
+          *ngIf="profileMenuOpen"
+          class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-50"
+        >
+          <a
+            routerLink="/profile"
+            class="block px-4 py-2 hover:bg-gray-100 text-gray-700"
+            >👤 Profile</a
+          >
+          <a
+            routerLink="/settings"
+            class="block px-4 py-2 hover:bg-gray-100 text-gray-700"
+            >⚙️ Settings</a
+          >
+          <button
+            (click)="logout()"
+            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+          >
+            🚪 Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
