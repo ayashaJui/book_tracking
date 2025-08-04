@@ -7,12 +7,12 @@ import { App } from './app';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import { NavBar } from './modules/shared/components/nav-bar/nav-bar';
 import { SharedModule } from './modules/shared/shared.module';
+import { AppLayout } from "./layout/component/app.layout";
 
 @NgModule({
   declarations: [App],
-  imports: [BrowserModule, AppRoutingModule, SharedModule],
+  imports: [BrowserModule, AppRoutingModule, SharedModule, AppLayout],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),
