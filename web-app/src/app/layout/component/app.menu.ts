@@ -18,7 +18,11 @@ export class AppMenu {
       {
         label: 'Home',
         items: [
-          { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
+          {
+            label: 'Dashboard',
+            icon: 'pi pi-fw pi-home',
+            routerLink: ['/dashboard'],
+          },
         ],
       },
       {
@@ -27,16 +31,21 @@ export class AppMenu {
           {
             label: 'Books',
             icon: 'pi pi-fw pi-book',
+            routerLink: ['/books'],
+          },
+          {
+            label: 'Reading Logs',
+            icon: 'fa fa-solid fa-book-open-reader',
             routerLink: ['/uikit/formlayout'],
           },
           {
             label: 'Wishlist',
-            icon: 'pi pi-fw pi-shopping-cart',
+            icon: 'fa-solid fa-heart-circle-plus',
             routerLink: ['/uikit/input'],
           },
           {
             label: 'Quotes',
-            icon: 'pi pi-fw pi-comment',
+            icon: 'fa-solid fa-quote-left',
             class: 'rotated-icon',
             routerLink: ['/uikit/button'],
           },
@@ -46,11 +55,15 @@ export class AppMenu {
             routerLink: ['/uikit/table'],
           },
           {
+            label: 'Spending',
+            icon: 'pi pi-fw pi-money-bill',
+            routerLink: ['/uikit/table'],
+          },
+          {
             label: 'Analytics',
             icon: 'pi pi-fw pi-chart-line',
             routerLink: ['/uikit/list'],
           },
-          
         ],
       },
       {
@@ -68,27 +81,27 @@ export class AppMenu {
             icon: 'pi pi-fw pi-cog',
             routerLink: ['/settings'],
           },
-        //   {
-        //     label: 'Auth',
-        //     icon: 'pi pi-fw pi-user',
-        //     items: [
-        //       {
-        //         label: 'Login',
-        //         icon: 'pi pi-fw pi-sign-in',
-        //         routerLink: ['/auth/login'],
-        //       },
-        //       {
-        //         label: 'Error',
-        //         icon: 'pi pi-fw pi-times-circle',
-        //         routerLink: ['/auth/error'],
-        //       },
-        //       {
-        //         label: 'Access Denied',
-        //         icon: 'pi pi-fw pi-lock',
-        //         routerLink: ['/auth/access'],
-        //       },
-        //     ],
-        //   },
+          //   {
+          //     label: 'Auth',
+          //     icon: 'pi pi-fw pi-user',
+          //     items: [
+          //       {
+          //         label: 'Login',
+          //         icon: 'pi pi-fw pi-sign-in',
+          //         routerLink: ['/auth/login'],
+          //       },
+          //       {
+          //         label: 'Error',
+          //         icon: 'pi pi-fw pi-times-circle',
+          //         routerLink: ['/auth/error'],
+          //       },
+          //       {
+          //         label: 'Access Denied',
+          //         icon: 'pi pi-fw pi-lock',
+          //         routerLink: ['/auth/access'],
+          //       },
+          //     ],
+          //   },
           //   {
           //     label: 'Crud',
           //     icon: 'pi pi-fw pi-pencil',

@@ -8,11 +8,18 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { SharedModule } from './modules/shared/shared.module';
-import { AppLayout } from "./layout/component/app.layout";
+import { AppLayout } from './layout/component/app.layout';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [App],
-  imports: [BrowserModule, AppRoutingModule, SharedModule, AppLayout],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule,
+    AppLayout,
+  ],
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),

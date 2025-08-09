@@ -1,0 +1,259 @@
+<div class="p-6">
+  <!-- Header -->
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4"
+  >
+    <div class="flex items-center gap-4">
+      <h1 class="text-2xl font-bold">
+        📚 All Books
+        <span class="text-gray-500 text-sm">({{ filteredBooks.length }})</span>
+      </h1>
+
+      <!-- view toggle -->
+      <button
+        pButton
+        type="button"
+        icon="pi"
+        [label]="viewMode === 'table' ? 'Show Grid' : 'Show Table'"
+        [icon]="viewMode === 'table' ? 'pi pi-th-large' : 'pi pi-table'"
+        class="p-button-sm"
+        (click)="toggleView()"
+      ></button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button
+        pButton
+        label="Add New Book"
+        icon="pi pi-plus"
+        class="p-button-success"
+      ></button>
+      <button
+        pButton
+        label="Export CSV"
+        icon="pi pi-upload"
+        class="p-button-secondary"
+        (click)="exportCSV()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="flex flex-wrap items-center gap-3 mb-4">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        placeholder="Search by title or author"
+        class="w-64"
+        [(ngModel)]="globalFilter"
+        (input)="applyFilters()"
+      />
+    </span>
+
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      placeholder="Filter by Status"
+      (onChange)="applyFilters()"
+      class="w-48"
+    ></p-select>
+
+    <p-multiSelect
+      [options]="genreOptions"
+      [(ngModel)]="selectedGenres"
+      placeholder="Filter by Genre"
+      (onChange)="applyFilters()"
+      class="w-56"
+      optionLabel="label"
+    ></p-multiSelect>
+
+    <p-select
+      [options]="authorOptions"
+      [(ngModel)]="selectedAuthor"
+      placeholder="Filter by Author"
+      (onChange)="applyFilters()"
+      class="w-48"
+    ></p-select>
+
+    <button
+      pButton
+      class="p-button-text"
+      label="Clear"
+      (click)="clearFilters()"
+    ></button>
+  </div>
+
+  <!-- Table View -->
+  <div *ngIf="viewMode === 'table'">
+    <p-table
+      #dt
+      [value]="filteredBooks"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      responsiveLayout="scroll"
+      [globalFilterFields]="['title', 'author']"
+      class="shadow-lg"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="title">
+            Title <p-sortIcon field="title"></p-sortIcon>
+          </th>
+          <th pSortableColumn="author">
+            Author <p-sortIcon field="author"></p-sortIcon>
+          </th>
+          <th>Genres</th>
+          <th class="text-center" pSortableColumn="pages">
+            Pages <p-sortIcon field="pages"></p-sortIcon>
+          </th>
+          <th class="text-center" pSortableColumn="price">
+            Price <p-sortIcon field="price"></p-sortIcon>
+          </th>
+          <th>Source</th>
+          <th>Status</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-book>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <img
+                *ngIf="book.cover"
+                [src]="book.cover"
+                alt="{{ book.title }}"
+                class="w-12 h-16 object-cover rounded"
+              />
+              <div>
+                <div class="font-semibold">{{ book.title }}</div>
+                <div class="text-sm text-gray-500">
+                  {{ book.dateAdded | date : "mediumDate" }}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>{{ book.author }}</td>
+          <td>
+            <ng-container *ngFor="let g of book.genres; let i = index">
+              <span
+                class="text-xs inline-block mr-1 px-2 py-1 rounded-full bg-gray-100 text-gray-700"
+                >{{ g }}</span
+              >
+            </ng-container>
+          </td>
+          <td class="text-center">{{ book.pages }}</td>
+          <td>
+            {{ book.price | currency : "USD" : "symbol" }}
+          </td>
+          <td class="text-center">{{ book.source }}</td>
+          <td>
+            <span
+              [ngClass]="getStatusBadgeClass(book.status)"
+              class="px-2 py-1 rounded text-xs"
+            >
+              {{ book.status }}
+            </span>
+          </td>
+          <td class=" text-center">
+            <button
+              pButton
+              pRipple
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-info p-button-sm mr-2"
+              (click)="viewBook(book)"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-warning p-button-sm mr-2"
+              (click)="editBook(book)"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-sm mr-2"
+              (click)="deleteBook(book)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="paginatorleft">
+        <div class="text-sm text-gray-600">Showing books</div>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Grid View -->
+  <div
+    *ngIf="viewMode === 'grid'"
+    class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
+  >
+    <p-card *ngFor="let book of filteredBooks" class="shadow-lg">
+      <ng-template pTemplate="header">
+        <img
+          [src]="book.cover"
+          alt="{{ book.title }}"
+          class="w-full h-48 object-cover rounded-t-lg"
+        />
+      </ng-template>
+
+      <div class="mt-2">
+        <div class="font-semibold">{{ book.title }}</div>
+        <div class="text-sm text-gray-600">by {{ book.author }}</div>
+        <div class="mt-2">
+          <span
+            *ngFor="let g of book.genres"
+            class="text-xs inline-block mr-1 px-2 py-1 rounded-full bg-gray-100 text-gray-700"
+            >{{ g }}</span
+          >
+        </div>
+        <div class="mt-2">
+          <p-rating
+            [ngModel]="book.rating"
+            [readonly]="true"
+            [stars]="5"
+          ></p-rating>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <div class="flex justify-between">
+          <div>
+            <span
+              [ngClass]="getStatusBadgeClass(book.status)"
+              class="px-2 py-1 rounded text-xs"
+              >{{ book.status }}</span
+            >
+          </div>
+          <div class="flex gap-2">
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-info p-button-sm"
+              (click)="viewBook(book)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-warning p-button-sm"
+              (click)="editBook(book)"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              (click)="deleteBook(book)"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

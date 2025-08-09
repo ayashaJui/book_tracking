@@ -1,17 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NotFound } from './modules/shared/components/not-found/not-found';
+import { NotFoundComponent } from './modules/shared/components/not-found/not-found';
 
 const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () =>
-      import('./modules/dashboard/dashboard.module').then(
+      import('./modules/dashboard/dashboard-module').then(
         (m) => m.DashboardModule
       ),
   },
 
-  { path: 'not-found', component: NotFound },
+  {
+    path: 'books',
+    loadChildren: () =>
+      import('./modules/books/books-module').then((m) => m.BooksModule),
+  },
+
+  { path: 'not-found', component: NotFoundComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' },
 ];
