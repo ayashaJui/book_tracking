@@ -14,6 +14,7 @@ import { TableModule } from 'primeng/table';
 import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { InputTextModule } from 'primeng/inputtext';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -32,6 +33,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CardModule,
     SelectModule,
     MultiSelectModule,
+    InputTextModule,
   ],
   exports: [
     ButtonModule,
@@ -45,6 +47,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     CardModule,
     SelectModule,
     MultiSelectModule,
+    InputTextModule,
   ],
 })
 export class SharedModule {}

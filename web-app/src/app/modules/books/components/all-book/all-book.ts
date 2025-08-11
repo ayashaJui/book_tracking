@@ -8,7 +8,7 @@ interface Book {
   genres: string[];
   pages: number;
   rating: number; // 0-5
-  status: 'Read' | 'Reading' | 'Wishlist' | 'Want to Read' | string;
+  status: 'Read' | 'Reading' | 'Want to Read' | string;
   cover?: string;
   dateAdded?: string;
   price?: number;
@@ -23,6 +23,8 @@ interface Book {
 })
 export class AllBook implements OnInit {
   @ViewChild('dt') table!: Table;
+  first = 0;
+  rows = 10;
 
   viewMode: 'table' | 'grid' = 'table';
 
@@ -37,7 +39,6 @@ export class AllBook implements OnInit {
     { label: 'All', value: null },
     { label: 'Read', value: 'Read' },
     { label: 'Reading', value: 'Reading' },
-    { label: 'Wishlist', value: 'Wishlist' },
     { label: 'Want to Read', value: 'Want to Read' },
   ];
 
@@ -64,7 +65,7 @@ export class AllBook implements OnInit {
         pages: 320,
         rating: 4.5,
         status: 'Read',
-        cover: 'assets/books/atomic-habits.jpg',
+        cover: 'assets/images/product-not-found.png',
         dateAdded: '2024-02-10',
         price: 12.99,
         source: 'Amazon',
@@ -77,7 +78,7 @@ export class AllBook implements OnInit {
         pages: 310,
         rating: 4.8,
         status: 'Reading',
-        cover: 'assets/books/hobbit.jpg',
+        cover: 'assets/images/product-not-found.png',
         dateAdded: '2024-05-01',
         price: 9.99,
         source: 'Library',
@@ -89,8 +90,8 @@ export class AllBook implements OnInit {
         genres: ['History', 'Non-Fiction'],
         pages: 498,
         rating: 4.6,
-        status: 'Wishlist',
-        cover: 'assets/books/sapiens.jpg',
+        status: 'Want to Read',
+        cover: 'assets/images/product-not-found.png',
         dateAdded: '2024-06-12',
         price: 14.99,
         source: 'Bookstore',

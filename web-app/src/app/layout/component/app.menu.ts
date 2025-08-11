@@ -36,7 +36,7 @@ export class AppMenu {
           {
             label: 'Reading Logs',
             icon: 'fa fa-solid fa-book-open-reader',
-            routerLink: ['/uikit/formlayout'],
+            routerLink: ['/reading-logs'],
           },
           {
             label: 'Wishlist',

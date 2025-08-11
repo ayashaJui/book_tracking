@@ -10,6 +10,13 @@ const routes: Routes = [
         (m) => m.DashboardModule
       ),
   },
+  {
+    path: 'reading-logs',
+    loadChildren: () =>
+      import('./modules/reading-logs/reading-logs-module').then(
+        (m) => m.ReadingLogsModule
+      ),
+  },
 
   {
     path: 'books',
