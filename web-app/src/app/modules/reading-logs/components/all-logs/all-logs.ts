@@ -80,8 +80,6 @@ export class AllLogs implements OnInit {
     { label: 'On Hold', value: 'On Hold' },
   ];
 
-  
-
   applyFilters() {
     this.filteredLogs = this.readingLogs.filter((log) => {
       const matchesGlobalFilter =

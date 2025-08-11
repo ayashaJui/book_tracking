@@ -41,7 +41,7 @@ export class AppMenu {
           {
             label: 'Wishlist',
             icon: 'fa-solid fa-heart-circle-plus',
-            routerLink: ['/uikit/input'],
+            routerLink: ['/wishlist'],
           },
           {
             label: 'Quotes',

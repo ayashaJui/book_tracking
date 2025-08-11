@@ -1,0 +1,58 @@
+<div class="p-6 space-y-6">
+  <!-- Monthly Budget Progress Bar -->
+  <div>
+    <h3 class="mb-2 font-medium">Monthly Budget</h3>
+    <p-progressBar [value]="budgetProgress" [showValue]="true" styleClass="h-6">
+    </p-progressBar>
+  </div>
+
+  <!-- Wishlist Table -->
+  <p-table
+    [value]="wishlist"
+    [paginator]="true"
+    [rows]="5"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Price</th>
+        <th>Date Added</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Notes</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-book>
+      <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.price | currency : "USD" }}</td>
+        <td>{{ book.dateAdded | date : "mediumDate" }}</td>
+        <td>
+          <p-badge
+            [value]="book.priority"
+            [severity]="getPrioritySeverity(book.priority)"
+          >
+          </p-badge>
+        </td>
+        <td>
+          <p-badge
+            [value]="book.status"
+            [severity]="getStatusSeverity(book.status)"
+          >
+          </p-badge>
+        </td>
+        <td>{{ book.notes || "-" }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #footer>
+      <tr>
+        <td colspan="3" class="text-right font-bold p-3 pb-0">Totals</td>
+        <td class="font-bold p-3 pb-0">{{ totalPrice | currency : "USD" }}</td>
+        <td class="font-bold p-3 pb-0">{{ wishlist.length }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

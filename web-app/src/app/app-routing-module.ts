@@ -17,6 +17,13 @@ const routes: Routes = [
         (m) => m.ReadingLogsModule
       ),
   },
+  {
+    path: 'wishlist',
+    loadChildren: () =>
+      import('./modules/wishlist/wishlist-module').then(
+        (m) => m.WishlistModule
+      ),
+  },
 
   {
     path: 'books',

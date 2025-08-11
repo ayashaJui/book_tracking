@@ -1,6 +1,6 @@
 <div class="p-6">
   <!-- Currently Reading Books Strip -->
-  <div *ngIf="readingLogs.length > 0" class="mb-10 p-4 rounded-lg ">
+  <div *ngIf="readingLogs.length > 0" class="mb-10 p-4 rounded-lg">
     <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
       📖 Currently Reading
       <span class="text-sm">({{ readingLogs.length }})</span>
@@ -30,13 +30,15 @@
         <div class="text-sm mb-4">
           Est. Time: {{ log.estimatedTimeHrs ?? "-" }} hrs
         </div>
-        <button
-          pButton
-          icon="pi pi-eye"
-          class="p-button-rounded p-button-text p-button-info p-button-sm"
-          (click)="viewLog(log)"
-          aria-label="View log details"
-        ></button>
+
+        <div class=" flex justify-end">
+          <button
+            pButton
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-text p-button-info p-button-sm"
+            (click)="viewLog(log)"
+          >view</button>
+        </div>
       </p-card>
     </div>
   </div>
