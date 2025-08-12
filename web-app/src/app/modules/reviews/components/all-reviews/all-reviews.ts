@@ -52,7 +52,10 @@ export class AllReviews implements OnInit {
     { label: 'Would Not Recommend', value: false },
   ];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Ensure filtered list reflects any preloaded reviews
+    this.applyFilters();
+  }
 
   get averageRating(): number {
     if (!this.reviews.length) return 0;
@@ -64,6 +67,10 @@ export class AllReviews implements OnInit {
     if (!this.reviews.length) return 0;
     const count = this.reviews.filter((r) => r.wouldRecommend).length;
     return Math.round((count / this.reviews.length) * 100);
+  }
+
+  get recommendedCount(): number {
+    return this.reviews.filter((r) => r.wouldRecommend).length;
   }
 
   submitReview() {
@@ -128,5 +135,30 @@ export class AllReviews implements OnInit {
     this.filterRating = null;
     this.filterRecommend = null;
     this.applyFilters();
+  }
+
+  trackByReviewId(_index: number, review: Review) {
+    return review.id;
+  }
+
+  viewReviewDetails(review: Review) {
+    // TODO: Implement review details view
+    console.log('View details for review:', review);
+    // You could open a dialog with full review details here
+  }
+
+  editReview(review: Review) {
+    // Populate the form with the review data for editing
+    this.newReview = {
+      rating: review.rating,
+      takeaways: review.takeaways,
+      wouldRecommend: review.wouldRecommend,
+      book: review.book,
+      author: review.author,
+    };
+    this.showReviewForm = true;
+
+    // TODO: Add logic to update existing review instead of creating new one
+    console.log('Edit review:', review);
   }
 }

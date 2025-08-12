@@ -57,7 +57,7 @@ export class AppMenu {
           {
             label: 'Spending',
             icon: 'pi pi-fw pi-money-bill',
-            routerLink: ['/uikit/table'],
+            routerLink: ['/spendings'],
           },
           {
             label: 'Analytics',

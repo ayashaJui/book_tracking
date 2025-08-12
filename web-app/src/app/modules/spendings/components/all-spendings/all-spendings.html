@@ -1,0 +1,134 @@
+<div class="max-w-7xl mx-auto p-8">
+  <!-- Header -->
+  <div class="mb-12">
+    <h1 class="text-4xl font-semibold mb-2 tracking-tight">
+      Spending Analytics
+    </h1>
+    <p class="text-lg">Track and analyze your book purchases</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <div
+      class="card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+    >
+      <div class="text-3xl font-bold mb-2">
+        ${{ totalSpent.toLocaleString() }}
+      </div>
+      <div class="text-sm uppercase tracking-wider font-medium">
+        Total Spent
+      </div>
+    </div>
+
+    <div
+      class="card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+    >
+      <div class="text-3xl font-bold mb-2">
+        ${{ thisMonth.toLocaleString() }}
+      </div>
+      <div class="text-sm uppercase tracking-wider font-medium">This Month</div>
+    </div>
+
+    <div
+      class="card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+    >
+      <div class="text-3xl font-bold mb-2">
+        ${{ avgPerBook.toLocaleString() }}
+      </div>
+      <div class="text-sm uppercase tracking-wider font-medium">
+        Avg Per Book
+      </div>
+    </div>
+
+    <div
+      class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+    >
+      <div class="text-3xl font-bold mb-2">{{ mostExpensive }}</div>
+      <div class="text-sm text-indigo-100 uppercase tracking-wider font-medium">
+        Most Expensive
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Section -->
+  <div class="card rounded-xl p-8 mb-12">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Monthly Budget</h2>
+    <div class="relative inline-block">
+      <input
+        type="number"
+        [(ngModel)]="monthlyBudget"
+        (ngModelChange)="onBudgetChange()"
+        placeholder="Set budget amount"
+        min="0"
+        class="text-lg pl-8 pr-4 py-3 border-2 border-gray-300 rounded-lg w-52 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200"
+      />
+      <span
+        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+        >$</span
+      >
+    </div>
+    <div
+      class="bg-amber-50 border-l-4 border-amber-400 p-4 mt-4 rounded-r-lg"
+      *ngIf="alertMessage"
+    >
+      <div class="flex items-center">
+        <i class="pi pi-exclamation-triangle text-amber-600 mr-2"></i>
+        <span class="text-amber-800 font-medium">{{ alertMessage }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="space-y-6">
+    <div class="grid grid-cols-1 my-10 lg:grid-cols-2 gap-6">
+      <div class="card rounded-xl p-6 flex flex-col">
+        <h3 class="text-lg font-semibold mb-6">Spending by Category</h3>
+        <div class="w-full flex-grow">
+          <apx-chart
+            [series]="categoryPieChartOptions.series"
+            [chart]="categoryPieChartOptions.chart"
+            [labels]="categoryPieChartOptions.labels"
+            [responsive]="categoryPieChartOptions.responsive"
+          ></apx-chart>
+        </div>
+      </div>
+
+      <div class="card rounded-xl p-6 flex flex-col">
+        <h3 class="text-lg font-semibold mb-6">Spending Trends</h3>
+        <div class="w-full flex-grow">
+          <apx-chart
+            [series]="historicalLineChartOptions.series"
+            [chart]="historicalLineChartOptions.chart"
+            [xaxis]="historicalLineChartOptions.xaxis"
+            [dataLabels]="historicalLineChartOptions.dataLabels"
+            [stroke]="historicalLineChartOptions.stroke"
+            [title]="historicalLineChartOptions.title"
+          ></apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="card rounded-xl p-6 my-10">
+      <h3 class="text-lg font-semibold mb-6">Top Vendors</h3>
+      <div class="w-full">
+        <apx-chart
+          [series]="vendorsBarChartOptions.series"
+          [chart]="vendorsBarChartOptions.chart"
+          [xaxis]="vendorsBarChartOptions.xaxis"
+          [title]="vendorsBarChartOptions.title"
+        ></apx-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="text-center mt-8">
+    <button
+      (click)="exportToCSV()"
+      class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/25"
+    >
+      <span>Export CSV</span>
+      <i class="pi pi-download text-sm"></i>
+    </button>
+  </div>
+</div>

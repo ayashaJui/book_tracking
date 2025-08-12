@@ -43,6 +43,11 @@ const routes: Routes = [
       import('./modules/reviews/reviews-module').then((m) => m.ReviewsModule),
   },
 
+  {
+    path: 'spendings', loadChildren: () =>
+      import('./modules/spendings/spendings-module').then((m) => m.SpendingsModule),
+  },
+
   { path: 'not-found', component: NotFoundComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' },
