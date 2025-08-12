@@ -18,6 +18,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { BadgeModule } from 'primeng/badge';
+import { DialogModule } from 'primeng/dialog';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -40,6 +41,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     TagModule,
     ButtonGroupModule,
     BadgeModule,
+    DialogModule,
   ],
   exports: [
     ButtonModule,
@@ -57,6 +59,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     TagModule,
     ButtonGroupModule,
     BadgeModule,
+    DialogModule,
   ],
 })
 export class SharedModule {}

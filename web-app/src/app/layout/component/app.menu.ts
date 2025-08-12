@@ -47,12 +47,12 @@ export class AppMenu {
             label: 'Quotes',
             icon: 'fa-solid fa-quote-left',
             class: 'rotated-icon',
-            routerLink: ['/uikit/button'],
+            routerLink: ['/quotes'],
           },
           {
             label: 'Reviews',
             icon: 'pi pi-fw pi-comments',
-            routerLink: ['/uikit/table'],
+            routerLink: ['/reviews'],
           },
           {
             label: 'Spending',

@@ -32,6 +32,7 @@ export class AllLogs implements OnInit {
 
   ngOnInit(): void {
     this.authorOptions = this.authors.map((a) => ({ label: a, value: a }));
+    
     this.bookReadingLogs = [
       {
         id: 1,

@@ -1,0 +1,280 @@
+<div class="max-w-5xl mx-auto p-6 space-y-8">
+  <h1 class="text-3xl font-bold mb-6 flex items-center gap-3">
+    ⭐ Reviews & Ratings
+    <i class="pi pi-star-fill text-yellow-500 text-3xl"></i>
+  </h1>
+
+  <!-- Polished Pill Stats Bar -->
+  <div class="flex justify-center gap-8 mb-10 max-w-3xl mx-auto px-4">
+    <div
+      class="flex items-center gap-4 bg-indigo-100 text-indigo-700 px-6 py-3 rounded-full shadow-md hover:shadow-xl hover:scale-[1.05] transition-transform transition-shadow duration-300 cursor-default select-none"
+      title="Total Reviews"
+    >
+      <i class="pi pi-comments text-2xl"></i>
+      <div class="text-center">
+        <div class="text-xs uppercase font-semibold tracking-wide">Reviews</div>
+        <div class="text-3xl font-extrabold leading-none">
+          {{ reviews.length }}
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center gap-4 bg-yellow-100 text-yellow-600 px-6 py-3 rounded-full shadow-md hover:shadow-xl hover:scale-[1.05] transition-transform transition-shadow duration-300 cursor-default select-none"
+      title="Average Rating"
+    >
+      <i class="pi pi-star-fill text-2xl"></i>
+      <div class="text-center">
+        <div class="text-xs uppercase font-semibold tracking-wide">
+          Avg Rating
+        </div>
+        <div
+          class="flex justify-center items-center gap-1 text-3xl font-extrabold leading-none"
+        >
+          {{ averageRating | number : "1.1-1" }}
+          <i
+            *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
+            class="pi"
+            [ngClass]="
+              i < Math.round(averageRating)
+                ? 'pi-star-fill text-yellow-500'
+                : 'pi-star text-gray-300'
+            "
+          ></i>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center gap-4 bg-green-100 text-green-700 px-6 py-3 rounded-full shadow-md hover:shadow-xl hover:scale-[1.05] transition-transform transition-shadow duration-300 cursor-default select-none"
+      title="Recommendation Rate"
+    >
+      <i class="pi pi-thumbs-up text-2xl"></i>
+      <div class="text-center">
+        <div class="text-xs uppercase font-semibold tracking-wide">
+          Recommend
+        </div>
+        <div class="text-3xl font-extrabold leading-none">
+          {{ recommendRate }}%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Review Button -->
+  <button
+    pButton
+    label="Add New Review"
+    icon="pi pi-plus"
+    class="p-button-success mb-6"
+    (click)="showReviewForm = true"
+  ></button>
+
+  <!-- Add New Review Form (toggle with button) -->
+  <section
+    *ngIf="showReviewForm"
+    class="p-6 border rounded-md bg-white shadow-sm mb-8"
+  >
+    <h2 class="text-2xl font-semibold mb-4">Your Review</h2>
+    <form (submit)="submitReview()">
+      <div class="mb-4">
+        <label for="book" class="block font-semibold mb-1">Book Name</label>
+        <input
+          id="book"
+          type="text"
+          [(ngModel)]="newReview.book"
+          name="book"
+          required
+          placeholder="Enter book name"
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="author" class="block font-semibold mb-1">Author Name</label>
+        <input
+          id="author"
+          type="text"
+          [(ngModel)]="newReview.author"
+          name="author"
+          required
+          placeholder="Enter author name"
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="rating" class="block font-semibold mb-1"
+          >Rating (out of 5)</label
+        >
+        <div class="flex items-center gap-2">
+          <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
+            <i
+              class="pi cursor-pointer"
+              [ngClass]="
+                i < (newReview.rating ?? 0)
+                  ? 'pi-star-fill text-yellow-400 hover:text-yellow-500'
+                  : 'pi-star text-gray-300 hover:text-yellow-300'
+              "
+              (click)="newReview.rating = i + 1"
+              (mouseenter)="hoverRating = i + 1"
+              (mouseleave)="hoverRating = 0"
+              [style.color]="hoverRating > i ? '#facc15' : null"
+            ></i>
+          </ng-container>
+          <span class="ml-3 text-gray-600">{{ newReview.rating || 0 }}/5</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="takeaways" class="block font-semibold mb-1"
+          >Lessons Learned / Key Takeaways</label
+        >
+        <textarea
+          id="takeaways"
+          rows="4"
+          [(ngModel)]="newReview.takeaways"
+          name="takeaways"
+          required
+          placeholder="What did you learn from this book?"
+          class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        ></textarea>
+      </div>
+
+      <div class="mb-4 flex items-center gap-4">
+        <label class="font-semibold">Would Recommend?</label>
+        <div>
+          <label class="mr-4">
+            <input
+              type="radio"
+              name="recommend"
+              [(ngModel)]="newReview.wouldRecommend"
+              [value]="true"
+              required
+              class="mr-1"
+            />
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="recommend"
+              [(ngModel)]="newReview.wouldRecommend"
+              [value]="false"
+              required
+              class="mr-1"
+            />
+            No
+          </label>
+        </div>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Submit Review"
+        class="p-button-success"
+        [disabled]="
+          !newReview.rating ||
+          !newReview.takeaways ||
+          !newReview.book ||
+          !newReview.author ||
+          newReview.wouldRecommend === null
+        "
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-outlined ml-3"
+        (click)="showReviewForm = false"
+      ></button>
+    </form>
+  </section>
+
+  <!-- Filters -->
+  <section class="mb-6 flex flex-wrap gap-4 items-center">
+    <input
+      type="text"
+      pInputText
+      placeholder="🔎 Search reviews by lessons, keywords, book or author..."
+      [(ngModel)]="filterText"
+      (input)="applyFilters()"
+      class="flex-grow max-w-lg p-inputtext"
+      name="filterText"
+    />
+    <p-select
+      [options]="ratingOptions"
+      [(ngModel)]="filterRating"
+      placeholder="Filter by Rating"
+      (onChange)="applyFilters()"
+      [showClear]="true"
+      class="w-48"
+      name="filterRating"
+    ></p-select>
+    <p-select
+      [options]="recommendOptions"
+      [(ngModel)]="filterRecommend"
+      placeholder="Filter by Recommendation"
+      (onChange)="applyFilters()"
+      [showClear]="true"
+      class="w-48"
+      name="filterRecommend"
+    ></p-select>
+    <button
+      pButton
+      label="Clear Filters"
+      icon="pi pi-filter-slash"
+      class="p-button-outlined"
+      (click)="clearFilters()"
+      type="button"
+    ></button>
+  </section>
+
+  <!-- Reviews List -->
+  <section class="space-y-4 max-w-4xl">
+    <h2 class="text-2xl font-semibold mb-4">Recent Reviews</h2>
+
+    <div *ngIf="filteredReviews.length === 0" class="text-gray-500 italic">
+      No reviews found.
+    </div>
+
+    <div
+      *ngFor="let review of filteredReviews"
+      class="border border-gray-200 rounded-md p-4 bg-white shadow-sm"
+    >
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-indigo-700">{{ review.book }}</span>
+          <span class="italic text-gray-600">by {{ review.author }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-indigo-700"
+            >{{ review.rating }}/5</span
+          >
+          <i
+            *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
+            class="pi"
+            [ngClass]="
+              i < review.rating
+                ? 'pi-star-fill text-yellow-400'
+                : 'pi-star text-gray-300'
+            "
+          ></i>
+        </div>
+        <div
+          class="text-sm font-semibold"
+          [ngClass]="review.wouldRecommend ? 'text-green-600' : 'text-red-600'"
+        >
+          {{
+            review.wouldRecommend ? "Would Recommend" : "Would Not Recommend"
+          }}
+        </div>
+      </div>
+      <p class="mb-3 italic text-gray-800">{{ review.takeaways }}</p>
+      <p class="text-xs text-gray-500">
+        Reviewed on {{ review.date | date : "mediumDate" }}
+      </p>
+    </div>
+  </section>
+</div>

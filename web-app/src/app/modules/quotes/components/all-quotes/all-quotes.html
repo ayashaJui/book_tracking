@@ -1,0 +1,298 @@
+<div class="space-y-8 p-4 max-w-7xl mx-auto">
+  <h2 class="text-3xl font-semibold mb-4 flex items-center gap-2">
+    💬 Favorite Quotes Archive
+    <span class="text-sm text-gray-500">({{ quotes.length }})</span>
+  </h2>
+
+  <!-- Top Buttons & Import grouped -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div class="flex flex-wrap gap-3">
+      <button
+        pButton
+        label="Add New Quote"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="openAddQuoteDialog()"
+      ></button>
+      <button
+        pButton
+        label="Manage Tags"
+        icon="pi pi-tags"
+        class="p-button-secondary"
+        (click)="openTagDialog()"
+      ></button>
+      <button
+        pButton
+        label="Show Favorites"
+        icon="pi pi-star"
+        [class.p-button-warning]="showFavoritesOnly"
+        class="p-button-outlined"
+        (click)="toggleFavoritesFilter()"
+      ></button>
+      <button
+        pButton
+        label="Export CSV"
+        icon="pi pi-file-export"
+        class="p-button-info"
+        (click)="exportQuotesCSV()"
+      ></button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <input
+        type="file"
+        accept=".csv"
+        (change)="importQuotesCSV($event)"
+        class="hidden"
+        #fileInput
+      />
+      <button
+        pButton
+        label="Import CSV"
+        icon="pi pi-file-upload"
+        (click)="fileInput.click()"
+        class="p-button-help"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Tag Cloud -->
+  <section class="mb-6 border border-gray-200 rounded-md p-4 ">
+    <h3 class="font-semibold mb-2 text-lg text-gray-700">Tag Cloud</h3>
+    <div class="flex flex-wrap gap-2 max-w-lg">
+      <button
+        *ngFor="let tag of tagCounts | keyvalue"
+        (click)="toggleTagFilter(tag.key)"
+        [ngClass]="
+          'px-4 py-1 rounded-full text-sm font-medium transition-transform duration-200 ease-in-out select-none focus:outline-none focus:ring-2 focus:ring-indigo-500 ' +
+          getTagSeverityClass(tag.key) +
+          (selectedTags.includes(tag.key)
+            ? ' ring-2 ring-indigo-500 scale-110'
+            : ' hover:brightness-90 hover:scale-105')
+        "
+        [attr.aria-pressed]="selectedTags.includes(tag.key)"
+        [title]="tag.key + ' (' + tag.value + ')'"
+        type="button"
+        tabindex="0"
+      >
+        {{ tag.key }}
+        <span class="ml-1 text-xs">({{ tag.value }})</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <form
+    class="flex flex-wrap gap-4 items-center max-w-4xl mb-6"
+    (submit)="$event.preventDefault()"
+  >
+    <span
+      class="p-input-icon-left flex-grow sm:flex-grow-0 w-full sm:w-64 max-w-full"
+      style="min-width: 180px"
+    >
+      <input
+        pInputText
+        type="search"
+        placeholder="🔎 Search quotes, books, authors..."
+        [(ngModel)]="globalFilter"
+        (input)="applyFilters()"
+        name="globalFilter"
+        autocomplete="off"
+        class="w-full"
+      />
+    </span>
+
+    <p-multiSelect
+      [options]="tagOptions"
+      [(ngModel)]="selectedTags"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by Tags"
+      (onChange)="applyFilters()"
+      [showClear]="true"
+      name="tags"
+      class="w-full sm:w-48 max-w-full"
+      panelStyleClass="max-w-xs"
+    ></p-multiSelect>
+
+    <p-select
+      [options]="bookOptions"
+      [(ngModel)]="selectedBook"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by Book"
+      (onChange)="applyFilters()"
+      [showClear]="true"
+      name="book"
+      class="w-full sm:w-48 max-w-full"
+    ></p-select>
+
+    <button
+      pButton
+      label="Clear Filters"
+      icon="pi pi-filter-slash"
+      class="p-button-outlined"
+      (click)="clearFilters()"
+      type="button"
+    ></button>
+  </form>
+
+  <!-- Quotes Table -->
+  <p-table
+    [value]="filteredQuotes"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    [globalFilterFields]="['quote', 'book', 'author']"
+    sortMode="multiple"
+  >
+    <ng-template pTemplate="header">
+      <tr class="bg-gray-50 text-gray-700">
+        <th pSortableColumn="quote" class="min-w-[220px]">
+          Quote <p-sortIcon field="quote"></p-sortIcon>
+        </th>
+        <th pSortableColumn="book" class="min-w-[140px]">
+          Book <p-sortIcon field="book"></p-sortIcon>
+        </th>
+        <th pSortableColumn="author" class="min-w-[140px]">
+          Author <p-sortIcon field="author"></p-sortIcon>
+        </th>
+        <th
+          pSortableColumn="pageNumber"
+          style="width: 80px"
+          class="text-center"
+        >
+          Page No. <p-sortIcon field="pageNumber"></p-sortIcon>
+        </th>
+        <th class="min-w-[160px]">Tags</th>
+        <th
+          pSortableColumn="dateAdded"
+          style="width: 140px"
+          class="text-center"
+        >
+          Date Added <p-sortIcon field="dateAdded"></p-sortIcon>
+        </th>
+        <th style="width: 80px" class="text-center">Favorite</th>
+        <th style="width: 180px" class="text-center">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-quote let-rowIndex="rowIndex">
+      <tr
+        [class]="
+          rowIndex % 2 === 0
+            ? 'bg-white hover:bg-gray-50 transition-colors duration-150 ease-in-out'
+            : 'bg-gray-50 hover:bg-gray-100 transition-colors duration-150 ease-in-out'
+        "
+      >
+        <td class="whitespace-normal max-w-xs px-3 py-2">{{ quote.quote }}</td>
+        <td class="px-3 py-2">{{ quote.book }}</td>
+        <td class="px-3 py-2">{{ quote.author }}</td>
+        <td class="text-center px-3 py-2">{{ quote.pageNumber || "-" }}</td>
+        <td class="px-3 py-2 max-w-xs">
+          <ng-container *ngFor="let tag of quote.tags">
+            <p-tag
+              [value]="tag"
+              class="mr-1 mb-1"
+              [severity]="getTagSeverity(tag)"
+            ></p-tag>
+          </ng-container>
+        </td>
+        <td class="text-center px-3 py-2">
+          {{ quote.dateAdded | date : "mediumDate" }}
+        </td>
+        <td class="text-center px-3 py-2">
+          <button
+            type="button"
+            class="p-button p-button-rounded p-button-text p-button-sm"
+            (click)="toggleFavorite(quote)"
+            pTooltip="Toggle Favorite"
+          >
+            <i
+              [ngClass]="
+                quote.favorite
+                  ? 'pi pi-star-fill text-yellow-500'
+                  : 'pi pi-star text-gray-500'
+              "
+            ></i>
+          </button>
+        </td>
+        <td class="text-center px-3 py-2 space-x-1">
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-sm p-button-warning"
+            (click)="editQuote(quote)"
+            pTooltip="Edit"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-sm p-button-danger"
+            (click)="deleteQuote(quote)"
+            pTooltip="Delete"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-share-alt"
+            class="p-button-rounded p-button-sm p-button-info"
+            (click)="shareQuote(quote)"
+            pTooltip="Share Quote"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-sm p-button-help"
+            (click)="viewQuoteDetails(quote)"
+            pTooltip="View Details"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Quote Details Dialog -->
+<p-dialog
+  header="Quote Details"
+  [(visible)]="displayQuoteDialog"
+  [modal]="true"
+  [style]="{ width: '40vw', minWidth: '320px' }"
+  [closeOnEscape]="true"
+  [dismissableMask]="true"
+>
+  <div *ngIf="selectedQuote" class="space-y-4">
+    <p class="mb-3 italic text-lg leading-relaxed">
+      "{{ selectedQuote.quote }}"
+    </p>
+    <p><strong>Book:</strong> {{ selectedQuote.book }}</p>
+    <p><strong>Author:</strong> {{ selectedQuote.author }}</p>
+    <p><strong>Page:</strong> {{ selectedQuote.pageNumber || "-" }}</p>
+    <p>
+      <strong>Tags:</strong>
+      <span *ngFor="let tag of selectedQuote.tags" class="mr-2">
+        <p-tag [value]="tag" [severity]="getTagSeverity(tag)"></p-tag>
+      </span>
+    </p>
+    <p>
+      <strong>Notes:</strong>
+    </p>
+    <textarea
+      [(ngModel)]="selectedQuote.notes"
+      rows="5"
+      class="w-full p-3 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-indigo-400"
+      placeholder="Add your notes here..."
+    ></textarea>
+  </div>
+  <p-footer class="flex justify-end gap-3">
+    <button pButton label="Close" (click)="displayQuoteDialog = false"></button>
+    <button
+      pButton
+      label="Save"
+      icon="pi pi-check"
+      class="p-button-success"
+      (click)="saveQuoteDetails()"
+    ></button>
+  </p-footer>
+</p-dialog>

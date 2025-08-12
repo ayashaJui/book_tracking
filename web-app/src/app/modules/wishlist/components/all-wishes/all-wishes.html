@@ -1,29 +1,114 @@
-<div class="p-6 space-y-6">
-  <!-- Monthly Budget Progress Bar -->
-  <div>
-    <h3 class="mb-2 font-medium">Monthly Budget</h3>
-    <p-progressBar [value]="budgetProgress" [showValue]="true" styleClass="h-6">
-    </p-progressBar>
+<div class="p-6 space-y-8">
+  <!-- Header / Actions -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-xl font-semibold">📦 Wishlist
+      <span class="text-sm">({{ wishlist.length }})</span>
+    </h2>
+    <div class="flex gap-2">
+      <button
+        pButton
+        type="button"
+        label="Add Wish"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="addWish()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Export CSV"
+        icon="pi pi-download"
+        class="p-button-secondary"
+        (click)="exportCSV()"
+      ></button>
+    </div>
   </div>
 
-  <!-- Wishlist Table -->
+  <!-- 📊 Monthly Budget -->
+  <div>
+    <h3 class="mb-2 font-semibold text-lg">Monthly Book Budget</h3>
+    <p-progressBar
+      [value]="budgetProgress"
+      [showValue]="true"
+      styleClass="h-6"
+    ></p-progressBar>
+    <div class="flex justify-between text-sm text-gray-500 mt-1 font-semibold">
+      <span>Budget: {{ monthlyBudget | currency : "USD" }}</span>
+      <span>Spent: {{ totalPrice | currency : "USD" }}</span>
+    </div>
+  </div>
+
+  <!-- 🔍 Filters -->
+  <div class="flex flex-wrap gap-3 items-center">
+    <span class="p-input-icon-left">
+      <input
+        pInputText
+        type="text"
+        placeholder="🔎 Search title or author"
+        [(ngModel)]="globalFilter"
+        (input)="applyFilters()"
+        class="w-full sm:w-64"
+      />
+    </span>
+
+    <p-select
+      [options]="priorityOptions"
+      [(ngModel)]="selectedPriority"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by Priority"
+      (onChange)="applyFilters()"
+      class="w-full sm:w-48"
+      [showClear]="true"
+    ></p-select>
+
+    <p-select
+      [options]="statusOptions"
+      [(ngModel)]="selectedStatus"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by Status"
+      (onChange)="applyFilters()"
+      class="w-full sm:w-48"
+      [showClear]="true"
+    ></p-select>
+
+    <button
+      pButton
+      label="Clear Filters"
+      icon="pi pi-filter-slash"
+      class="p-button-outlined"
+      (click)="clearFilters()"
+    ></button>
+  </div>
+
+  <!-- 📚 Wishlist Table -->
   <p-table
-    [value]="wishlist"
+    #dt
+    [value]="filteredWishlist"
     [paginator]="true"
     [rows]="5"
     responsiveLayout="scroll"
+    [globalFilterFields]="['title', 'author', 'status']"
+    class="shadow rounded-lg"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th>Title</th>
-        <th>Author</th>
+        <th pSortableColumn="title">
+          Title <p-sortIcon field="title"></p-sortIcon>
+        </th>
+        <th pSortableColumn="author">
+          Author <p-sortIcon field="author"></p-sortIcon>
+        </th>
         <th>Price</th>
         <th>Date Added</th>
         <th>Priority</th>
         <th>Status</th>
         <th>Notes</th>
+        <th>Actions</th>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="body" let-book>
       <tr>
         <td>{{ book.title }}</td>
@@ -34,24 +119,48 @@
           <p-badge
             [value]="book.priority"
             [severity]="getPrioritySeverity(book.priority)"
-          >
-          </p-badge>
+          ></p-badge>
         </td>
         <td>
           <p-badge
             [value]="book.status"
             [severity]="getStatusSeverity(book.status)"
-          >
-          </p-badge>
+          ></p-badge>
         </td>
         <td>{{ book.notes || "-" }}</td>
+        <td class="space-x-2">
+          <button
+            pButton
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-info p-button-sm"
+            (click)="viewBook(book)"
+            pTooltip="View Details"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-warning p-button-sm"
+            (click)="editBook(book)"
+            pTooltip="Edit"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-danger p-button-sm"
+            (click)="deleteBook(book)"
+            pTooltip="Delete"
+          ></button>
+        </td>
       </tr>
     </ng-template>
-    <ng-template #footer>
+
+    <ng-template pTemplate="footer">
       <tr>
-        <td colspan="3" class="text-right font-bold p-3 pb-0">Totals</td>
-        <td class="font-bold p-3 pb-0">{{ totalPrice | currency : "USD" }}</td>
-        <td class="font-bold p-3 pb-0">{{ wishlist.length }}</td>
+        <td colspan="2" class="text-right font-bold p-3">Totals</td>
+        <td class="font-bold">{{ totalPrice | currency : "USD" }}</td>
+        <td colspan="5" class="font-bold">
+          {{ filteredWishlist.length }} Books
+        </td>
       </tr>
     </ng-template>
   </p-table>

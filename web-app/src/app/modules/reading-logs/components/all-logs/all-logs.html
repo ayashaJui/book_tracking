@@ -31,13 +31,15 @@
           Est. Time: {{ log.estimatedTimeHrs ?? "-" }} hrs
         </div>
 
-        <div class=" flex justify-end">
+        <div class="flex justify-end">
           <button
             pButton
             icon="pi pi-eye"
             class="p-button-rounded p-button-text p-button-info p-button-sm"
             (click)="viewLog(log)"
-          >view</button>
+          >
+            view
+          </button>
         </div>
       </p-card>
     </div>

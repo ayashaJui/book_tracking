@@ -10,6 +10,13 @@ const routes: Routes = [
         (m) => m.DashboardModule
       ),
   },
+
+   {
+    path: 'books',
+    loadChildren: () =>
+      import('./modules/books/books-module').then((m) => m.BooksModule),
+  },
+
   {
     path: 'reading-logs',
     loadChildren: () =>
@@ -26,9 +33,14 @@ const routes: Routes = [
   },
 
   {
-    path: 'books',
+    path: 'quotes',
     loadChildren: () =>
-      import('./modules/books/books-module').then((m) => m.BooksModule),
+      import('./modules/quotes/quotes-module').then((m) => m.QuotesModule),
+  },
+
+  {
+    path: 'reviews', loadChildren: () =>
+      import('./modules/reviews/reviews-module').then((m) => m.ReviewsModule),
   },
 
   { path: 'not-found', component: NotFoundComponent },
