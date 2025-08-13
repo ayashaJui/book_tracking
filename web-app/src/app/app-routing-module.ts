@@ -11,7 +11,7 @@ const routes: Routes = [
       ),
   },
 
-   {
+  {
     path: 'books',
     loadChildren: () =>
       import('./modules/books/books-module').then((m) => m.BooksModule),
@@ -39,13 +39,25 @@ const routes: Routes = [
   },
 
   {
-    path: 'reviews', loadChildren: () =>
+    path: 'reviews',
+    loadChildren: () =>
       import('./modules/reviews/reviews-module').then((m) => m.ReviewsModule),
   },
 
   {
-    path: 'spendings', loadChildren: () =>
-      import('./modules/spendings/spendings-module').then((m) => m.SpendingsModule),
+    path: 'spendings',
+    loadChildren: () =>
+      import('./modules/spendings/spendings-module').then(
+        (m) => m.SpendingsModule
+      ),
+  },
+
+  {
+    path: 'analytics',
+    loadChildren: () =>
+      import('./modules/analytics/analytics-module').then(
+        (m) => m.AnalyticsModule
+      ),
   },
 
   { path: 'not-found', component: NotFoundComponent },

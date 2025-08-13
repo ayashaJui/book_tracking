@@ -62,7 +62,7 @@ export class AppMenu {
           {
             label: 'Analytics',
             icon: 'pi pi-fw pi-chart-line',
-            routerLink: ['/uikit/list'],
+            routerLink: ['/analytics'],
           },
         ],
       },
