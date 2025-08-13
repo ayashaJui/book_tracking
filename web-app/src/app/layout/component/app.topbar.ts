@@ -4,7 +4,8 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
-import { LayoutService } from '../service/layout.service';
+import { ColorScheme, LayoutService } from '../service/layout.service';
+import { UiService } from '../../modules/shared/services/ui.service.service';
 
 @Component({
   selector: 'app-topbar',
@@ -15,12 +16,27 @@ import { LayoutService } from '../service/layout.service';
 export class AppTopbar {
   items!: MenuItem[];
 
-  constructor(public layoutService: LayoutService) {}
+  constructor(
+    public layoutService: LayoutService,
+    private uiService: UiService
+  ) {}
 
   toggleDarkMode() {
-    this.layoutService.layoutConfig.update((state) => ({
-      ...state,
-      darkTheme: !state.darkTheme,
-    }));
+    // this.layoutService.layoutConfig.update((state) => ({
+    //   ...state,
+    //   darkTheme: !state.darkTheme,
+    // }));
+    this.layoutService.layoutConfig.update((state) => {
+      const newDarkTheme = !state.darkTheme;
+      this.uiService.setColorScheme(
+        (newDarkTheme ? 'dark' : 'light') as ColorScheme
+      );
+      return {
+        ...state,
+        darkTheme: newDarkTheme,
+      };
+    });
   }
+
+  
 }

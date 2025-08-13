@@ -21,6 +21,7 @@ import { BadgeModule } from 'primeng/badge';
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule } from 'primeng/accordion';
 import { DataViewModule } from 'primeng/dataview';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -46,6 +47,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     DialogModule,
     AccordionModule,
     DataViewModule,
+    InputNumberModule,
   ],
   exports: [
     ButtonModule,
@@ -66,6 +68,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     DialogModule,
     AccordionModule,
     DataViewModule,
+    InputNumberModule,
   ],
 })
 export class SharedModule {}

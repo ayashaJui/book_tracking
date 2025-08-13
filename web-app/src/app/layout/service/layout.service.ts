@@ -1,6 +1,8 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 
+export type ColorScheme = 'light' | 'dark';
+
 export interface layoutConfig {
     preset?: string;
     primary?: string;

@@ -1,20 +1,20 @@
 <!-- book-tracker-dashboard.component.html -->
 <div class="">
   <!-- Top Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Total Books Added</h3>
       <p class="text-3xl font-bold mt-2">45</p>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Books Finished</h3>
       <p class="text-3xl font-bold mt-2">30</p>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Total Reading Time</h3>
       <p class="text-3xl font-bold mt-2">120 hrs</p>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Total Money Spent</h3>
       <p class="text-3xl font-bold mt-2">$600</p>
     </div>
@@ -22,7 +22,7 @@
 
   <!-- Second row -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Average Rating Given</h3>
       <p-rating
         [readonly]="true"
@@ -30,21 +30,21 @@
         [(ngModel)]="ratingValue"
       ></p-rating>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Reading Goals</h3>
       <p>Read 12 books in 2025</p>
       <p-progressBar [value]="75"></p-progressBar>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Wishlist Count</h3>
       <p class="text-3xl font-bold mt-2">10</p>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Recent Activity</h3>
-      <ul class=" mt-2">
+      <ul class="mt-2">
         <li>
           <span class="font-medium">Apr ‘20:</span> Finished reading "The Road"
         </li>
@@ -54,7 +54,7 @@
         <li><span class="font-medium">Apr ‘15:</span> Read for 1 hour</li>
       </ul>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Genres Read</h3>
       <div class="flex justify-center items-center w-full mt-4">
         <p-chart
@@ -67,7 +67,7 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Reading Days Heatmap</h3>
       <div id="chart" *ngIf="chartOptions">
         <apx-chart
@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Monthly Reading Time</h3>
       <p-chart type="bar" [data]="monthlyReadingChartData"></p-chart>
     </div>
@@ -92,16 +92,16 @@
 
   <!-- Quotes & Most Read Author -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold italic">'The Great Gatsby'</h3>
-      <blockquote class="mt-2 italic ">
+      <blockquote class="mt-2 italic">
         “So we beat on, boats against the current, borne back ceaselessly into
         the past.”
       </blockquote>
       <p class="mt-1 text-right font-bold">— The Great Gatsby</p>
     </div>
     <div
-      class="col-span-1 card p-4 rounded-2xl shadow flex flex-col items-center justify-center"
+      class="col-span-1 card-container card p-4 rounded-2xl shadow flex flex-col items-center justify-center"
     >
       <h3 class="text-xl font-semibold">Most Read Author</h3>
       <p class="text-3xl font-bold mt-2">Haruki Murakami</p>
@@ -110,8 +110,8 @@
   </div>
 
   <!-- Book Completion & Next Plan -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" >
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Book Completion Timeline</h3>
       <p-timeline [value]="events" align="alternate">
         <ng-template pTemplate="content" let-event>
@@ -119,7 +119,7 @@
         </ng-template>
       </p-timeline>
     </div>
-    <div class="col-span-1 card p-4 rounded-2xl shadow">
+    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
       <h3 class="text-xl font-semibold">Next Book Plan</h3>
       <ul class="mt-2 list-disc list-inside">
         <li>"Atomic Habits" — Start on Aug 10</li>
