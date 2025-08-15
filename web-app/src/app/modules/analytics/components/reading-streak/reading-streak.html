@@ -1,0 +1,166 @@
+<!-- Modern Reading Streak Calendar -->
+<div
+  class="w-full bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 chart-card"
+>
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
+  >
+    <div class="flex items-center gap-3">
+      <div
+        class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25"
+      >
+        <svg
+          class="h-5 w-5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          ></path>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+          Reading Activity
+        </h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Your daily reading habits at a glance
+        </p>
+      </div>
+    </div>
+
+    <!-- Badges + Legend -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div
+        class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-400 to-red-500 px-3 py-1.5 text-sm font-medium text-white shadow-lg shadow-orange-500/25"
+      >
+        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        <span>{{ getCurrentStreak() }} day streak</span>
+      </div>
+
+      <div
+        class="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-400"
+      >
+        <span class="mr-2">Less</span>
+        <div class="flex items-center gap-1">
+          <div class="h-3 w-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <div
+            class="h-3 w-3 rounded-sm bg-emerald-100 dark:bg-emerald-900"
+          ></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <div
+            class="h-3 w-3 rounded-sm bg-emerald-200 dark:bg-emerald-700"
+          ></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <div
+            class="h-3 w-3 rounded-sm bg-emerald-300 dark:bg-emerald-600"
+          ></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <div
+            class="h-3 w-3 rounded-sm bg-emerald-400 dark:bg-emerald-500"
+          ></div>
+        </div>
+        <span class="ml-2">More</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Calendar -->
+  <div class="space-y-4 overflow-x-auto overflow-y-hidden pb-4 w-full">
+    <!-- Month Headers -->
+    <div class="relative min-w-[800px] w-full">
+      <div
+        class="grid grid-cols-[repeat(53,_1fr)] gap-[3px] text-xs font-medium text-slate-600 dark:text-slate-400 pl-8 w-full"
+      >
+        <div
+          *ngFor="let month of getMonthLabels(); let i = index"
+          class="text-center"
+          [style.gridColumnStart]="getMonthPosition(i)"
+        >
+          {{ month }}
+        </div>
+      </div>
+
+      <div class="flex gap-[3px] mt-2">
+        <!-- Weekday Labels -->
+        <div
+          class="w-8 text-xs text-slate-600 dark:text-slate-400 flex-shrink-0"
+        >
+          <div class="grid grid-rows-7 gap-[3px]">
+            <div class="h-3 flex items-center">Mon</div>
+            <div class="h-3 flex items-center">Tue</div>
+            <div class="h-3 flex items-center">Wed</div>
+            <div class="h-3 flex items-center">Thu</div>
+            <div class="h-3 flex items-center">Fri</div>
+            <div class="h-3 flex items-center">Sat</div>
+            <div class="h-3 flex items-center">Sun</div>
+          </div>
+        </div>
+
+        <!-- Activity Grid -->
+        <div class="flex-1">
+          <div class="grid grid-cols-[repeat(53,_1fr)] gap-[3px]">
+            <div
+              class="space-y-[3px]"
+              *ngFor="let week of getActivityData(); trackBy: trackByWeek"
+            >
+              <div
+                *ngFor="let day of week; trackBy: trackByDay"
+                class="h-3 w-3 rounded-sm transition-colors duration-200 hover:ring-2 hover:ring-emerald-500 hover:ring-offset-1 dark:hover:ring-emerald-400 cursor-pointer"
+                [ngClass]="getActivityClass(day.activity)"
+                [title]="day.tooltip"
+                (click)="onDateClick(day.date)"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div class="rounded-lg bg-slate-50 dark:bg-slate-800 p-4 text-center">
+      <div class="text-2xl font-bold text-slate-900 dark:text-white">
+        {{ getActivityStats().totalDays }}
+      </div>
+      <div class="text-sm text-slate-600 dark:text-slate-400">Days active</div>
+    </div>
+    <div class="rounded-lg bg-slate-50 dark:bg-slate-800 p-4 text-center">
+      <div class="text-2xl font-bold text-slate-900 dark:text-white">
+        {{ getActivityStats().averagePages }}
+      </div>
+      <div class="text-sm text-slate-600 dark:text-slate-400">
+        Avg pages/day
+      </div>
+    </div>
+    <div class="rounded-lg bg-slate-50 dark:bg-slate-800 p-4 text-center">
+      <div class="text-2xl font-bold text-slate-900 dark:text-white">
+        {{ getActivityStats().bestStreak }}
+      </div>
+      <div class="text-sm text-slate-600 dark:text-slate-400">Best streak</div>
+    </div>
+    <div class="rounded-lg bg-slate-50 dark:bg-slate-800 p-4 text-center">
+      <div class="text-2xl font-bold text-slate-900 dark:text-white">
+        {{ getActivityStats().thisMonth }}
+      </div>
+      <div class="text-sm text-slate-600 dark:text-slate-400">This month</div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -14,7 +14,12 @@ import {
   ApexNonAxisChartSeries,
   ApexResponsive,
   ApexPlotOptions,
+  ChartComponent,
 } from 'ng-apexcharts';
+
+import { LayoutService } from '../../../../layout/service/layout.service';
+import { Subscription } from 'rxjs';
+import { UiService } from '../../../shared/services/ui.service.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries | ApexNonAxisChartSeries;
@@ -41,6 +46,8 @@ export type ChartOptions = {
   styleUrl: './all-analytics.scss',
 })
 export class AllAnalytics implements OnInit {
+  subscriptions: Subscription[] = [];
+
   // Filters
   genres = ['All', 'Fiction', 'Self-Help', 'Classic', 'Biography'];
   authors = [
@@ -135,12 +142,30 @@ export class AllAnalytics implements OnInit {
 
   // Charts
   readingTrendChart!: ChartOptions;
+  @ViewChild('readingTrendChartComponent')
+  readingTrendChartComponent!: ChartComponent;
   genrePieChart!: ChartOptions;
+  @ViewChild('genrePieChartComponent') genrePieChartComponent!: ChartComponent;
   spendingBarChart!: ChartOptions;
+  @ViewChild('spendingBarChartComponent')
+  spendingBarChartComponent!: ChartComponent;
   ratingDistributionChart!: ChartOptions;
+  @ViewChild('ratingDistributionChartComponent')
+  ratingDistributionChartComponent!: ChartComponent;
   authorLeaderboardChart!: ChartOptions;
+  @ViewChild('authorLeaderboardChartComponent')
+  authorLeaderboardChartComponent!: ChartComponent;
   completionRadialChart!: ChartOptions;
-  streakHeatmapChart!: ChartOptions;
+  @ViewChild('completionRadialChartComponent')
+  completionRadialChartComponent!: ChartComponent;
+  // streakHeatmapChart!: ChartOptions;
+  // @ViewChild('streakHeatmapChartComponent')
+  // streakHeatmapChartComponent!: ChartComponent;
+
+  constructor(
+    private layoutService: LayoutService,
+    private uiService: UiService
+  ) {}
 
   ngOnInit(): void {
     this.updateDashboard();
@@ -164,7 +189,7 @@ export class AllAnalytics implements OnInit {
     this.updateRatingDistribution(filteredBooks);
     this.updateAuthorLeaderboard(filteredBooks);
     this.updateCompletionRate(filteredBooks);
-    this.updateStreakHeatmap(filteredBooks);
+    // this.updateStreakHeatmap(filteredBooks);
   }
 
   resetFilters() {
@@ -507,13 +532,12 @@ export class AllAnalytics implements OnInit {
         height: 320,
         toolbar: { show: false },
         background: 'transparent',
-        fontFamily: 'Inter, system-ui, sans-serif',
       },
       xaxis: {
         categories: months,
         labels: {
           style: {
-            colors: '#6B7280',
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
             fontSize: '12px',
             fontWeight: 500,
           },
@@ -524,7 +548,7 @@ export class AllAnalytics implements OnInit {
       yaxis: {
         labels: {
           style: {
-            colors: '#6B7280',
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
             fontSize: '12px',
           },
         },
@@ -563,7 +587,7 @@ export class AllAnalytics implements OnInit {
       },
       tooltip: {
         shared: true,
-        theme: 'light',
+        theme: this.layoutService.isDarkTheme() ? 'dark' : 'light',
         style: {
           fontSize: '12px',
           fontFamily: 'Inter, system-ui, sans-serif',
@@ -575,15 +599,44 @@ export class AllAnalytics implements OnInit {
         },
       },
       legend: {
-        position: 'top',
-        horizontalAlign: 'left',
-        fontSize: '14px',
-        fontWeight: 600,
         labels: {
-          colors: '#374151',
+          colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
         },
       },
     };
+
+    this.subscriptions.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
+
+        this.readingTrendChartComponent?.updateOptions({
+          xaxis: {
+            categories: months,
+            labels: {
+              categories: this.getMonthLabels(),
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          tooltip: {
+            theme: colorScheme,
+          },
+          legend: {
+            labels: {
+              colors: newColor,
+            },
+          },
+        });
+      })
+    );
   }
 
   private updateGenrePie(books: any[]) {
@@ -596,7 +649,6 @@ export class AllAnalytics implements OnInit {
         height: 320,
         toolbar: { show: false },
         background: 'transparent',
-        fontFamily: 'Inter, system-ui, sans-serif',
       },
       labels: Object.keys(genreMap),
       colors: ['#8B5CF6', '#06B6D4', '#F59E0B', '#EF4444', '#10B981'],
@@ -604,7 +656,7 @@ export class AllAnalytics implements OnInit {
         position: 'bottom',
         fontSize: '13px',
         labels: {
-          colors: '#374151',
+          colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
         },
       },
       plotOptions: {
@@ -659,6 +711,21 @@ export class AllAnalytics implements OnInit {
         },
       ],
     };
+
+    this.subscriptions.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
+
+        this.genrePieChartComponent.updateOptions({
+          labels: Object.keys(genreMap),
+          legend: {
+            labels: {
+              colors: newColor,
+            },
+          },
+        });
+      })
+    );
   }
 
   private updateSpendingBar(books: any[]) {
@@ -687,7 +754,6 @@ export class AllAnalytics implements OnInit {
         height: 320,
         toolbar: { show: false },
         background: 'transparent',
-        fontFamily: 'Inter, system-ui, sans-serif',
       },
       plotOptions: {
         bar: {
@@ -702,9 +768,7 @@ export class AllAnalytics implements OnInit {
         categories: months,
         labels: {
           style: {
-            colors: '#6B7280',
-            fontSize: '12px',
-            fontWeight: 500,
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
           },
         },
         axisBorder: { show: false },
@@ -713,8 +777,7 @@ export class AllAnalytics implements OnInit {
       yaxis: {
         labels: {
           style: {
-            colors: '#6B7280',
-            fontSize: '12px',
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
           },
           formatter: (val) => `$${val}`,
         },
@@ -750,16 +813,40 @@ export class AllAnalytics implements OnInit {
         formatter: (val) => `$${val}`,
       },
       tooltip: {
-        theme: 'light',
-        style: {
-          fontSize: '12px',
-          fontFamily: 'Inter, system-ui, sans-serif',
-        },
+        theme: this.layoutService.isDarkTheme() ? 'dark' : 'light',
+
         y: {
           formatter: (val) => `$${val}`,
         },
       },
     };
+
+    this.subscriptions.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
+
+        this.spendingBarChartComponent.updateOptions({
+          xaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+              formatter: (val: any) => `$${val}`,
+            },
+          },
+          tooltip: {
+            theme: colorScheme,
+          },
+        });
+      })
+    );
   }
 
   private updateRatingDistribution(books: any[]) {
@@ -770,10 +857,48 @@ export class AllAnalytics implements OnInit {
     this.ratingDistributionChart = {
       series: [{ name: 'Books', data: ratingCounts }],
       chart: { type: 'bar', height: 300, toolbar: { show: false } },
-      xaxis: { categories: ['1★', '2★', '3★', '4★', '5★'] },
+      xaxis: {
+        categories: ['1★', '2★', '3★', '4★', '5★'],
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
+          },
+          // formatter: (val: any) => `$${val}`,
+        },
+      },
       plotOptions: { bar: { columnWidth: '50%' } },
       tooltip: { theme: 'dark' },
     };
+
+    this.subscriptions.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
+
+        this.ratingDistributionChartComponent.updateOptions({
+          xaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+        });
+      })
+    );
   }
 
   private updateAuthorLeaderboard(books: any[]) {
@@ -787,9 +912,49 @@ export class AllAnalytics implements OnInit {
       ],
       chart: { type: 'bar', height: 300, toolbar: { show: false } },
       plotOptions: { bar: { horizontal: true } },
-      xaxis: { categories: Object.keys(authorMap) },
-      tooltip: { theme: 'dark' },
+      xaxis: {
+        categories: Object.keys(authorMap),
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#6B7280',
+          },
+        },
+      },
+      tooltip: { theme: this.layoutService.isDarkTheme() ? 'dark' : 'light' },
     };
+
+    this.subscriptions.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
+
+        this.authorLeaderboardChartComponent.updateOptions({
+          xaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          tooltip: {
+            theme: colorScheme,
+          },
+        });
+      })
+    );
   }
 
   private updateCompletionRate(books: any[]) {
@@ -841,26 +1006,26 @@ export class AllAnalytics implements OnInit {
       series.push({ name: day, data });
     });
 
-    this.streakHeatmapChart = {
-      series,
-      chart: { type: 'heatmap', height: 350, toolbar: { show: false } },
-      colors: ['#e0f2f1', '#80cbc4', '#26a69a', '#004d40'],
-      dataLabels: { enabled: false },
-      tooltip: {
-        theme: 'dark',
-        y: {
-          formatter: (val: any, opts: any) => {
-            const dataPoint =
-              opts?.w?.config?.series[opts.seriesIndex]?.data[
-                opts.dataPointIndex
-              ];
-            if (dataPoint && dataPoint.books.length) {
-              return `${val} pages\nBooks: ${dataPoint.books.join(', ')}`;
-            }
-            return `${val} pages`;
-          },
-        },
-      },
-    };
+    // this.streakHeatmapChart = {
+    //   series,
+    //   chart: { type: 'heatmap', height: 350, toolbar: { show: false } },
+    //   colors: ['#e0f2f1', '#80cbc4', '#26a69a', '#004d40'],
+    //   dataLabels: { enabled: false },
+    //   tooltip: {
+    //     theme: 'dark',
+    //     y: {
+    //       formatter: (val: any, opts: any) => {
+    //         const dataPoint =
+    //           opts?.w?.config?.series[opts.seriesIndex]?.data[
+    //             opts.dataPointIndex
+    //           ];
+    //         if (dataPoint && dataPoint.books.length) {
+    //           return `${val} pages\nBooks: ${dataPoint.books.join(', ')}`;
+    //         }
+    //         return `${val} pages`;
+    //       },
+    //     },
+    //   },
+    // };
   }
 }

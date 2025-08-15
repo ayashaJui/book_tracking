@@ -4,11 +4,13 @@ import { CommonModule } from '@angular/common';
 import { AnalyticsRoutingModule } from './analytics-routing-module';
 import { AllAnalytics } from './components/all-analytics/all-analytics';
 import { SharedModule } from '../shared/shared.module';
+import { ReadingStreak } from './components/reading-streak/reading-streak';
 
 
 @NgModule({
   declarations: [
-    AllAnalytics
+    AllAnalytics,
+    ReadingStreak
   ],
   imports: [
     CommonModule, SharedModule,

@@ -113,14 +113,14 @@
 
   <div class="max-w-7xl mx-auto px-6 py-8">
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Total Books Card -->
       <div
-        class="card rounded-2xl p-6 transition-all duration-300 group kpi-card"
+        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
       >
         <div class="flex items-center justify-between mb-4">
           <div
-            class="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors kpi-icon"
+            class="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors"
           >
             <i class="pi pi-book text-blue-600 text-xl"></i>
           </div>
@@ -130,10 +130,10 @@
           >
         </div>
         <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900">
+          <p class="text-3xl font-bold dark:text-white">
             {{ formatNumber(stats.totalBooks) }}
           </p>
-          <p class="text-sm text-gray-600">Books Read</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Books Read</p>
           <div
             class="flex items-center gap-1 text-xs"
             [ngClass]="getTrendColor(stats.trends.books.isPositive)"
@@ -146,24 +146,24 @@
 
       <!-- Pages Read Card -->
       <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group kpi-card"
+        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
       >
         <div class="flex items-center justify-between mb-4">
           <div
-            class="p-3 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors kpi-icon"
+            class="p-3 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors"
           >
             <i class="pi pi-file text-emerald-600 text-xl"></i>
           </div>
           <span
-            class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
             >PAGES</span
           >
         </div>
         <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900">
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">
             {{ formatNumber(stats.totalPages) }}
           </p>
-          <p class="text-sm text-gray-600">Pages Read</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Pages Read</p>
           <div
             class="flex items-center gap-1 text-xs"
             [ngClass]="getTrendColor(stats.trends.pages.isPositive)"
@@ -176,22 +176,24 @@
 
       <!-- Average Rating Card -->
       <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group kpi-card"
+        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
       >
         <div class="flex items-center justify-between mb-4">
           <div
-            class="p-3 bg-amber-100 rounded-xl group-hover:bg-amber-200 transition-colors kpi-icon"
+            class="p-3 bg-amber-100 rounded-xl group-hover:bg-amber-200 transition-colors"
           >
             <i class="pi pi-star text-amber-600 text-xl"></i>
           </div>
           <span
-            class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
             >RATING</span
           >
         </div>
         <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900">{{ stats.avgRating }}</p>
-          <p class="text-sm text-gray-600">Average Rating</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">
+            {{ stats.avgRating }}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Average Rating</p>
           <div class="flex items-center gap-1">
             <div class="flex gap-1">
               <i
@@ -206,24 +208,24 @@
 
       <!-- Reading Hours Card -->
       <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group kpi-card"
+        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
       >
         <div class="flex items-center justify-between mb-4">
           <div
-            class="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors kpi-icon"
+            class="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors"
           >
             <i class="pi pi-clock text-purple-600 text-xl"></i>
           </div>
           <span
-            class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
             >HOURS</span
           >
         </div>
         <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900">
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">
             {{ formatNumber(stats.totalHours) }}
           </p>
-          <p class="text-sm text-gray-600">Reading Hours</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Reading Hours</p>
           <div
             class="flex items-center gap-1 text-xs"
             [ngClass]="getTrendColor(stats.trends.hours.isPositive)"
@@ -233,64 +235,38 @@
           </div>
         </div>
       </div>
-
-      <!-- Completion Rate Card -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group kpi-card"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div
-            class="p-3 bg-rose-100 rounded-xl group-hover:bg-rose-200 transition-colors kpi-icon"
-          >
-            <i class="pi pi-check-circle text-rose-600 text-xl"></i>
-          </div>
-          <span
-            class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
-            >RATE</span
-          >
-        </div>
-        <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900">
-            {{ stats.completionRate }}%
-          </p>
-          <p class="text-sm text-gray-600">Completion Rate</p>
-          <div
-            class="w-full bg-gray-200 rounded-full h-2 relative progress-bar"
-          >
-            <div
-              class="bg-rose-500 h-2 rounded-full transition-all duration-500"
-              [style.width.%]="stats.completionRate"
-            ></div>
-          </div>
-        </div>
-      </div>
     </div>
+
     <!-- Charts Grid -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
       <!-- Reading Trend Chart -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-100 rounded-lg">
-              <i class="pi pi-chart-line text-blue-600"></i>
+            <div class="p-2 bg-blue-100 dark:bg-blue-200 rounded-lg">
+              <i class="pi pi-chart-line text-blue-600 dark:text-blue-400"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Reading Trend</h3>
-              <p class="text-sm text-gray-600">Monthly books & pages</p>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Reading Trend
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Monthly books & pages
+              </p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full"
+              class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-200 text-green-700 dark:text-green-800 text-xs font-medium rounded-full"
             >
               <i class="pi pi-arrow-up text-xs"></i>
               +23%
             </span>
           </div>
         </div>
+
         <apx-chart
+          #readingTrendChartComponent
           [series]="readingTrendChart.series"
           [chart]="readingTrendChart.chart"
           [xaxis]="readingTrendChart.xaxis!"
@@ -307,27 +283,33 @@
       </div>
 
       <!-- Genre Distribution Chart -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-purple-100 rounded-lg">
-              <i class="pi pi-chart-pie text-purple-600"></i>
+            <div class="p-2 bg-purple-100 dark:bg-purple-200 rounded-lg">
+              <i
+                class="pi pi-chart-pie text-purple-600 dark:text-purple-800"
+              ></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Genre Distribution
               </h3>
-              <p class="text-sm text-gray-600">Reading preferences</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Reading preferences
+              </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 text-xs text-gray-500">
+          <div
+            class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+          >
             <i class="pi pi-info-circle"></i>
             <span>Click to filter</span>
           </div>
         </div>
+
         <apx-chart
+          #genrePieChartComponent
           [series]="genrePieChart.series"
           [chart]="genrePieChart.chart"
           [labels]="genrePieChart.labels!"
@@ -343,24 +325,26 @@
       </div>
 
       <!-- Monthly Spending Chart -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-emerald-100 rounded-lg">
-              <i class="pi pi-dollar text-emerald-600"></i>
+            <div class="p-2 bg-emerald-100 dark:bg-emerald-200 rounded-lg">
+              <i
+                class="pi pi-dollar text-emerald-600 dark:text-emerald-800"
+              ></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Monthly Spending
               </h3>
-              <p class="text-sm text-gray-600">Book purchases</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Book purchases
+              </p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full"
+              class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-200 text-red-700 dark:text-red-800 text-xs font-medium rounded-full"
             >
               <i class="pi pi-arrow-down text-xs"></i>
               -5%
@@ -368,6 +352,7 @@
           </div>
         </div>
         <apx-chart
+          #spendingBarChartComponent
           [series]="spendingBarChart.series"
           [chart]="spendingBarChart.chart"
           [plotOptions]="spendingBarChart.plotOptions!"
@@ -383,32 +368,35 @@
       </div>
 
       <!-- Rating Distribution Chart -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-amber-100 rounded-lg">
-              <i class="pi pi-star text-amber-600"></i>
+            <div class="p-2 bg-amber-100 dark:bg-amber-200 rounded-lg">
+              <i class="pi pi-star text-amber-600 dark:text-amber-800"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Rating Distribution
               </h3>
-              <p class="text-sm text-gray-600">Book ratings breakdown</p>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Book ratings breakdown
+              </p>
             </div>
           </div>
           <div class="flex items-center gap-1">
             <i class="pi pi-star-fill text-amber-400 text-sm"></i>
-            <span class="text-sm font-medium text-gray-700">{{
-              stats.avgRating
-            }}</span>
+            <span
+              class="text-sm font-medium text-gray-700 dark:text-gray-300"
+              >{{ stats.avgRating }}</span
+            >
           </div>
         </div>
         <apx-chart
+          #ratingDistributionChartComponent
           [series]="ratingDistributionChart.series"
           [chart]="ratingDistributionChart.chart"
           [xaxis]="ratingDistributionChart.xaxis!"
+          [yaxis]="ratingDistributionChart.yaxis!"
           [plotOptions]="ratingDistributionChart.plotOptions!"
           [tooltip]="ratingDistributionChart.tooltip!"
         >
@@ -416,179 +404,86 @@
       </div>
 
       <!-- Author Leaderboard Chart -->
-      <div
-        class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-rose-100 rounded-lg">
-              <i class="pi pi-users text-rose-600"></i>
+            <div class="p-2 bg-rose-100 dark:bg-rose-200 rounded-lg">
+              <i class="pi pi-users text-rose-600 dark:text-rose-800"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Top Authors</h3>
-              <p class="text-sm text-gray-600">Most read authors</p>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Top Authors
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Most read authors
+              </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 text-xs text-gray-500">
+          <div
+            class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+          >
             <i class="pi pi-info-circle"></i>
             <span>Click to filter</span>
           </div>
         </div>
         <apx-chart
+          #authorLeaderboardChartComponent
           [series]="authorLeaderboardChart.series"
           [chart]="authorLeaderboardChart.chart"
           [plotOptions]="authorLeaderboardChart.plotOptions!"
           [xaxis]="authorLeaderboardChart.xaxis!"
+          [yaxis]="authorLeaderboardChart.yaxis!"
           [tooltip]="authorLeaderboardChart.tooltip!"
           (dataPointSelection)="onAuthorClick($event)"
         >
         </apx-chart>
       </div>
 
-      <!-- Modern Reading Streak Calendar -->
-      <div
-        class="col-span-1 xl:col-span-2 bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 chart-card"
-      >
+      <!-- Completion Rate Card -->
+      <div class="card rounded-2xl p-6 transition-all duration-300">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <div
-              class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25"
-            >
-              <svg
-                class="h-5 w-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                ></path>
-              </svg>
+            <div class="p-2 bg-rose-100 dark:bg-rose-200 rounded-lg">
+              <i
+                class="pi pi-check-circle text-rose-600 dark:text-rose-800"
+              ></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-slate-900">
-                Reading Activity
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Reading Progress
               </h3>
-              <p class="text-sm text-slate-600">
-                Your daily reading habits at a glance
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                Books completion status
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <!-- Current Streak Badge -->
-            <div
-              class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-400 to-red-500 px-3 py-1.5 text-sm font-medium text-white shadow-lg shadow-orange-500/25"
+          <div class="flex items-center gap-2">
+            <span
+              class="inline-flex items-center gap-1 px-2 py-1 bg-rose-100 dark:bg-rose-200 text-rose-700 dark:text-rose-800 text-xs font-medium rounded-full"
             >
-              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fill-rule="evenodd"
-                  d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              <span>{{ getCurrentStreak() }} day streak</span>
-            </div>
-
-            <!-- Legend -->
-            <div class="flex items-center gap-3 text-xs text-slate-600">
-              <div class="flex items-center gap-1">
-                <div class="h-3 w-3 rounded-sm bg-slate-100"></div>
-                <span>No activity</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <div class="h-3 w-3 rounded-sm bg-emerald-200"></div>
-                <span>Light</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <div class="h-3 w-3 rounded-sm bg-emerald-400"></div>
-                <span>Medium</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <div class="h-3 w-3 rounded-sm bg-emerald-600"></div>
-                <span>Heavy</span>
-              </div>
-            </div>
+              <i [class]="getTrendIcon(stats.trends.completion.isPositive)"></i>
+              {{ stats.trends.completion.value }}% vs last month
+            </span>
           </div>
         </div>
-
-        <!-- Calendar Grid -->
-        <div class="space-y-4">
-          <!-- Month Headers -->
-          <div
-            class="grid grid-cols-12 gap-1 text-xs font-medium text-slate-600"
+        <div class="flex flex-col items-center justify-center">
+          <apx-chart
+            #completionRadialChartComponent
+            [series]="completionRadialChart.series"
+            [chart]="completionRadialChart.chart"
+            [plotOptions]="completionRadialChart.plotOptions!"
+            [labels]="completionRadialChart.labels!"
+            [tooltip]="completionRadialChart.tooltip!"
+            class="completion-radial-chart"
           >
-            <div class="text-center" *ngFor="let month of getMonthLabels()">
-              {{ month }}
-            </div>
-          </div>
-
-          <!-- Weekday Labels -->
-          <div class="flex gap-1">
-            <div class="w-8 text-xs text-slate-600">
-              <div class="h-3 mb-1"></div>
-              <div class="space-y-1">
-                <div class="h-3 flex items-center">Mon</div>
-                <div class="h-3"></div>
-                <div class="h-3 flex items-center">Wed</div>
-                <div class="h-3"></div>
-                <div class="h-3 flex items-center">Fri</div>
-                <div class="h-3"></div>
-                <div class="h-3 flex items-center">Sun</div>
-              </div>
-            </div>
-
-            <!-- Activity Grid -->
-            <div class="flex-1">
-              <div class="grid grid-cols-53 gap-1">
-                <!-- Week columns -->
-                <div
-                  class="space-y-1"
-                  *ngFor="let week of getActivityData(); trackBy: trackByWeek"
-                >
-                  <div
-                    *ngFor="let day of week; trackBy: trackByDay"
-                    class="h-3 w-3 rounded-sm transition-all duration-200 hover:ring-2 hover:ring-emerald-500 hover:ring-offset-1 cursor-pointer"
-                    [ngClass]="getActivityClass(day.activity)"
-                    [title]="day.tooltip"
-                    (click)="onDateClick(day.date)"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Summary Stats -->
-          <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <div class="rounded-lg bg-slate-50 p-4 text-center">
-              <div class="text-2xl font-bold text-slate-900">
-                {{ getActivityStats().totalDays }}
-              </div>
-              <div class="text-sm text-slate-600">Days active</div>
-            </div>
-            <div class="rounded-lg bg-slate-50 p-4 text-center">
-              <div class="text-2xl font-bold text-slate-900">
-                {{ getActivityStats().averagePages }}
-              </div>
-              <div class="text-sm text-slate-600">Avg pages/day</div>
-            </div>
-            <div class="rounded-lg bg-slate-50 p-4 text-center">
-              <div class="text-2xl font-bold text-slate-900">
-                {{ getActivityStats().bestStreak }}
-              </div>
-              <div class="text-sm text-slate-600">Best streak</div>
-            </div>
-            <div class="rounded-lg bg-slate-50 p-4 text-center">
-              <div class="text-2xl font-bold text-slate-900">
-                {{ getActivityStats().thisMonth }}
-              </div>
-              <div class="text-sm text-slate-600">This month</div>
-            </div>
-          </div>
+          </apx-chart>
         </div>
       </div>
+    </div>
+
+    <!-- Full Width Reading Streak Section -->
+    <div class="w-full mt-8">
+      <app-reading-streak> </app-reading-streak>
     </div>
   </div>
 </div>
