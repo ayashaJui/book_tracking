@@ -60,6 +60,20 @@ const routes: Routes = [
       ),
   },
 
+  {
+    path: 'profile',
+    loadChildren: () =>
+      import('./modules/profile/profile-module').then((m) => m.ProfileModule),
+  },
+
+  {
+    path: 'settings',
+    loadChildren: () =>
+      import('./modules/settings/settings-module').then(
+        (m) => m.SettingsModule
+      ),
+  },
+
   { path: 'not-found', component: NotFoundComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' },

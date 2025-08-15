@@ -23,6 +23,9 @@ import { AccordionModule } from 'primeng/accordion';
 import { DataViewModule } from 'primeng/dataview';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
+import { Avatar } from 'primeng/avatar';
+import { Chip } from 'primeng/chip';
+import { Knob } from 'primeng/knob';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -50,6 +53,9 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     DataViewModule,
     InputNumberModule,
     TooltipModule,
+    Avatar,
+    Chip,
+    Knob,
   ],
   exports: [
     ButtonModule,
@@ -72,6 +78,9 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     DataViewModule,
     InputNumberModule,
     TooltipModule,
+    Avatar,
+    Chip,
+    Knob,
   ],
 })
 export class SharedModule {}

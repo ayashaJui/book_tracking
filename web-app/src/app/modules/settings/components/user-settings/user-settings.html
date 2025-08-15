@@ -1,0 +1,397 @@
+<div class="max-w-5xl mx-auto p-6 space-y-8">
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-white">⚙️ Settings</h1>
+
+  <!-- General (restored) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🌍 General
+    </h2>
+
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">Language</p>
+        <p class="text-sm text-gray-500">Select your preferred language</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.language"
+      >
+        <option>English</option>
+        <option>বাংলা</option>
+      </select>
+    </div>
+
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">Time Zone</p>
+        <p class="text-sm text-gray-500">Adjust time for reading logs</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.timezone"
+      >
+        <option>GMT+6 (Dhaka)</option>
+        <option>GMT+0</option>
+        <option>GMT+5:30 (India)</option>
+      </select>
+    </div>
+
+    <div class="flex items-center justify-between py-3 settings-row">
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">Currency</p>
+        <p class="text-sm text-gray-500">Used for spending & budgets</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.currency"
+      >
+        <option>BDT</option>
+        <option>USD</option>
+        <option>EUR</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Appearance (restored + extra toggle) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🎨 Appearance
+    </h2>
+
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">Theme</p>
+        <p class="text-sm text-gray-500">Light, Dark, or Auto</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.theme"
+      >
+        <option>Light</option>
+        <option>Dark</option>
+        <option>Auto</option>
+      </select>
+    </div>
+
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">Font Size</p>
+        <p class="text-sm text-gray-500">Adjust text size</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.fontSize"
+      >
+        <option>Small</option>
+        <option>Medium</option>
+        <option>Large</option>
+      </select>
+    </div>
+
+    <div class="flex items-center justify-between py-3 settings-row">
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Show Covers in Lists
+        </p>
+        <p class="text-sm text-gray-500">Toggle thumbnails in book lists</p>
+      </div>
+      <label
+        class="relative inline-flex items-center cursor-pointer select-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-800 rounded-full"
+      >
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          [(ngModel)]="settings.showCovers"
+          aria-label="Show covers in lists"
+        />
+        <!-- Track -->
+        <div
+          class="w-11 h-6 rounded-full transition-colors bg-gray-300 dark:bg-gray-600 peer-checked:bg-indigo-600 peer-disabled:opacity-60 peer-disabled:cursor-not-allowed"
+        ></div>
+        <!-- Knob -->
+        <div
+          class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white dark:bg-gray-100 border border-gray-300 dark:border-gray-500 shadow transform transition-transform peer-checked:translate-x-5 peer-active:scale-95"
+        ></div>
+      </label>
+    </div>
+  </section>
+
+  <!-- Notifications (restored) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🔔 Notifications
+    </h2>
+
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Daily Reading Reminder
+        </p>
+        <p class="text-sm text-gray-500">Get a nudge at a set time</p>
+      </div>
+      <input
+        type="time"
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.dailyReminder"
+      />
+    </div>
+
+    <div class="flex items-center justify-between py-3 settings-row">
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Wishlist Price Drop Alerts
+        </p>
+        <p class="text-sm text-gray-500">
+          Notify when a wishlist book gets cheaper
+        </p>
+      </div>
+      <label
+        class="relative inline-flex items-center cursor-pointer select-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-800 rounded-full"
+      >
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          [(ngModel)]="settings.wishlistAlerts"
+          aria-label="Enable wishlist price drop alerts"
+        />
+        <div
+          class="w-11 h-6 rounded-full transition-colors bg-gray-300 dark:bg-gray-600 peer-checked:bg-indigo-600 peer-disabled:opacity-60 peer-disabled:cursor-not-allowed"
+        ></div>
+        <div
+          class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white dark:bg-gray-100 border border-gray-300 dark:border-gray-500 shadow transform transition-transform peer-checked:translate-x-5 peer-active:scale-95"
+        ></div>
+      </label>
+    </div>
+  </section>
+
+  <!-- Notification Customization (new) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🔧 Notification Preferences
+    </h2>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Quote of the Day
+      </p>
+      <label
+        class="relative inline-flex items-center cursor-pointer select-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-800 rounded-full"
+      >
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          [(ngModel)]="settings.quoteOfDay"
+          aria-label="Quote of the day notification"
+        />
+        <div
+          class="w-11 h-6 rounded-full transition-colors bg-gray-300 dark:bg-gray-600 peer-checked:bg-indigo-600"
+        ></div>
+        <div
+          class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white dark:bg-gray-100 border border-gray-300 dark:border-gray-500 shadow transform transition-transform peer-checked:translate-x-5 peer-active:scale-95"
+        ></div>
+      </label>
+    </div>
+    <div class="flex items-center justify-between py-3 settings-row">
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Price Drop Threshold (%)
+      </p>
+      <input
+        type="number"
+        class="w-24 bg-gray-100 dark:bg-gray-700 rounded p-2 text-center"
+        [(ngModel)]="settings.priceDropThreshold"
+      />
+    </div>
+  </section>
+
+  <!-- Integrations (restored idea) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🔗 Integrations
+    </h2>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <p class="font-medium text-gray-700 dark:text-gray-300">Goodreads Sync</p>
+      <button
+        class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+      >
+        Connect
+      </button>
+    </div>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3"
+    >
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Google Drive Backup
+      </p>
+      <button
+        class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
+      >
+        Connect
+      </button>
+    </div>
+    <div class="flex items-center justify-between py-3 settings-row">
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Calendar Reminders
+      </p>
+      <button
+        class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
+      >
+        Connect
+      </button>
+    </div>
+  </section>
+
+  <!-- Data & Privacy (restored) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      💾 Data & Backup
+    </h2>
+    <div
+      class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 py-3"
+    >
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Export Data (CSV/JSON)
+      </p>
+      <div class="space-x-2">
+        <button
+          class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          CSV
+        </button>
+        <button
+          class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          JSON
+        </button>
+      </div>
+    </div>
+    <div class="flex justify-between items-center py-3">
+      <p class="font-medium text-gray-700 dark:text-gray-300">Import Data</p>
+      <button
+        class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
+      >
+        Import
+      </button>
+    </div>
+  </section>
+
+  <section class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🔒 Privacy & Security
+    </h2>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Account Privacy
+        </p>
+        <p class="text-sm text-gray-500">Control who can see your data</p>
+      </div>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.accountPrivacy"
+      >
+        <option>Public</option>
+        <option>Private</option>
+      </select>
+    </div>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Two-Factor Authentication
+        </p>
+        <p class="text-sm text-gray-500">Add an extra layer of security</p>
+      </div>
+      <label
+        class="relative inline-flex items-center cursor-pointer select-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-800 rounded-full"
+      >
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          [(ngModel)]="settings.twoFA"
+          aria-label="Enable two factor authentication"
+        />
+        <div
+          class="w-11 h-6 rounded-full transition-colors bg-gray-300 dark:bg-gray-600 peer-checked:bg-indigo-600"
+        ></div>
+        <div
+          class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white dark:bg-gray-100 border border-gray-300 dark:border-gray-500 shadow transform transition-transform peer-checked:translate-x-5 peer-active:scale-95"
+        ></div>
+      </label>
+    </div>
+    <div class="flex items-center justify-between py-3 settings-row">
+      <div>
+        <p class="font-medium text-gray-700 dark:text-gray-300">
+          Change Password
+        </p>
+        <p class="text-sm text-gray-500">Update your account password</p>
+      </div>
+      <button
+        class="px-3 py-1 text-sm bg-pink-600 text-white rounded hover:bg-pink-700"
+      >
+        Change
+      </button>
+    </div>
+  </section>
+
+  <!-- Advanced Preferences (new) -->
+  <section
+    class="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 settings-section"
+  >
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+      🛠️ Advanced Preferences
+    </h2>
+    <div
+      class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-3 settings-row"
+    >
+      <p class="font-medium text-gray-700 dark:text-gray-300">
+        Default Sorting
+      </p>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.defaultSort"
+      >
+        <option>Title (A→Z)</option>
+        <option>Date Purchased (newest)</option>
+        <option>Rating (high→low)</option>
+      </select>
+    </div>
+    <div class="flex items-center justify-between py-3 settings-row">
+      <p class="font-medium text-gray-700 dark:text-gray-300">Default View</p>
+      <select
+        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded p-2"
+        [(ngModel)]="settings.defaultView"
+      >
+        <option>Grid</option>
+        <option>List</option>
+      </select>
+    </div>
+  </section>
+</div>
