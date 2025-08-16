@@ -1,158 +1,532 @@
 <!-- book-tracker-dashboard.component.html -->
-<div class="">
-  <!-- Top Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Total Books Added</h3>
-      <p class="text-3xl font-bold mt-2">45</p>
+<div class="min-h-screen">
+  <!-- Dashboard Header -->
+  <div
+    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(99, 102, 241, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
     </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Books Finished</h3>
-      <p class="text-3xl font-bold mt-2">30</p>
-    </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Total Reading Time</h3>
-      <p class="text-3xl font-bold mt-2">120 hrs</p>
-    </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Total Money Spent</h3>
-      <p class="text-3xl font-bold mt-2">$600</p>
-    </div>
-  </div>
 
-  <!-- Second row -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Average Rating Given</h3>
-      <p-rating
-        [readonly]="true"
-        [stars]="5"
-        [(ngModel)]="ratingValue"
-      ></p-rating>
-    </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Reading Goals</h3>
-      <p>Read 12 books in 2025</p>
-      <p-progressBar [value]="75"></p-progressBar>
-    </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Wishlist Count</h3>
-      <p class="text-3xl font-bold mt-2">10</p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Recent Activity</h3>
-      <ul class="mt-2">
-        <li>
-          <span class="font-medium">Apr ‘20:</span> Finished reading "The Road"
-        </li>
-        <li>
-          <span class="font-medium">Apr ‘18:</span> Added a quote from "Sapiens"
-        </li>
-        <li><span class="font-medium">Apr ‘15:</span> Read for 1 hour</li>
-      </ul>
-    </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Genres Read</h3>
-      <div class="flex justify-center items-center w-full mt-4">
-        <p-chart
-          type="pie"
-          [data]="genreChartData"
-          class="w-full md:w-[20rem]"
-        ></p-chart>
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-book text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Dashboard
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Track your literary journey and reading habits
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Reading Days Heatmap</h3>
-      <div id="chart" *ngIf="chartOptions">
+  <div class="max-w-7xl mx-auto py-8">
+    <!-- Top Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-blue-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md"
+          >
+            <i class="pi pi-book text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Books Added
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              45
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-green-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 text-white shadow-md"
+          >
+            <i class="pi pi-check-circle text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Books Finished
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              30
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-purple-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-md"
+          >
+            <i class="pi pi-clock text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Reading Time
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              120 hrs
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-amber-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md"
+          >
+            <i class="pi pi-dollar text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Total Money Spent
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              $600
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Favorite Genre -->
+      <div
+        class="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-indigo-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-md"
+          >
+            <i class="pi pi-star text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Favorite Genre
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              4
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Most read genre this year
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Current Streak -->
+      <div
+        class="bg-gradient-to-br from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-red-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md"
+          >
+            <i class="pi pi-chart-line text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Current Streak
+            </h3>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">
+              🔥 3 days
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Keep it up!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-yellow-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="text-center">
+          <div
+            class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 text-white rounded-lg mb-4 shadow-md"
+          >
+            <i class="pi pi-star text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
+            Average Rating Given
+          </h3>
+          <p-rating
+            class="justify-center"
+            [readonly]="true"
+            [stars]="5"
+            [(ngModel)]="ratingValue"
+          ></p-rating>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-green-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="text-center">
+          <div
+            class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-lg mb-4 shadow-md"
+          >
+            <i class="pi pi-flag text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
+            Reading Goals
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-3">
+            Read 12 books in 2025
+          </p>
+          <p-progressBar
+            [value]="75"
+            class="mb-2"
+            class="justify-center"
+          ></p-progressBar>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            9 of 12 books completed
+          </p>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-pink-50 to-rose-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-pink-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="text-center">
+          <div
+            class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 text-white rounded-lg mb-4 shadow-md"
+          >
+            <i class="pi pi-heart text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
+            Wishlist Count
+          </h3>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white">10</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity and Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-blue-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-md"
+          >
+            <i class="pi pi-history text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Recent Activity
+          </h3>
+        </div>
+        <div class="space-y-3">
+          <div
+            class="flex items-start py-3 border-l-2 border-green-200 dark:border-green-800 pl-4 bg-green-50/50 dark:bg-green-900/10 rounded-r-lg"
+          >
+            <div
+              class="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"
+            ></div>
+            <div>
+              <span class="font-medium text-gray-900 dark:text-white"
+                >Apr '20:</span
+              >
+              <span class="text-gray-600 dark:text-gray-300 ml-1"
+                >Finished reading "The Road"</span
+              >
+            </div>
+          </div>
+          <div
+            class="flex items-start py-3 border-l-2 border-blue-200 dark:border-blue-800 pl-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-r-lg"
+          >
+            <div
+              class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"
+            ></div>
+            <div>
+              <span class="font-medium text-gray-900 dark:text-white"
+                >Apr '18:</span
+              >
+              <span class="text-gray-600 dark:text-gray-300 ml-1"
+                >Added a quote from "Sapiens"</span
+              >
+            </div>
+          </div>
+          <div
+            class="flex items-start py-3 border-l-2 border-purple-200 dark:border-purple-800 pl-4 bg-purple-50/50 dark:bg-purple-900/10 rounded-r-lg"
+          >
+            <div
+              class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"
+            ></div>
+            <div>
+              <span class="font-medium text-gray-900 dark:text-white"
+                >Apr '15:</span
+              >
+              <span class="text-gray-600 dark:text-gray-300 ml-1"
+                >Read for 1 hour</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-indigo-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-md"
+          >
+            <i class="pi pi-chart-pie text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Genres Read
+          </h3>
+        </div>
+        <div class="flex justify-center items-center">
+          <apx-chart
+            #genrePieChart
+            [series]="genreChartOptions.series"
+            [chart]="genreChartOptions.chart"
+            [labels]="genreChartOptions.labels"
+            [colors]="genreChartOptions.colors"
+            [legend]="genreChartOptions.legend"
+            [responsive]="genreChartOptions.responsive"
+            class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
+          ></apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-orange-50 to-red-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-orange-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-md"
+          >
+            <i class="pi pi-calendar text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Reading Days Heatmap
+          </h3>
+        </div>
+        <div id="chart" *ngIf="chartOptions">
+          <apx-chart
+            #chart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [plotOptions]="chartOptions.plotOptions"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [dataLabels]="chartOptions.dataLabels"
+            [fill]="chartOptions.fill"
+            [tooltip]="chartOptions.tooltip"
+            [legend]="chartOptions.legend"
+          ></apx-chart>
+        </div>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-teal-50 to-cyan-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 shadow-lg border border-teal-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 text-white shadow-md"
+          >
+            <i class="pi pi-chart-bar text-xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Monthly Reading Time
+          </h3>
+        </div>
         <apx-chart
-          #chart
-          [series]="chartOptions.series"
-          [chart]="chartOptions.chart"
-          [plotOptions]="chartOptions.plotOptions"
-          [xaxis]="chartOptions.xaxis"
-          [dataLabels]="chartOptions.dataLabels"
-          [fill]="chartOptions.fill"
-          [tooltip]="chartOptions.tooltip"
-          [legend]="chartOptions.legend"
+          #monthlyReadingChart
+          [series]="monthlyReadingChartOptions.series"
+          [chart]="monthlyReadingChartOptions.chart"
+          [xaxis]="monthlyReadingChartOptions.xaxis"
+          [yaxis]="monthlyReadingChartOptions.yaxis"
+          [colors]="monthlyReadingChartOptions.colors!"
+          [dataLabels]="monthlyReadingChartOptions.dataLabels"
+          [plotOptions]="monthlyReadingChartOptions.plotOptions"
+          [tooltip]="monthlyReadingChartOptions.tooltip"
         ></apx-chart>
       </div>
     </div>
 
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Monthly Reading Time</h3>
-      <p-chart type="bar" [data]="monthlyReadingChartData"></p-chart>
+    <!-- Quotes & Most Read Author -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-center mb-4">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md"
+          >
+            <i class="fa-solid fa-quote-left text-xl"></i>
+          </div>
+          <h3
+            class="text-lg font-medium text-gray-900 dark:text-white italic ml-4"
+          >
+            'The Great Gatsby'
+          </h3>
+        </div>
+        <blockquote
+          class="mt-4 text-base italic text-gray-700 dark:text-gray-300 border-l-4 border-emerald-500 pl-4 bg-emerald-50/30 dark:bg-emerald-900/10 py-3 rounded-r-lg"
+        >
+          "So we beat on, boats against the current, borne back ceaselessly into
+          the past."
+        </blockquote>
+        <p
+          class="mt-4 text-right text-sm font-medium text-gray-500 dark:text-gray-400"
+        >
+          — The Great Gatsby
+        </p>
+      </div>
+      <div
+        class="bg-gradient-to-br from-gray-50 via-purple-50 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center"
+      >
+        <div class="text-center">
+          <div
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-xl mb-4 shadow-md"
+          >
+            <i class="pi pi-user text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Most Read Author
+          </h3>
+          <p
+            class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1"
+          >
+            Haruki Murakami
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">8 books read</p>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Quotes & Most Read Author -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold italic">'The Great Gatsby'</h3>
-      <blockquote class="mt-2 italic">
-        “So we beat on, boats against the current, borne back ceaselessly into
-        the past.”
-      </blockquote>
-      <p class="mt-1 text-right font-bold">— The Great Gatsby</p>
+    <!-- Book Completion & Next Plan -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div
+        class="bg-gradient-to-br from-gray-50 via-cyan-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-md"
+          >
+            <i class="fa-solid fa-timeline text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Book Completion Timeline
+          </h3>
+        </div>
+        <p-timeline [value]="events" align="alternate">
+          <ng-template pTemplate="content" let-event>
+            <p class="text-gray-700 dark:text-gray-300">{{ event.status }}</p>
+          </ng-template>
+        </p-timeline>
+      </div>
+      <div
+        class="bg-gradient-to-br from-gray-50 via-rose-50 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-center mb-6">
+          <div
+            class="p-3 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-md"
+          >
+            <i class="pi pi-list text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white ml-4">
+            Next Book Plan
+          </h3>
+        </div>
+        <div class="space-y-3">
+          <div
+            class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/30 border border-gray-200 dark:border-gray-600"
+          >
+            <i class="pi pi-circle-fill text-rose-500 mr-3 text-xs"></i>
+            <span class="text-gray-700 dark:text-gray-300"
+              >"Atomic Habits" — Start on Aug 10</span
+            >
+          </div>
+          <div
+            class="flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/30 border border-gray-200 dark:border-gray-600"
+          >
+            <i class="pi pi-circle-fill text-rose-500 mr-3 text-xs"></i>
+            <span class="text-gray-700 dark:text-gray-300"
+              >"Educated" — Start on Aug 20</span
+            >
+          </div>
+        </div>
+      </div>
     </div>
-    <div
-      class="col-span-1 card-container card p-4 rounded-2xl shadow flex flex-col items-center justify-center"
-    >
-      <h3 class="text-xl font-semibold">Most Read Author</h3>
-      <p class="text-3xl font-bold mt-2">Haruki Murakami</p>
-      <p class="">8 books read</p>
-    </div>
-  </div>
 
-  <!-- Book Completion & Next Plan -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Book Completion Timeline</h3>
-      <p-timeline [value]="events" align="alternate">
-        <ng-template pTemplate="content" let-event>
-          <p>{{ event.status }}</p>
-        </ng-template>
-      </p-timeline>
+    <!-- Action Buttons -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <button
+        pButton
+        label="Add New Book"
+        icon="pi pi-book"
+        class="px-4 py-3 transition-colors"
+      ></button>
+      <button
+        pButton
+        label="Add a New Quote"
+        severity="info"
+        icon="fa-solid fa-quote-left"
+        class="px-4 py-3 transition-colors"
+      ></button>
+      <button
+        pButton
+        label="View Wishlist"
+        severity="help"
+        icon="pi pi-heart"
+        class="px-4 py-3 transition-colors"
+      ></button>
+      <button
+        pButton
+        label="Update Progress"
+        severity="contrast"
+        icon="pi pi-sync"
+        class="px-4 py-3 transition-colors"
+      ></button>
     </div>
-    <div class="col-span-1 card-container card p-4 rounded-2xl shadow">
-      <h3 class="text-xl font-semibold">Next Book Plan</h3>
-      <ul class="mt-2 list-disc list-inside">
-        <li>"Atomic Habits" — Start on Aug 10</li>
-        <li>"Educated" — Start on Aug 20</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="col-span-1 flex gap-2 mb-10">
-    <button
-      pButton
-      label="Add New Book"
-      icon="pi pi-book"
-      class="p-button-rounded p-button-info w-full"
-    ></button>
-    <button
-      pButton
-      label="Add a New Quote"
-      icon="pi pi-quote-right"
-      class="p-button-rounded p-button-success w-full"
-    ></button>
-    <button
-      pButton
-      label="View Wishlist"
-      icon="pi pi-heart"
-      class="p-button-rounded p-button-warning w-full"
-    ></button>
-    <button
-      pButton
-      label="Update Progress"
-      icon="pi pi-sync"
-      class="p-button-rounded p-button-contrast w-full"
-    ></button>
   </div>
 </div>

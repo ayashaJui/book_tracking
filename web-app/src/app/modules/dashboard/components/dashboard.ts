@@ -6,17 +6,49 @@ import {
   ApexDataLabels,
   ApexChart,
   ChartComponent,
+  ApexNonAxisChartSeries,
+  ApexResponsive,
+  ApexLegend,
+  ApexPlotOptions,
+  ApexXAxis,
+  ApexYAxis,
+  ApexFill,
+  ApexTooltip,
 } from 'ng-apexcharts';
+import { LayoutService } from '../../../layout/service/layout.service';
+import { UiService } from '../../shared/services/ui.service.service';
+import { Subscription } from 'rxjs';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   plotOptions: ApexPlotOptions;
   xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
   dataLabels: ApexDataLabels;
   fill: ApexFill;
-  tooltip: ApexTooltip;
+  legend: any;
+  tooltip: any;
+};
+
+export type PieChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: string[];
+  colors: string[];
   legend: ApexLegend;
+  responsive: ApexResponsive[];
+};
+
+export type BarChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  colors?: string[];
+  dataLabels: ApexDataLabels;
+  plotOptions: ApexPlotOptions;
+  tooltip: any;
 };
 
 @Component({
@@ -26,41 +58,39 @@ export type ChartOptions = {
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
+  subscription: Subscription[] = [];
+
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptions!: ChartOptions;
+  @ViewChild('genrePieChart') genrePieChart!: ChartComponent;
+  public genreChartOptions!: PieChartOptions;
+  @ViewChild('monthlyReadingChart') monthlyReadingChart!: ChartComponent;
+  public monthlyReadingChartOptions!: BarChartOptions;
 
   ratingValue: number = 4.5;
   events: any[] = [];
 
-  genreChartData = {
-    labels: ['Fiction', 'Non-Fiction', 'Mystery', 'Other'],
-    datasets: [
-      {
-        data: [40, 25, 20, 15],
-        backgroundColor: ['#3b82f6', '#34d399', '#a78bfa', '#fcd34d'],
-      },
-    ],
-  };
-
-  monthlyReadingChartData = {
-    labels: ['Jan', 'Feb', 'Mar'],
-    datasets: [
-      {
-        label: 'Reading Time (min)',
-        data: [7, 13, 6],
-        backgroundColor: '#60a5fa',
-      },
-    ],
-  };
-
-  constructor() {}
+  constructor(
+    private layoutService: LayoutService,
+    private uiService: UiService
+  ) {}
 
   ngOnInit() {
+    this.initializeHeatmapChart();
+    this.initializeGenreChart();
+    this.initializeMonthlyReadingChart();
+    this.initializeEvents();
+  }
+
+  initializeHeatmapChart() {
     this.chartOptions = {
       series: this.generateSeriesData(),
       chart: {
         height: 350,
         type: 'heatmap',
+        toolbar: {
+          show: false,
+        },
       },
       plotOptions: {
         heatmap: {
@@ -79,6 +109,18 @@ export class Dashboard {
       },
       xaxis: {
         categories: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+          },
+        },
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+          },
+        },
       },
       dataLabels: {
         enabled: false,
@@ -91,12 +133,190 @@ export class Dashboard {
         y: {
           formatter: (val: number) => `${val} mins`,
         },
+        theme: this.layoutService.isDarkTheme() ? 'dark' : 'light',
       },
       legend: {
         show: true,
+        labels: {
+          colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+        },
       },
     };
 
+    this.subscription.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#4b5563';
+
+        this.chart.updateOptions({
+          xaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          tooltip: {
+            theme: colorScheme,
+          },
+          legend: {
+            labels: {
+              colors: newColor,
+            },
+          },
+        });
+      })
+    );
+  }
+
+  initializeGenreChart() {
+    this.genreChartOptions = {
+      series: [40, 25, 20, 15],
+      chart: {
+        type: 'pie',
+        width: 380,
+      },
+      labels: ['Fiction', 'Non-Fiction', 'Mystery', 'Other'],
+      colors: ['#3b82f6', '#34d399', '#a78bfa', '#fcd34d'],
+      legend: {
+        position: 'bottom',
+        labels: {
+          colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+        },
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: 'bottom',
+            },
+          },
+        },
+      ],
+    };
+
+    this.subscription.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#4b5563';
+
+        this.genrePieChart.updateOptions({
+          legend: {
+            labels: {
+              colors: newColor,
+            },
+          },
+        });
+      })
+    );
+  }
+
+  initializeMonthlyReadingChart() {
+    this.monthlyReadingChartOptions = {
+      series: [
+        {
+          name: 'Reading Time (min)',
+          data: [7, 13, 6],
+        },
+      ],
+      chart: {
+        type: 'bar',
+        height: 350,
+        toolbar: {
+          show: false,
+        },
+      },
+      xaxis: {
+        title: {
+          text: 'Months',
+          style: {
+            color: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+          },
+        },
+        categories: ['Jan', 'Feb', 'Mar'],
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+          },
+        },
+      },
+      yaxis: {
+        title: {
+          text: 'Minutes',
+          style: {
+            color: this.layoutService.isDarkTheme() ? '#f2f3f4' : '#4b5563',
+          },
+        },
+        labels: {
+          style: {
+            colors: this.layoutService.isDarkTheme() ? '#fff' : '#415B61',
+          },
+        },
+      },
+      colors: ['#60a5fa'],
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          horizontal: false,
+        },
+      },
+      tooltip: {
+        theme: this.layoutService.isDarkTheme() ? 'dark' : 'light',
+      },
+    };
+
+    this.subscription.push(
+      this.uiService.colorScheme$.subscribe((colorScheme) => {
+        const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#4b5563';
+
+        this.monthlyReadingChart.updateOptions({
+          yaxis: {
+            title: {
+              style: {
+                color: newColor,
+              },
+              text: 'Minutes',
+            },
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+          xaxis: {
+            title: {
+              style: {
+                color: newColor,
+              },
+            },
+            labels: {
+              style: {
+                colors: newColor,
+              },
+            },
+          },
+
+          tooltip: {
+            theme: colorScheme,
+          },
+        });
+      })
+    );
+  }
+
+  initializeEvents() {
     this.events = [
       {
         status: 'Ordered',
@@ -140,5 +360,23 @@ export class Dashboard {
     }
 
     return data;
+  }
+
+  // Dynamic methods for updating chart data
+  updateGenreData(newData: number[], newLabels: string[]) {
+    this.genreChartOptions.series = newData;
+    this.genreChartOptions.labels = newLabels;
+  }
+
+  updateMonthlyReadingData(newData: number[], newCategories: string[]) {
+    this.monthlyReadingChartOptions.series = [
+      {
+        name: 'Reading Time (min)',
+        data: newData,
+      },
+    ];
+    this.monthlyReadingChartOptions.xaxis = {
+      categories: newCategories,
+    };
   }
 }
