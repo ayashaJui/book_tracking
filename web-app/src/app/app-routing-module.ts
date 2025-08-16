@@ -31,6 +31,11 @@ const routes: Routes = [
         (m) => m.WishlistModule
       ),
   },
+  {
+    path: 'series',
+    loadChildren: () =>
+      import('./modules/series/series-module').then((m) => m.SeriesModule),
+  },
 
   {
     path: 'quotes',

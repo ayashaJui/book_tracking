@@ -1,0 +1,669 @@
+<!-- Modern Header Section -->
+<div
+  class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+>
+  <!-- Background Pattern -->
+  <div
+    class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+  ></div>
+  <div class="absolute inset-0 opacity-30 dark:opacity-10">
+    <div
+      class="w-full h-full"
+      style="
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          rgba(99, 102, 241, 0.3) 1px,
+          transparent 0
+        );
+        background-size: 20px 20px;
+      "
+    ></div>
+  </div>
+
+  <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <div class="max-w-7xl mx-auto">
+      <div
+        class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+      >
+        <!-- Left Side - Title and Description -->
+        <div class="flex-1">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+            >
+              <i class="pi pi-book text-white text-xl"></i>
+            </div>
+            <div>
+              <h1
+                class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+              >
+                Book Series Library
+              </h1>
+              <p
+                class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+              >
+                Track your reading journey across multiple book series
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side - Quick Stats -->
+        <div class="flex-shrink-0 w-full lg:w-auto">
+          <div class="grid grid-cols-3 gap-4 lg:gap-6">
+            <div class="text-center">
+              <div
+                class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+              >
+                <span
+                  class="text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-400"
+                  >{{ getTotalSeries() }}</span
+                >
+              </div>
+              <p
+                class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+              >
+                Series
+              </p>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+              >
+                <span
+                  class="text-xl lg:text-2xl font-bold text-green-600 dark:text-green-400"
+                  >{{ getTotalBooksRead() }}</span
+                >
+              </div>
+              <p
+                class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+              >
+                Books
+              </p>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+              >
+                <span
+                  class="text-xl lg:text-2xl font-bold text-purple-600 dark:text-purple-400"
+                  >{{ getCompletedSeries() }}</span
+                >
+              </div>
+              <p
+                class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+              >
+                Done
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Container -->
+<div class="lg:px-6 py-6 lg:py-8">
+  <!-- Dashboard Overview -->
+  <div class="grid grid-cols-1 gap-6 mb-8">
+    <!-- Row 1: Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <!-- Average Progress Card -->
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              Avg Progress
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+              {{ getAverageProgress() }}%
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-chart-line text-white"></i>
+          </div>
+        </div>
+        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div
+            class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+            [style.width.%]="getAverageProgress()"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Currently Reading Card -->
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              Reading Now
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+              {{ getCurrentlyReading() }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-eye text-white"></i>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+          <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <span class="text-xs text-gray-500 dark:text-gray-400"
+            >Active sessions</span
+          >
+        </div>
+      </div>
+
+      <!-- Pages Read Card -->
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              Pages Read
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+              {{ getTotalPages() | number }}
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-file text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completion Rate Card -->
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              Completion
+            </p>
+            <p class="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+              {{ getCompletionRate() }}%
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-star-fill text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Favorite Genre Card -->
+      <div
+        class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 rounded-2xl text-white shadow-lg"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-indigo-100 text-sm font-medium">Favorite Genre</p>
+            <p class="text-3xl font-bold mt-1">{{ getFavoriteGenre() }}</p>
+            <p class="text-indigo-200 text-sm mt-1">Most read category</p>
+          </div>
+          <div
+            class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center"
+          >
+            <i class="pi pi-heart text-2xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Fav Genre + Pie Chart -->
+    <div class="grid grid-cols-1 gap-4">
+      <!-- Reading Distribution Chart -->
+      <div class="p-5 lg:p-6 rounded-2xl h-full">
+        <div class="flex items-center gap-3 mb-4 lg:mb-6 justify-center">
+          <div
+            class="w-9 h-9 lg:w-10 lg:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-chart-pie text-white text-xs lg:text-sm"></i>
+          </div>
+          <div>
+            <h3
+              class="font-semibold text-gray-800 dark:text-white text-base lg:text-lg"
+            >
+              Reading Distribution
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Series completion status
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-center mb-4 lg:mb-6">
+          <apx-chart
+            #piechart
+            [series]="chartOptions.series"
+            [chart]="chartOptions.chart"
+            [labels]="chartOptions.labels"
+            [colors]="chartOptions.colors!"
+            [legend]="chartOptions.legend!"
+            [responsive]="chartOptions.responsive"
+          ></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters & Controls -->
+  <div
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 mb-10"
+  >
+    <div class="p-4 lg:p-6">
+      <!-- <div class="flex items-center gap-3 mb-4">
+        <div
+          class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+        >
+          <i class="pi pi-filter text-blue-600 dark:text-blue-400 text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-gray-800 dark:text-white">
+          Filters & Search
+        </h3>
+      </div> -->
+
+      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+        <!-- Search -->
+        <div class="flex items-center gap-3 flex-1 w-full lg:w-auto min-w-0">
+          <div
+            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0"
+          >
+            <i
+              class="pi pi-search text-gray-500 dark:text-gray-400 text-sm"
+            ></i>
+          </div>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search by title, author, or genre..."
+            class="w-full rounded-lg"
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+
+        <!-- Filters -->
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4"
+        >
+          <div class="flex items-center gap-2">
+            <label class="text-sm whitespace-nowrap">Status:</label>
+            <p-select [showClear]="true"
+              [options]="statusOptions"
+              [(ngModel)]="filterStatus"
+              class="rounded-lg min-w-[100px]"
+            >
+            </p-select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <label
+              class="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+              >Sort by:</label
+            >
+            <p-select [showClear]="true"
+              [(ngModel)]="sortOption"
+              [options]="sortOptions"
+              class="rounded-lg min-w-[130px]"
+            >
+            </p-select>
+          </div>
+
+          <!-- Add Button -->
+          <button
+            pButton
+            type="button"
+            icon="pi pi-plus"
+            label="Add Series"
+            class="p-button-rounded whitespace-nowrap"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Series Collection -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        Your Series Collection
+        <span class="text-sm text-gray-500 font-normal ml-2"
+          >({{ displayedSeries.length }} series)</span
+        >
+      </h2>
+      <div class="flex items-center gap-2">
+        <button
+          pButton
+          icon="pi pi-th-large"
+          class="p-button-text p-button-sm"
+          [class.p-button-outlined]="viewMode === 'grid'"
+          (click)="viewMode = 'grid'"
+        ></button>
+        <button
+          pButton
+          icon="pi pi-list"
+          class="p-button-text p-button-sm"
+          [class.p-button-outlined]="viewMode === 'list'"
+          (click)="viewMode = 'list'"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    <div
+      *ngIf="viewMode === 'grid'"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6"
+    >
+      <p-card
+        *ngFor="let series of displayedSeries"
+        (click)="openSeries(series)"
+        styleClass="cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden group bg-white dark:bg-gray-800"
+      >
+        <ng-template pTemplate="header">
+          <div class="relative">
+            <img
+              [src]="series.coverUrl"
+              class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+              alt="cover"
+            />
+            <!-- Gradient Overlay -->
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
+            ></div>
+
+            <!-- Status Badge -->
+            <div class="absolute top-3 left-3">
+              <p-tag
+                *ngIf="getCompletionPercentage(series) === 100"
+                severity="success"
+                value="Completed"
+                rounded
+                styleClass="shadow-lg"
+              ></p-tag>
+              <p-tag
+                *ngIf="
+                  getCompletionPercentage(series) !== 100 &&
+                  getCompletionPercentage(series) > 0
+                "
+                severity="warning"
+                value="In Progress"
+                rounded
+                styleClass="shadow-lg"
+              ></p-tag>
+              <p-tag
+                *ngIf="getCompletionPercentage(series) === 0"
+                severity="secondary"
+                value="Not Started"
+                rounded
+                styleClass="shadow-lg"
+              ></p-tag>
+            </div>
+
+            <!-- Progress Badge -->
+            <div
+              class="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white text-xs font-bold px-2 py-1 rounded-full backdrop-blur-sm shadow-lg"
+            >
+              {{ getCompletionPercentage(series) }}%
+            </div>
+
+            <!-- Genre Tag -->
+            <div class="absolute bottom-3 left-3" *ngIf="series.genre">
+              <span
+                class="bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm"
+              >
+                {{ series.genre }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="p-4 space-y-3">
+          <div>
+            <h3
+              class="text-lg font-bold text-gray-800 dark:text-gray-100 line-clamp-1 mb-1"
+            >
+              {{ series.title }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ series.author }}
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              class="flex justify-between items-center text-xs text-gray-500"
+            >
+              <span>Progress</span>
+              <span>{{ series.readBooks }}/{{ series.totalBooks }} books</span>
+            </div>
+            <p-progressBar
+              [value]="getCompletionPercentage(series)"
+              [showValue]="false"
+              styleClass="h-2"
+            ></p-progressBar>
+          </div>
+
+          <!-- Reading Status Indicator -->
+          <div class="flex items-center gap-2 text-xs">
+            <span
+              class="flex items-center gap-1"
+              *ngIf="hasCurrentlyReading(series)"
+            >
+              <span
+                class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
+              ></span>
+              <span class="text-blue-600 font-medium">Currently Reading</span>
+            </span>
+            <span
+              class="flex items-center gap-1"
+              *ngIf="
+                !hasCurrentlyReading(series) &&
+                getCompletionPercentage(series) < 100
+              "
+            >
+              <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+              <span class="text-gray-500">Paused</span>
+            </span>
+            <span
+              class="flex items-center gap-1"
+              *ngIf="getCompletionPercentage(series) === 100"
+            >
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="text-green-600 font-medium">Completed</span>
+            </span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- List View -->
+    <div *ngIf="viewMode === 'list'" class="space-y-3">
+      <p-card
+        *ngFor="let series of displayedSeries"
+        (click)="openSeries(series)"
+        styleClass="cursor-pointer transition-all duration-200 hover:shadow-md border border-gray-200 dark:border-gray-700 rounded-xl"
+      >
+        <div class="flex items-center gap-4 p-2">
+          <img
+            [src]="series.coverUrl"
+            class="w-16 h-20 object-cover rounded-lg flex-shrink-0"
+            alt="cover"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between">
+              <div class="min-w-0 flex-1">
+                <h3
+                  class="font-semibold text-gray-800 dark:text-gray-100 truncate"
+                >
+                  {{ series.title }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ series.author }}
+                </p>
+                <p class="text-xs text-gray-500" *ngIf="series.genre">
+                  {{ series.genre }}
+                </p>
+              </div>
+              <div class="flex items-center gap-3 ml-4">
+                <div class="text-right">
+                  <div class="text-sm font-medium">
+                    {{ getCompletionPercentage(series) }}%
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    {{ series.readBooks }}/{{ series.totalBooks }} books
+                  </div>
+                </div>
+                <p-progressBar
+                  [value]="getCompletionPercentage(series)"
+                  [showValue]="false"
+                  styleClass="w-20 h-2"
+                ></p-progressBar>
+                <p-tag
+                  [value]="
+                    getCompletionPercentage(series) === 100
+                      ? 'Done'
+                      : getCompletionPercentage(series) > 0
+                      ? 'Progress'
+                      : 'New'
+                  "
+                  [severity]="
+                    getCompletionPercentage(series) === 100
+                      ? 'success'
+                      : getCompletionPercentage(series) > 0
+                      ? 'warning'
+                      : 'secondary'
+                  "
+                  rounded
+                ></p-tag>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Series Modal with Roadmap (Enhanced) -->
+  <p-dialog
+    [(visible)]="showDialog"
+    [modal]="true"
+    [closable]="true"
+    (onHide)="closeSeries()"
+    header="{{ selectedSeries?.title }}"
+    [style]="{ width: '880px' }"
+    styleClass="rounded-xl overflow-hidden"
+  >
+    <div *ngIf="selectedSeries" class="space-y-5">
+      <h3 class="font-semibold text-sm tracking-wide uppercase text-gray-500">
+        Books Roadmap
+      </h3>
+
+      <div
+        class="flex items-stretch overflow-x-auto gap-8 pb-4 border-b border-gray-200 dark:border-gray-700 scrollbar-thin"
+      >
+        <ng-container *ngFor="let book of selectedSeries.books; let i = index">
+          <div class="flex flex-col items-center relative group min-w-[90px]">
+            <!-- Book Dot -->
+            <div
+              [ngClass]="getBookDotColor(book)"
+              class="w-7 h-7 rounded-full cursor-pointer relative ring-offset-2 ring-transparent group-hover:ring-2 transition-shadow"
+              pTooltip="Pages: {{ book.pagesRead || 'N/A' }} | Rating: {{
+                book.rating || 'N/A'
+              }} | Finished: {{ book.finishedDate || 'N/A' }}"
+              tooltipPosition="top"
+            ></div>
+            <small
+              class="mt-2 text-[10px] font-medium text-center line-clamp-2"
+              >{{ book.title }}</small
+            >
+            <!-- Connector Line -->
+            <div
+              *ngIf="i < selectedSeries.books.length - 1"
+              class="absolute top-3 left-[84px] w-16 h-[2px] bg-gray-200 dark:bg-gray-600"
+            ></div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Book List with Inline Actions -->
+      <div class="max-h-96 overflow-y-auto pr-1 space-y-2">
+        <div
+          *ngFor="let book of selectedSeries.books"
+          class="flex flex-wrap justify-between items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+        >
+          <div class="flex flex-col">
+            <span class="font-medium text-sm">{{ book.title }}</span>
+            <span
+              class="text-[11px] text-gray-500"
+              *ngIf="book.pagesRead || book.rating"
+              >Pages: {{ book.pagesRead || "—" }} | Rating:
+              {{ book.rating || "—" }}</span
+            >
+          </div>
+          <div class="flex items-center gap-2">
+            <p-tag
+              [value]="book.status"
+              [severity]="
+                book.status === 'Finished'
+                  ? 'success'
+                  : book.status === 'Reading'
+                  ? 'warning'
+                  : book.status === 'On Hold'
+                  ? 'info'
+                  : 'secondary'
+              "
+              rounded
+              styleClass="text-[11px]"
+            ></p-tag>
+            <button
+              *ngIf="book.status !== 'Finished'"
+              pButton
+              (click)="markBookAsRead(book)"
+              icon="pi pi-check"
+              label="Mark Read"
+              class="p-button-success p-button-sm"
+            ></button>
+            <button
+              *ngIf="book.status === 'Finished'"
+              pButton
+              (click)="markBookAsUnread(book)"
+              icon="pi pi-undo"
+              label="Mark Unread"
+              class="p-button-secondary p-button-sm"
+            ></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button
+          pButton
+          class="p-button-rounded p-button-primary p-button-sm"
+          icon="pi pi-forward"
+          label="Start Next Book"
+          (click)="addNextBook()"
+        ></button>
+      </div>
+
+      <!-- Preserve original modal content (hidden to avoid duplication) -->
+      <div class="hidden">
+        <h3 class="font-semibold mb-4">Books Roadmap</h3>
+        <!-- Original roadmap & list preserved above -->
+      </div>
+    </div>
+  </p-dialog>
+</div>

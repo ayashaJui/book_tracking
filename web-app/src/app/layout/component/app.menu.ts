@@ -44,6 +44,11 @@ export class AppMenu {
             routerLink: ['/wishlist'],
           },
           {
+            label: 'Series Tracking',
+            icon: 'pi pi-fw pi-list',
+            routerLink: ['/series'],
+          },
+          {
             label: 'Quotes',
             icon: 'fa-solid fa-quote-left',
             class: 'rotated-icon',
