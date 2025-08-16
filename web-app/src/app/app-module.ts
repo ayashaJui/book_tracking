@@ -10,6 +10,7 @@ import Aura from '@primeuix/themes/aura';
 import { SharedModule } from './modules/shared/shared.module';
 import { AppLayout } from './layout/component/app.layout';
 import { CommonModule } from '@angular/common';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 @NgModule({
   declarations: [App],
@@ -29,6 +30,7 @@ import { CommonModule } from '@angular/common';
         options: { darkModeSelector: '.app-dark' },
       },
     }),
+    provideHttpClient(withFetch()),
   ],
   bootstrap: [App],
 })

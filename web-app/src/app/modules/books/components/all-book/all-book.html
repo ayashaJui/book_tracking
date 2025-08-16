@@ -1,254 +1,733 @@
-<div class="p-6">
-  <!-- Header -->
-  <div
-    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4"
-  >
-    <div class="flex items-center gap-4">
-      <h1 class="text-2xl font-bold">
-        📚 All Books
-        <span class="text-gray-500 text-sm">({{ filteredBooks.length }})</span>
-      </h1>
-
-      <!-- view toggle -->
-      <button
-        pButton
-        type="button"
-        icon="pi"
-        [label]="viewMode === 'table' ? 'Show Grid' : 'Show Table'"
-        [icon]="viewMode === 'table' ? 'pi pi-th-large' : 'pi pi-table'"
-        class="p-button-sm"
-        (click)="toggleView()"
-      ></button>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <button
-        pButton
-        label="Add New Book"
-        icon="pi pi-plus"
-        class="p-button-success"
-      ></button>
-      <button
-        pButton
-        label="Export CSV"
-        icon="pi pi-upload"
-        class="p-button-secondary"
-        (click)="exportCSV()"
-      ></button>
+<div class="min-h-screen">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div
+        class="p-8 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 mb-4"
+      >
+        <i
+          class="pi pi-spin pi-spinner text-4xl text-indigo-600 mb-4 block"
+        ></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">
+          Loading your library...
+        </h3>
+        <p class="text-gray-500">Please wait while we fetch your books</p>
+      </div>
     </div>
   </div>
 
-  <!-- Search & Filters -->
-  <div class="flex flex-wrap items-center gap-3 mb-4">
-    <input
-      type="text"
-      pInputText
-      placeholder="🔎 Search by title or author"
-      class="w-64"
-      [(ngModel)]="globalFilter"
-      (input)="applyFilters()"
-    />
-
-    <p-select
-      [options]="statusOptions"
-      [(ngModel)]="selectedStatus"
-      placeholder="Filter by Status"
-      (onChange)="applyFilters()"
-      class="w-48"
-    ></p-select>
-
-    <p-multiSelect
-      [options]="genreOptions"
-      [(ngModel)]="selectedGenres"
-      placeholder="Filter by Genre"
-      (onChange)="applyFilters()"
-      class="w-56"
-      optionLabel="label"
-    ></p-multiSelect>
-
-    <p-select
-      [options]="authorOptions"
-      [(ngModel)]="selectedAuthor"
-      placeholder="Filter by Author"
-      (onChange)="applyFilters()"
-      class="w-48"
-    ></p-select>
-
-    <button
-      pButton
-      class="p-button-text"
-      label="Clear"
-      (click)="clearFilters()"
-    ></button>
-  </div>
-
-  <!-- Table View -->
-  <div *ngIf="viewMode === 'table'">
-    <p-table
-      #dt
-      [value]="filteredBooks"
-      [first]="first"
-      [paginator]="true"
-      [rows]="rows"
-      [rowsPerPageOptions]="[5, 10, 20]"
-      responsiveLayout="scroll"
-      [globalFilterFields]="['title', 'author']"
-      class="shadow-lg"
+  <!-- Main Content -->
+  <div *ngIf="!loading" class="animate-fade-in-up">
+    <!-- Modern Header Section -->
+    <div
+      class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
     >
-      <ng-template pTemplate="header">
-        <tr>
-          <th pSortableColumn="title">
-            Title <p-sortIcon field="title"></p-sortIcon>
-          </th>
-          <th pSortableColumn="author">
-            Author <p-sortIcon field="author"></p-sortIcon>
-          </th>
-          <th>Genres</th>
-          <th class="text-center" pSortableColumn="pages">
-            Pages <p-sortIcon field="pages"></p-sortIcon>
-          </th>
-          <th class="text-center" pSortableColumn="price">
-            Price <p-sortIcon field="price"></p-sortIcon>
-          </th>
-          <th>Source</th>
-          <th>Status</th>
-          <th class="text-center">Actions</th>
-        </tr>
-      </ng-template>
+      <!-- Background Pattern -->
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+      ></div>
+      <div class="absolute inset-0 opacity-30 dark:opacity-10">
+        <div
+          class="w-full h-full"
+          style="
+            background-image: radial-gradient(
+              circle at 1px 1px,
+              rgba(99, 102, 241, 0.3) 1px,
+              transparent 0
+            );
+            background-size: 20px 20px;
+          "
+        ></div>
+      </div>
 
-      <ng-template pTemplate="body" let-book>
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
+      <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto">
+          <div
+            class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+          >
+            <!-- Left Side - Title and Description -->
+            <div class="flex-1">
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+                >
+                  <i class="pi pi-book text-white text-xl"></i>
+                </div>
+                <div>
+                  <h1
+                    class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                  >
+                    All Books
+                  </h1>
+                  <p
+                    class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                  >
+                    Manage and track your personal library collection
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side - Quick Stats -->
+            <div class="flex-shrink-0 w-full lg:w-auto">
+              <div class="grid grid-cols-3 gap-4 lg:gap-6">
+                <div class="text-center">
+                  <div
+                    class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                  >
+                    <span
+                      class="text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-400"
+                      >{{ filteredBooks.length }}</span
+                    >
+                  </div>
+                  <p
+                    class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >
+                    Books
+                  </p>
+                </div>
+                <div class="text-center">
+                  <div
+                    class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                  >
+                    <span
+                      class="text-xl lg:text-2xl font-bold text-green-600 dark:text-green-400"
+                      >{{ getBooksByStatus("Read").length }}</span
+                    >
+                  </div>
+                  <p
+                    class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >
+                    Read
+                  </p>
+                </div>
+                <div class="text-center">
+                  <div
+                    class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                  >
+                    <span
+                      class="text-xl lg:text-2xl font-bold text-purple-600 dark:text-purple-400"
+                      >{{ getBooksByStatus("Reading").length }}</span
+                    >
+                  </div>
+                  <p
+                    class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >
+                    Reading
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="lg:px-6 py-6 lg:py-8">
+      <!-- Action Buttons -->
+      <div class="mb-8">
+        <div
+          class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+        >
+          <div class="flex items-center gap-4">
+            <!-- Enhanced view toggle -->
+            <div class="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
+              <button
+                pButton
+                type="button"
+                [class]="
+                  viewMode === 'table' ? 'p-button-filled' : 'p-button-text'
+                "
+                icon="pi pi-table"
+                class="p-button-sm rounded-md transition-all duration-200"
+                (click)="viewMode = 'table'"
+                pTooltip="Table View"
+              ></button>
+              <button
+                pButton
+                type="button"
+                [class]="
+                  viewMode === 'grid' ? 'p-button-filled' : 'p-button-text'
+                "
+                icon="pi pi-th-large"
+                class="p-button-sm rounded-md transition-all duration-200"
+                (click)="viewMode = 'grid'"
+                pTooltip="Grid View"
+              ></button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button
+              pButton
+              label="Add New Book"
+              icon="pi pi-plus"
+              class="p-button-success p-button-raised shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              (click)="addBookPage()"
+            ></button>
+            <button
+              pButton
+              label="Export CSV"
+              icon="pi pi-download"
+              class="p-button-outlined hover:shadow-lg transition-all duration-200"
+              (click)="exportCSV()"
+            ></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Search & Filters -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
+      >
+        <div class="p-4 lg:p-6">
+          <div
+            class="flex flex-col lg:flex-row items-start lg:items-center gap-4"
+          >
+            <!-- Search -->
+            <div
+              class="flex items-center gap-3 flex-1 w-full lg:w-auto min-w-0"
+            >
+              <div
+                class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <i
+                  class="pi pi-search text-gray-500 dark:text-gray-400 text-sm"
+                ></i>
+              </div>
+              <input
+                pInputText
+                type="text"
+                placeholder="Search by title, author, or series..."
+                class="w-full rounded-lg"
+                [(ngModel)]="globalFilter"
+                (input)="applyFilters()"
+              />
+            </div>
+
+            <!-- Filters -->
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4"
+            >
+              <div class="flex items-center gap-2">
+                <label class="text-sm whitespace-nowrap">Status:</label>
+                <p-select
+                  [showClear]="true"
+                  [options]="statusOptions"
+                  [(ngModel)]="selectedStatus"
+                  (onChange)="applyFilters()"
+                  class="rounded-lg min-w-[120px]"
+                >
+                </p-select>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="text-sm whitespace-nowrap">Genres:</label>
+                <p-multiSelect
+                  [showClear]="true"
+                  [options]="genreOptions"
+                  [(ngModel)]="selectedGenres"
+                  (onChange)="applyFilters()"
+                  optionLabel="label"
+                  class="rounded-lg min-w-[140px]"
+                >
+                </p-multiSelect>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="text-sm whitespace-nowrap">Author:</label>
+                <p-select
+                  [showClear]="true"
+                  [options]="authorOptions"
+                  [(ngModel)]="selectedAuthor"
+                  (onChange)="applyFilters()"
+                  class="rounded-lg min-w-[120px]"
+                >
+                </p-select>
+              </div>
+
+              <button
+                pButton
+                class="p-button-text hover:bg-gray-100 rounded-xl transition-all duration-200"
+                label="Clear All"
+                icon="pi pi-times"
+                (click)="clearFilters()"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div
+            class="flex items-center gap-6 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{{ getBooksByStatus("Read").length }} Read</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{{ getBooksByStatus("Reading").length }} Reading</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{{ getBooksByStatus("Want to Read").length }} Want to
+                Read</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Table View -->
+      <div
+        *ngIf="viewMode === 'table'"
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <p-table
+          #dt
+          [value]="filteredBooks"
+          [first]="first"
+          [paginator]="true"
+          [rows]="rows"
+          [rowsPerPageOptions]="[5, 10, 20, 50]"
+          responsiveLayout="scroll"
+          [globalFilterFields]="['title', 'author']"
+          styleClass="p-datatable-lg p-datatable-striped"
+          [tableStyle]="{ 'min-width': '70rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr class="bg-gradient-to-r from-indigo-50 to-purple-50">
+              <th
+                pSortableColumn="title"
+                class="px-6 py-4 text-left font-semibold text-gray-700"
+              >
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-book text-indigo-500"></i>
+                  Title
+                  <p-sortIcon field="title"></p-sortIcon>
+                </div>
+              </th>
+              <th
+                pSortableColumn="author"
+                class="px-6 py-4 text-left font-semibold text-gray-700"
+              >
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-user text-indigo-500"></i>
+                  Author
+                  <p-sortIcon field="author"></p-sortIcon>
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left font-semibold text-gray-700">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-tags text-indigo-500"></i>
+                  Genres
+                </div>
+              </th>
+              <th
+                class="text-center px-6 py-4 font-semibold text-gray-700"
+                pSortableColumn="pages"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-file text-indigo-500"></i>
+                  Pages
+                  <p-sortIcon field="pages"></p-sortIcon>
+                </div>
+              </th>
+              <th
+                class="text-center px-6 py-4 font-semibold text-gray-700"
+                pSortableColumn="price"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-dollar text-indigo-500"></i>
+                  Price
+                  <p-sortIcon field="price"></p-sortIcon>
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left font-semibold text-gray-700">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-bookmark text-indigo-500"></i>
+                  Series
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left font-semibold text-gray-700">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-shopping-cart text-indigo-500"></i>
+                  Source
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left font-semibold text-gray-700">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-flag text-indigo-500"></i>
+                  Status
+                </div>
+              </th>
+              <th class="text-center px-6 py-4 font-semibold text-gray-700">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-cog text-indigo-500"></i>
+                  Actions
+                </div>
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-book>
+            <tr
+              class="hover:bg-indigo-50/50 transition-all duration-200 border-b border-gray-100"
+            >
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-4">
+                  <div class="relative">
+                    <img
+                      *ngIf="book.cover"
+                      [src]="book.cover"
+                      alt="{{ book.title }}"
+                      class="w-12 h-16 object-cover rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                    />
+                    <div
+                      *ngIf="!book.cover"
+                      class="w-12 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center"
+                    >
+                      <i class="pi pi-book text-gray-400"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div
+                      class="font-semibold text-gray-900 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    >
+                      {{ book.title }}
+                    </div>
+                    <div
+                      class="text-sm text-gray-500 flex items-center gap-2 mt-1"
+                    >
+                      <i class="pi pi-calendar text-xs"></i>
+                      {{ book.dateAdded | date : "mediumDate" }}
+                    </div>
+                    <div *ngIf="book.rating" class="mt-1">
+                      <p-rating
+                        [ngModel]="book.rating"
+                        [readonly]="true"
+                        [stars]="5"
+                        styleClass="text-xs"
+                      ></p-rating>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">{{ book.author }}</div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex flex-wrap gap-1">
+                  <ng-container *ngFor="let g of book.genres; let i = index">
+                    <span
+                      class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 hover:from-indigo-200 hover:to-purple-200 transition-all duration-200"
+                    >
+                      {{ g }}
+                    </span>
+                  </ng-container>
+                </div>
+              </td>
+              <td class="text-center px-6 py-4">
+                <span class="font-medium text-gray-700">{{ book.pages }}</span>
+              </td>
+              <td class="text-center px-6 py-4">
+                <span class="font-semibold text-green-600">
+                  {{ book.price | currency : "USD" : "symbol" }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <ng-container *ngIf="book.seriesId">
+                  <div
+                    class="flex items-center gap-2 text-blue-600 hover:text-blue-800 cursor-pointer transition-colors duration-200"
+                    (click)="viewSeries(book.seriesId)"
+                  >
+                    <i class="pi pi-bookmark text-sm"></i>
+                    <div>
+                      <div class="font-medium">{{ book.seriesName }}</div>
+                      <div class="text-xs text-gray-500">
+                        ({{ getSeriesCompletion(book.seriesId) }})
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <span *ngIf="!book.seriesId" class="text-gray-400 text-sm"
+                  >No series</span
+                >
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-shopping-cart text-gray-400 text-sm"></i>
+                  <span class="text-gray-700 font-medium">{{
+                    book.source || "Unknown"
+                  }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span
+                  [ngClass]="getStatusBadgeClass(book.status)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+                >
+                  {{ book.status }}
+                </span>
+              </td>
+              <td class="text-center px-6 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-eye"
+                    class="p-button-rounded p-button-text p-button-info p-button-sm hover:scale-110 transition-all duration-200"
+                    (click)="viewBook(book)"
+                    pTooltip="View Details"
+                  ></button>
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-warning p-button-sm hover:scale-110 transition-all duration-200"
+                    (click)="editBook(book)"
+                    pTooltip="Edit Book"
+                  ></button>
+                  <button
+                    pButton
+                    pRipple
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm hover:scale-110 transition-all duration-200"
+                    (click)="deleteBook(book)"
+                    pTooltip="Delete Book"
+                  ></button>
+                  <button
+                    *ngIf="book.seriesId"
+                    pButton
+                    pRipple
+                    icon="pi pi-bookmark"
+                    class="p-button-rounded p-button-text p-button-secondary p-button-sm hover:scale-110 transition-all duration-200"
+                    title="View Series"
+                    (click)="viewSeries(book.seriesId)"
+                    pTooltip="View Series"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="9" class="text-center py-12">
+                <div class="flex flex-col items-center gap-4">
+                  <div class="p-6 bg-gray-100 rounded-full">
+                    <i class="pi pi-book text-4xl text-gray-400"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">
+                      No books found
+                    </h3>
+                    <p class="text-gray-500">
+                      Try adjusting your search or filters, or add your first
+                      book!
+                    </p>
+                  </div>
+                  <button
+                    pButton
+                    label="Add Your First Book"
+                    icon="pi pi-plus"
+                    class="p-button-outlined"
+                    (click)="addBookPage()"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Enhanced Grid View -->
+      <div *ngIf="viewMode === 'grid'">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+        >
+          <div
+            *ngFor="let book of filteredBooks"
+            class="group bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            <!-- Book Cover -->
+            <div class="relative h-64 overflow-hidden">
               <img
                 *ngIf="book.cover"
                 [src]="book.cover"
                 alt="{{ book.title }}"
-                class="w-12 h-16 object-cover rounded"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
-              <div>
-                <div class="font-semibold">{{ book.title }}</div>
-                <div class="text-sm text-gray-500">
-                  {{ book.dateAdded | date : "mediumDate" }}
+              <div
+                *ngIf="!book.cover"
+                class="w-full h-full bg-gradient-to-br from-indigo-200 to-purple-300 flex items-center justify-center"
+              >
+                <i class="pi pi-book text-6xl text-white/70"></i>
+              </div>
+
+              <!-- Status Badge -->
+              <div class="absolute top-3 right-3">
+                <span
+                  [ngClass]="getStatusBadgeClass(book.status)"
+                  class="px-2 py-1 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm"
+                >
+                  {{ book.status }}
+                </span>
+              </div>
+
+              <!-- Series Badge -->
+              <div *ngIf="book.seriesId" class="absolute top-3 left-3">
+                <div
+                  class="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1"
+                >
+                  <i class="pi pi-bookmark text-xs text-blue-600"></i>
+                  <span class="text-xs font-medium text-blue-600">Series</span>
                 </div>
               </div>
-            </div>
-          </td>
-          <td>{{ book.author }}</td>
-          <td>
-            <ng-container *ngFor="let g of book.genres; let i = index">
-              <span
-                class="text-xs inline-block mr-1 px-2 py-1 rounded-full bg-gray-100 text-gray-700"
-                >{{ g }}</span
+
+              <!-- Quick Actions Overlay -->
+              <div
+                class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2"
               >
-            </ng-container>
-          </td>
-          <td class="text-center">{{ book.pages }}</td>
-          <td>
-            {{ book.price | currency : "USD" : "symbol" }}
-          </td>
-          <td class="text-center">{{ book.source }}</td>
-          <td>
-            <span
-              [ngClass]="getStatusBadgeClass(book.status)"
-              class="px-2 py-1 rounded text-xs"
-            >
-              {{ book.status }}
-            </span>
-          </td>
-          <td class="text-center">
-            <button
-              pButton
-              pRipple
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-info p-button-sm mr-2"
-              (click)="viewBook(book)"
-            ></button>
-            <button
-              pButton
-              pRipple
-              icon="pi pi-pencil"
-              class="p-button-rounded p-button-warning p-button-sm mr-2"
-              (click)="editBook(book)"
-            ></button>
-            <button
-              pButton
-              pRipple
-              icon="pi pi-trash"
-              class="p-button-rounded p-button-danger p-button-sm mr-2"
-              (click)="deleteBook(book)"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-info p-button-sm bg-white/20 border-white/30 hover:bg-white/30 transition-all duration-200"
+                  (click)="viewBook(book); $event.stopPropagation()"
+                  pTooltip="View Details"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-warning p-button-sm bg-white/20 border-white/30 hover:bg-white/30 transition-all duration-200"
+                  (click)="editBook(book); $event.stopPropagation()"
+                  pTooltip="Edit Book"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-danger p-button-sm bg-white/20 border-white/30 hover:bg-white/30 transition-all duration-200"
+                  (click)="deleteBook(book); $event.stopPropagation()"
+                  pTooltip="Delete Book"
+                ></button>
+              </div>
+            </div>
 
-    </p-table>
-  </div>
+            <!-- Book Details -->
+            <div class="p-4">
+              <div class="mb-3">
+                <h3
+                  class="font-bold text-gray-900 text-lg leading-tight mb-1 line-clamp-2"
+                >
+                  {{ book.title }}
+                </h3>
+                <p class="text-gray-600 text-sm font-medium">
+                  by {{ book.author }}
+                </p>
+              </div>
 
-  <!-- Grid View -->
-  <div
-    *ngIf="viewMode === 'grid'"
-    class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
-  >
-    <p-card *ngFor="let book of filteredBooks" class="shadow-lg">
-      <ng-template pTemplate="header">
-        <img
-          [src]="book.cover"
-          alt="{{ book.title }}"
-          class="w-full h-48 object-cover rounded-t-lg"
-        />
-      </ng-template>
+              <!-- Genres -->
+              <div class="mb-3">
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="let g of book.genres.slice(0, 3)"
+                    class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700"
+                  >
+                    {{ g }}
+                  </span>
+                  <span
+                    *ngIf="book.genres.length > 3"
+                    class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500"
+                  >
+                    +{{ book.genres.length - 3 }}
+                  </span>
+                </div>
+              </div>
 
-      <div class="mt-2">
-        <div class="font-semibold">{{ book.title }}</div>
-        <div class="text-sm text-gray-600">by {{ book.author }}</div>
-        <div class="mt-2">
-          <span
-            *ngFor="let g of book.genres"
-            class="text-xs inline-block mr-1 px-2 py-1 rounded-full bg-gray-100 text-gray-700"
-            >{{ g }}</span
-          >
+              <!-- Rating -->
+              <div class="mb-3" *ngIf="book.rating">
+                <p-rating
+                  [ngModel]="book.rating"
+                  [readonly]="true"
+                  [stars]="5"
+                  styleClass="text-sm"
+                ></p-rating>
+              </div>
+
+              <!-- Book Info -->
+              <div class="space-y-2 text-sm text-gray-600 mb-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1">
+                    <i class="pi pi-file text-xs"></i>
+                    <span>{{ book.pages }} pages</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <i class="pi pi-dollar text-xs"></i>
+                    <span class="font-semibold text-green-600">{{
+                      book.price | currency : "USD" : "symbol"
+                    }}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1" *ngIf="book.source">
+                  <i class="pi pi-shopping-cart text-xs"></i>
+                  <span>{{ book.source }}</span>
+                </div>
+
+                <div
+                  *ngIf="book.seriesId"
+                  class="flex items-center gap-1 text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
+                  (click)="viewSeries(book.seriesId); $event.stopPropagation()"
+                >
+                  <i class="pi pi-bookmark text-xs"></i>
+                  <span class="font-medium">{{ book.seriesName }}</span>
+                  <span class="text-xs text-gray-500"
+                    >({{ getSeriesCompletion(book.seriesId) }})</span
+                  >
+                </div>
+              </div>
+
+              <!-- Date Added -->
+              <div
+                class="text-xs text-gray-400 flex items-center gap-1 border-t pt-2"
+              >
+                <i class="pi pi-calendar"></i>
+                <span>Added {{ book.dateAdded | date : "mediumDate" }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="mt-2">
-          <p-rating
-            [ngModel]="book.rating"
-            [readonly]="true"
-            [stars]="5"
-          ></p-rating>
+
+        <!-- Empty State for Grid View -->
+        <div *ngIf="filteredBooks.length === 0" class="text-center py-20">
+          <div class="flex flex-col items-center gap-6">
+            <div class="p-8 bg-white/70 backdrop-blur-sm rounded-full">
+              <i class="pi pi-book text-6xl text-gray-400"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-600 mb-2">
+                No books found
+              </h3>
+              <p class="text-gray-500 mb-6">
+                Try adjusting your search or filters, or add your first book!
+              </p>
+              <button
+                pButton
+                label="Add Your First Book"
+                icon="pi pi-plus"
+                class="p-button-success p-button-lg"
+                (click)="addBookPage()"
+              ></button>
+            </div>
+          </div>
         </div>
       </div>
-
-      <ng-template pTemplate="footer">
-        <div class="flex justify-between">
-          <div>
-            <span
-              [ngClass]="getStatusBadgeClass(book.status)"
-              class="px-2 py-1 rounded text-xs"
-              >{{ book.status }}</span
-            >
-          </div>
-          <div class="flex gap-2">
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-info p-button-sm"
-              (click)="viewBook(book)"
-            ></button>
-            <button
-              pButton
-              icon="pi pi-pencil"
-              class="p-button-rounded p-button-text p-button-warning p-button-sm"
-              (click)="editBook(book)"
-            ></button>
-            <button
-              pButton
-              icon="pi pi-trash"
-              class="p-button-rounded p-button-text p-button-danger p-button-sm"
-              (click)="deleteBook(book)"
-            ></button>
-          </div>
-        </div>
-      </ng-template>
-    </p-card>
+    </div>
   </div>
 </div>

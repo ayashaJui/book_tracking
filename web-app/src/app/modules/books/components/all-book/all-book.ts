@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 
 interface Book {
@@ -13,6 +14,8 @@ interface Book {
   dateAdded?: string;
   price?: number;
   source?: string; // e.g., 'Amazon', 'Library', etc.
+  seriesId?: number; // optional series id
+  seriesName?: string; // optional series name
 }
 
 @Component({
@@ -27,6 +30,7 @@ export class AllBook implements OnInit {
   rows = 10;
 
   viewMode: 'table' | 'grid' = 'table';
+  loading = false;
 
   // Filters / search
   globalFilter = '';
@@ -52,51 +56,81 @@ export class AllBook implements OnInit {
   // UI bindings
   ratingValue = 4; // sample binding for other UI pieces
 
-  constructor() {}
+  seriesMap: { [key: number]: Book[] } = {};
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
+    this.loading = true;
+
+    // Simulate loading time for better UX
+    setTimeout(() => {
+      this.loadBooks();
+      this.loading = false;
+    }, 800);
+  }
+
+  loadBooks(): void {
     // SAMPLE DATA — replace with real data from backend
     this.books = [
       {
         id: 1,
-        title: 'Atomic Habits',
-        author: 'James Clear',
-        genres: ['Self-help', 'Productivity'],
-        pages: 320,
-        rating: 4.5,
-        status: 'Read',
-        cover: 'assets/images/product-not-found.png',
-        dateAdded: '2024-02-10',
-        price: 12.99,
-        source: 'Amazon',
-      },
-      {
-        id: 2,
         title: 'The Hobbit',
         author: 'J.R.R. Tolkien',
-        genres: ['Fantasy'],
+        genres: ['Fantasy', 'Adventure'],
         pages: 310,
         rating: 4.8,
         status: 'Reading',
         cover: 'assets/images/product-not-found.png',
         dateAdded: '2024-05-01',
         price: 9.99,
-        source: 'Library',
+        source: 'Amazon',
+        seriesId: 1,
+        seriesName: 'Middle-earth',
+      },
+      {
+        id: 2,
+        title: 'The Fellowship of the Ring',
+        author: 'J.R.R. Tolkien',
+        genres: ['Fantasy', 'Epic'],
+        pages: 423,
+        rating: 4.9,
+        status: 'Read',
+        cover: 'assets/images/product-not-found.png',
+        dateAdded: '2024-06-01',
+        price: 11.99,
+        source: 'Barnes & Noble',
+        seriesId: 1,
+        seriesName: 'Middle-earth',
       },
       {
         id: 3,
-        title: 'Sapiens',
-        author: 'Yuval Noah Harari',
-        genres: ['History', 'Non-Fiction'],
-        pages: 498,
-        rating: 4.6,
+        title: 'Dune',
+        author: 'Frank Herbert',
+        genres: ['Science Fiction', 'Space Opera'],
+        pages: 688,
+        rating: 4.7,
         status: 'Want to Read',
         cover: 'assets/images/product-not-found.png',
-        dateAdded: '2024-06-12',
-        price: 14.99,
-        source: 'Bookstore',
+        dateAdded: '2024-07-15',
+        price: 15.99,
+        source: 'Amazon',
       },
-      // add more items for testing...
+      {
+        id: 4,
+        title: 'The Name of the Wind',
+        author: 'Patrick Rothfuss',
+        genres: ['Fantasy', 'Adventure'],
+        pages: 662,
+        rating: 4.6,
+        status: 'Read',
+        cover: 'assets/images/product-not-found.png',
+        dateAdded: '2024-04-22',
+        price: 12.99,
+        source: 'Library',
+        seriesId: 2,
+        seriesName: 'The Kingkiller Chronicle',
+      },
     ];
 
     // populate filter option lists
@@ -115,10 +149,36 @@ export class AllBook implements OnInit {
 
     // initial filtered list
     this.applyFilters();
+
+    this.groupBooksBySeries();
   }
 
-  toggleView() {
-    this.viewMode = this.viewMode === 'table' ? 'grid' : 'table';
+  groupBooksBySeries() {
+    this.seriesMap = {};
+    this.books.forEach((book) => {
+      if (book.seriesId) {
+        if (!this.seriesMap[book.seriesId]) {
+          this.seriesMap[book.seriesId] = [];
+        }
+        this.seriesMap[book.seriesId].push(book);
+      }
+    });
+  }
+
+  // compute series completion status
+  getSeriesCompletion(seriesId: number): string {
+    const booksInSeries = this.seriesMap[seriesId];
+    const finishedCount = booksInSeries.filter(
+      (b) => b.status === 'Read'
+    ).length;
+    return `${finishedCount}/${booksInSeries.length} read`;
+  }
+
+  // optional: view series details
+  viewSeries(seriesId: number) {
+    const booksInSeries = this.seriesMap[seriesId];
+    console.log('Series Books:', booksInSeries);
+    // open dialog or navigate to series page
   }
 
   applyFilters() {
@@ -183,6 +243,10 @@ export class AllBook implements OnInit {
     }
   }
 
+  getBooksByStatus(status: string): Book[] {
+    return this.books.filter((book) => book.status === status);
+  }
+
   // placeholder actions
   viewBook(book: Book) {
     console.log('view', book);
@@ -195,5 +259,9 @@ export class AllBook implements OnInit {
     // confirm & remove
     this.books = this.books.filter((b) => b.id !== book.id);
     this.applyFilters();
+  }
+
+  addBookPage() {
+    this.router.navigate(['/books/add']);
   }
 }
