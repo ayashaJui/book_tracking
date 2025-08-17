@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 
 interface ReadingLog {
@@ -32,7 +33,7 @@ export class AllLogs implements OnInit {
 
   ngOnInit(): void {
     this.authorOptions = this.authors.map((a) => ({ label: a, value: a }));
-    
+
     this.bookReadingLogs = [
       {
         id: 1,
@@ -65,13 +66,15 @@ export class AllLogs implements OnInit {
     this.filteredLogs = [...this.bookReadingLogs];
   }
 
+  constructor(private router: Router) {}
+
   get readingLogs() {
     return this.filteredLogs.filter((log) => log.status === 'Reading');
   }
 
   get authors(): string[] {
     // Extract unique authors from logs for filtering
-    return Array.from(new Set(this.readingLogs.map((log) => log.author)));
+    return Array.from(new Set(this.bookReadingLogs.map((log) => log.author)));
   }
 
   statusOptions = [
@@ -82,7 +85,7 @@ export class AllLogs implements OnInit {
   ];
 
   applyFilters() {
-    this.filteredLogs = this.readingLogs.filter((log) => {
+    this.filteredLogs = this.bookReadingLogs.filter((log) => {
       const matchesGlobalFilter =
         !this.globalFilter ||
         log.title.toLowerCase().includes(this.globalFilter.toLowerCase()) ||
@@ -138,7 +141,9 @@ export class AllLogs implements OnInit {
   deleteLog(log: ReadingLog) {
     // implement delete confirmation here
     if (confirm(`Delete reading log for "${log.title}"?`)) {
-      this.bookReadingLogs = this.readingLogs.filter((l) => l.id !== log.id);
+      this.bookReadingLogs = this.bookReadingLogs.filter(
+        (l) => l.id !== log.id
+      );
       this.applyFilters();
     }
   }
@@ -148,5 +153,13 @@ export class AllLogs implements OnInit {
     if (this.table) {
       this.table.exportCSV();
     }
+  }
+
+  addLog() {
+    this.router.navigate(['/reading-logs/add-log']);
+  }
+
+  getLogsByStatus(status: string): ReadingLog[] {
+    return this.bookReadingLogs.filter((log) => log.status === status);
   }
 }

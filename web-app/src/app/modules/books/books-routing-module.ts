@@ -9,7 +9,7 @@ const routes: Routes = [
     component: AllBook,
   },
   {
-    path: 'add',
+    path: 'add-book',
     component: AddBook,
   },
 ];

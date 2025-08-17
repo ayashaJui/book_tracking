@@ -1,206 +1,582 @@
-<div class="p-6">
-  <!-- Currently Reading Books Strip -->
-  <div *ngIf="readingLogs.length > 0" class="mb-10 p-4 rounded-lg">
-    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-      📖 Currently Reading
-      <span class="text-sm">({{ readingLogs.length }})</span>
-    </h2>
-    <div class="flex overflow-x-auto gap-5 no-scrollbar mt-5">
-      <p-card
-        *ngFor="let log of readingLogs"
-        class="flex-shrink-0 w-64 shadow-md rounded-lg hover:shadow-lg transition-shadow"
-      >
-        <div
-          class="font-semibold text-lg mb-1 truncate"
-          title="{{ log.title }}"
-        >
-          {{ log.title }}
-        </div>
-        <div class="text-sm mb-2 truncate" title="{{ log.author }}">
-          by {{ log.author }}
-        </div>
-        <div class="mb-2">
-          <span
-            [ngClass]="getStatusBadgeClass(log.status)"
-            class="px-3 py-1 rounded text-xs inline-block font-medium"
-            >{{ log.status }}</span
-          >
-        </div>
-        <div class="text-sm mb-2">Started: {{ formatDate(log.startDate) }}</div>
-        <div class="text-sm mb-4">
-          Est. Time: {{ log.estimatedTimeHrs ?? "-" }} hrs
-        </div>
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(99, 102, 241, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
 
-        <div class="flex justify-end">
-          <button
-            pButton
-            icon="pi pi-eye"
-            class="p-button-rounded p-button-text p-button-info p-button-sm"
-            (click)="viewLog(log)"
-          >
-            view
-          </button>
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-book text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Reading Logs
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Track and manage your reading journey
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Quick Stats -->
+          <div class="flex-shrink-0 w-full lg:w-auto">
+            <div class="grid grid-cols-3 gap-4 lg:gap-6">
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-200"
+                    >{{ readingLogs.length }}</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-200"
+                >
+                  Logs
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-green-600 dark:text-green-200"
+                    >{{ getLogsByStatus("Finished").length }}</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300"
+                >
+                  Finished
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-purple-600 dark:text-purple-300"
+                    >{{ getLogsByStatus("Reading").length }}</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300"
+                >
+                  Reading
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </p-card>
+      </div>
     </div>
   </div>
 
-  <hr class="my-4" />
+  <!-- Main Content Container -->
+  <div class="lg:px-6 py-6 lg:py-8">
+    <!-- Currently Reading Books Strip -->
+    <div *ngIf="readingLogs.length > 0" class="mb-10 rounded-2xl shadow-sm">
+      <div class="p-6">
+        <h2
+          class="text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800 dark:text-white"
+        >
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center"
+          >
+            <i class="fa-solid fa-book-bookmark text-white text-sm"></i>
+          </div>
+          Currently Reading
+          <span
+            class="text-sm font-normal text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full"
+            >{{ readingLogs.length }}</span
+          >
+        </h2>
+        <div class="flex overflow-x-auto gap-6 pb-4">
+          <div
+            *ngFor="let log of readingLogs"
+            class="group flex-shrink-0 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 overflow-hidden"
+          >
+            <!-- Content -->
+            <div class="p-6">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                  <h3
+                    class="font-bold text-lg mb-2 text-gray-900 dark:text-white truncate leading-tight"
+                    title="{{ log.title }}"
+                  >
+                    {{ log.title }}
+                  </h3>
+                  <p
+                    class="text-gray-600 dark:text-gray-300 text-sm font-medium"
+                    title="{{ log.author }}"
+                  >
+                    by {{ log.author }}
+                  </p>
+                </div>
+                <span
+                  [ngClass]="getStatusBadgeClass(log.status)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm whitespace-nowrap"
+                  >{{ log.status }}</span
+                >
+              </div>
 
-  <!-- Reading Logs Section -->
-  <div class="pt-8">
-    <!-- Header + Actions -->
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
-    >
-      <h1 class="text-2xl font-bold flex items-center gap-2">
-        📖 Reading Logs
-        <span class="text-gray-500 text-sm">({{ filteredLogs.length }})</span>
-      </h1>
-      <div class="flex items-center gap-3">
-        <button
-          pButton
-          label="Add New Log"
-          icon="pi pi-plus"
-          class="p-button-success"
-        ></button>
-        <button
-          pButton
-          label="Export CSV"
-          icon="pi pi-upload"
-          class="p-button-secondary"
-          (click)="exportCSV()"
-        ></button>
+              <!-- Progress Info -->
+              <div class="space-y-3 mb-4">
+                <div
+                  class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                >
+                  <i class="pi pi-calendar text-blue-500"></i>
+                  <span>Started: {{ formatDate(log.startDate) }}</span>
+                </div>
+                <div
+                  class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                >
+                  <i class="pi pi-clock text-purple-500"></i>
+                  <span>Est. Time: {{ log.estimatedTimeHrs ?? "-" }} hrs</span>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div
+                class="mb-4"
+                *ngIf="
+                  log.status === 'Reading' &&
+                  log.actualTimeHrs &&
+                  log.estimatedTimeHrs
+                "
+              >
+                <div
+                  class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1"
+                >
+                  <span>Progress</span>
+                  <span
+                    >{{
+                      (log.actualTimeHrs / log.estimatedTimeHrs) * 100
+                        | number : "1.0-0"
+                    }}%</span
+                  >
+                </div>
+                <div
+                  class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2"
+                >
+                  <div
+                    class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                    [style.width.%]="
+                      (log.actualTimeHrs / log.estimatedTimeHrs) * 100
+                    "
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <div class="flex justify-end">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  label="View Details"
+                  class="p-button-sm p-button-outlined transition-all duration-200"
+                  (click)="viewLog(log)"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Filters -->
-    <div class="flex flex-wrap items-center gap-4 mb-6 rounded-md">
-      <input
-        type="text"
-        pInputText
-        placeholder="🔎 Search by title or author"
-        class="w-64"
-        [(ngModel)]="globalFilter"
-        (input)="applyFilters()"
-      />
+    <!-- Enhanced Action Buttons and Filters Section -->
+    <div class="mb-8">
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"
+      >
+        <div class="flex items-center gap-4">
+          <h2
+            class="text-2xl font-bold flex items-center gap-3 text-gray-800 dark:text-white"
+          >
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-list text-white text-sm"></i>
+            </div>
+            All Reading Logs
+            <span
+              class="text-sm font-normal text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full"
+              >{{ filteredLogs.length }}</span
+            >
+          </h2>
+        </div>
+        <div
+          class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto"
+        >
+          <button
+            pButton
+            label="Add New"
+            icon="pi pi-plus"
+            class="p-button-success p-button-raised shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
+            (click)="addLog()"
+          ></button>
+          <button
+            pButton
+            label="Export CSV"
+            icon="pi pi-download"
+            class="p-button-outlined hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
+            (click)="exportCSV()"
+          ></button>
+        </div>
+      </div>
 
-      <p-select
-        [options]="statusOptions"
-        [(ngModel)]="selectedStatus"
-        placeholder="Filter by Status"
-        (onChange)="applyFilters()"
-        class="w-48"
-        showClear="true"
-      ></p-select>
+      <!-- Enhanced Filters -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+      >
+        <div class="space-y-4">
+          <!-- Search -->
+          <div class="w-full">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <i
+                  class="pi pi-search text-gray-500 dark:text-gray-400 text-sm"
+                ></i>
+              </div>
+              <input
+                pInputText
+                type="text"
+                placeholder="Search by title or author..."
+                class="w-full rounded-lg"
+                [(ngModel)]="globalFilter"
+                (input)="applyFilters()"
+              />
+            </div>
+          </div>
 
-      <p-multiSelect
-        [options]="authorOptions"
-        [(ngModel)]="selectedAuthors"
-        placeholder="Filter by Author"
-        (onChange)="applyFilters()"
-        class="w-56"
-        optionLabel="label"
-        display="chip"
-      ></p-multiSelect>
+          <!-- Filters Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Status:</label
+              >
+              <p-select
+                [showClear]="true"
+                [options]="statusOptions"
+                [(ngModel)]="selectedStatus"
+                (onChange)="applyFilters()"
+                class="w-full"
+                placeholder="All Status"
+              ></p-select>
+            </div>
 
-      <button
-        pButton
-        class="p-button-text"
-        label="Clear"
-        (click)="clearFilters()"
-      ></button>
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Authors:</label
+              >
+              <p-multiSelect
+                [showClear]="true"
+                [options]="authorOptions"
+                [(ngModel)]="selectedAuthors"
+                (onChange)="applyFilters()"
+                optionLabel="label"
+                class="w-full"
+                placeholder="All Authors"
+                display="chip"
+              ></p-multiSelect>
+            </div>
+
+            <div class="flex items-end">
+              <button
+                pButton
+                class="p-button-text hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 w-full"
+                label="Clear All"
+                icon="pi pi-times"
+                (click)="clearFilters()"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Table View -->
-    <div>
+    <!-- Enhanced Table View -->
+    <div class="rounded-2xl shadow-sm overflow-hidden">
       <p-table
         [value]="filteredLogs"
         [paginator]="true"
-        [rows]="5"
-        [rowsPerPageOptions]="[5, 10, 20]"
-        class="shadow rounded-lg"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20, 50]"
         [responsiveLayout]="'scroll'"
+        stripedRows
+        [tableStyle]="{ 'min-width': '70rem' }"
       >
         <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="title" class="text-left px-4 py-2">
-              Title <p-sortIcon field="title"></p-sortIcon>
+          <tr
+            class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-800"
+          >
+            <th>Sl No</th>
+            <th
+              pSortableColumn="title"
+              class="px-6 py-4 text-left font-semibold"
+            >
+              <div class="flex items-center gap-2">
+                <i class="pi pi-book text-indigo-500"></i>
+                Title
+                <p-sortIcon field="title"></p-sortIcon>
+              </div>
             </th>
-            <th pSortableColumn="author" class="text-left px-4 py-2">
-              Author <p-sortIcon field="author"></p-sortIcon>
+            <th
+              pSortableColumn="author"
+              class="px-6 py-4 text-left font-semibold"
+            >
+              <div class="flex items-center gap-2">
+                <i class="pi pi-user text-indigo-500"></i>
+                Author
+                <p-sortIcon field="author"></p-sortIcon>
+              </div>
             </th>
-            <th class="text-left px-4 py-2">Start Date</th>
-            <th class="text-left px-4 py-2">Finish Date</th>
-            <th pSortableColumn="status" class="text-left px-4 py-2">
-              Status <p-sortIcon field="status"></p-sortIcon>
+            <th class="px-6 py-4 text-left font-semibold">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-calendar text-indigo-500"></i>
+                Start Date
+              </div>
             </th>
-            <th class="text-left px-4 py-2">Est. Time (hrs)</th>
-            <th class="text-left px-4 py-2">Actual Time (hrs)</th>
-            <th class="text-center px-4 py-2">Progress</th>
-            <th class="text-center px-4 py-2">Actions</th>
+            <th class="px-6 py-4 text-left font-semibold">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-calendar-plus text-indigo-500"></i>
+                Finish Date
+              </div>
+            </th>
+            <th
+              pSortableColumn="status"
+              class="px-6 py-4 text-center font-semibold"
+            >
+              <div class="flex items-center gap-2">
+                <i class="pi pi-flag text-indigo-500"></i>
+                Status
+                <p-sortIcon field="status"></p-sortIcon>
+              </div>
+            </th>
+            <th class="px-6 py-4 text-center font-semibold">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-clock text-indigo-500"></i>
+                Est. Time (hrs)
+              </div>
+            </th>
+            <th class="px-6 py-4 text-center font-semibold">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-stopwatch text-indigo-500"></i>
+                Actual Time (hrs)
+              </div>
+            </th>
+            <th class="px-6 py-4 text-center font-semibold">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-chart-bar text-indigo-500"></i>
+                Progress
+              </div>
+            </th>
+            <th class="px-6 py-4 text-center font-semibold">
+              <div class="flex items-center justify-center gap-2">
+                <i class="pi pi-cog text-indigo-500"></i>
+                Actions
+              </div>
+            </th>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-log>
-          <tr>
-            <td
-              class="px-4 py-2 font-semibold truncate"
-              title="{{ log.title }}"
-            >
-              {{ log.title }}
+        <ng-template pTemplate="body" let-log let-rowIndex="rowIndex">
+          <tr class="transition-all duration-200">
+            <td>{{ rowIndex + 1 }}</td>
+            <td class="px-6 py-4 text-left">
+              <div
+                class="font-semibold text-gray-900 dark:text-white truncate max-w-xs"
+                title="{{ log.title }}"
+              >
+                {{ log.title }}
+              </div>
             </td>
-            <td class="px-4 py-2 truncate" title="{{ log.author }}">
-              {{ log.author }}
+            <td class="px-6 py-4 text-left">
+              <div
+                class="font-medium text-gray-700 dark:text-gray-300 truncate"
+                title="{{ log.author }}"
+              >
+                {{ log.author }}
+              </div>
             </td>
-            <td class="px-4 py-2">{{ formatDate(log.startDate) }}</td>
-            <td class="px-4 py-2">{{ formatDate(log.finishDate) }}</td>
-            <td class="px-4 py-2">
+            <td class="px-6 py-4 text-left">
+              <div
+                class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+              >
+                <i class="pi pi-calendar text-xs"></i>
+                {{ formatDate(log.startDate) }}
+              </div>
+            </td>
+            <td class="px-6 py-4 text-left">
+              <div
+                class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+              >
+                <i class="pi pi-calendar-plus text-xs"></i>
+                {{ formatDate(log.finishDate) }}
+              </div>
+            </td>
+            <td class="px-6 py-4 text-center">
               <span
                 [ngClass]="getStatusBadgeClass(log.status)"
-                class="px-2 py-1 rounded text-xs inline-block"
+                class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
               >
                 {{ log.status }}
               </span>
             </td>
-            <td class="px-4 py-2">{{ log.estimatedTimeHrs ?? "-" }}</td>
-            <td class="px-4 py-2">{{ log.actualTimeHrs ?? "-" }}</td>
-            <td class="px-4 py-2 text-center">
+            <td class="px-6 py-4 text-center">
+              <span
+                class="font-medium text-blue-600 dark:text-blue-400 text-center"
+              >
+                {{ log.estimatedTimeHrs ?? "-" }}
+              </span>
+            </td>
+            <td
+              class="px-6 py-4 text-center text-purple-600 dark:text-purple-400"
+            >
+              {{ log.actualTimeHrs ?? "-" }}
+              <!-- <span
+                class="font-medium text-purple-600 dark:text-purple-400 text-center"
+              >
+              </span> -->
+            </td>
+            <td class="px-6 py-4 text-center">
               <ng-container [ngSwitch]="log.status">
-                <span *ngSwitchCase="'Finished'">100%</span>
-                <span *ngSwitchCase="'Reading'">
-                  {{
-                    log.actualTimeHrs && log.estimatedTimeHrs
-                      ? ((log.actualTimeHrs / log.estimatedTimeHrs) * 100
-                          | number : "1.0-0") + "%"
-                      : "-"
-                  }}
-                </span>
-                <span *ngSwitchDefault>-</span>
+                <div
+                  *ngSwitchCase="'Finished'"
+                  class="flex items-center justify-center gap-2"
+                >
+                  <!-- <div
+                    class="w-16 bg-green-200 dark:bg-green-800 rounded-full h-2"
+                  >
+                    <div class="bg-green-500 h-2 rounded-full w-full"></div>
+                  </div> -->
+                  <span
+                    class="text-sm font-semibold text-green-600 dark:text-green-400"
+                    >100%</span
+                  >
+                </div>
+                <div
+                  *ngSwitchCase="'Reading'"
+                  class="flex items-center justify-center gap-2"
+                >
+                  <div
+                    *ngIf="log.actualTimeHrs && log.estimatedTimeHrs"
+                    class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2"
+                  >
+                    <div
+                      class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                      [style.width.%]="
+                        (log.actualTimeHrs / log.estimatedTimeHrs) * 100
+                      "
+                    ></div>
+                  </div>
+                  <span
+                    class="text-sm font-semibold text-blue-600 dark:text-blue-400"
+                  >
+                    {{
+                      log.actualTimeHrs && log.estimatedTimeHrs
+                        ? ((log.actualTimeHrs / log.estimatedTimeHrs) * 100
+                            | number : "1.0-0") + "%"
+                        : "-"
+                    }}
+                  </span>
+                </div>
+                <span *ngSwitchDefault class="text-gray-400 text-sm">-</span>
               </ng-container>
             </td>
-            <td class="px-4 py-2 text-center">
-              <button
-                pButton
-                pRipple
-                icon="pi pi-eye"
-                class="p-button-rounded p-button-info p-button-sm mr-2"
-                (click)="viewLog(log)"
-              ></button>
-              <button
-                pButton
-                pRipple
-                icon="pi pi-pencil"
-                class="p-button-rounded p-button-warning p-button-sm mr-2"
-                (click)="editLog(log)"
-              ></button>
-              <button
-                pButton
-                pRipple
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-danger p-button-sm"
-                (click)="deleteLog(log)"
-              ></button>
+            <td class="px-6 py-4 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-info p-button-sm transition-all duration-200"
+                  (click)="viewLog(log)"
+                  pTooltip="View Details"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text p-button-warning p-button-sm transition-all duration-200"
+                  (click)="editLog(log)"
+                  pTooltip="Edit Log"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger p-button-sm transition-all duration-200"
+                  (click)="deleteLog(log)"
+                  pTooltip="Delete Log"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10" class="text-center py-12">
+              <div class="flex flex-col items-center text-center gap-4">
+                <div class="p-8 bg-white/70 backdrop-blur-sm rounded-full">
+                  <i class="pi pi-book text-6xl text-gray-400"></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300"
+                  >
+                    No reading logs found
+                  </h3>
+                  <p class="text-gray-500 dark:text-gray-400 mb-6">
+                    Try adjusting your search or filters, or add your first
+                    reading log!
+                  </p>
+                  <button
+                    pButton
+                    label="Add Your First Log"
+                    icon="pi pi-plus"
+                    class="p-button-success p-button-lg"
+                    (click)="addLog()"
+                  ></button>
+                </div>
+              </div>
             </td>
           </tr>
         </ng-template>

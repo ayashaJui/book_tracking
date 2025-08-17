@@ -262,6 +262,6 @@ export class AllBook implements OnInit {
   }
 
   addBookPage() {
-    this.router.navigate(['/books/add']);
+    this.router.navigate(['/books/add-book']);
   }
 }

@@ -1,0 +1,320 @@
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(99, 102, 241, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
+
+    <div class="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="max-w-3xl mx-auto text-left">
+        <div
+          class="flex items-center justify-start gap-3 sm:gap-4 mb-3 sm:mb-4"
+        >
+          <div
+            class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg"
+          >
+            <i class="pi pi-plus text-white text-lg sm:text-xl"></i>
+          </div>
+          <h1
+            class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+          >
+            Add Reading Log
+          </h1>
+        </div>
+        <p class="text-gray-600 dark:text-gray-300 text-base sm:text-lg">
+          Track your reading progress and create a new log entry
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-6.5xl mx-auto p-4 sm:p-6">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+    >
+      <div class="p-6 sm:p-8">
+        <form
+          #logForm="ngForm"
+          (ngSubmit)="saveLog()"
+          class="space-y-6 sm:space-y-8"
+        >
+          <!-- Basic Information Section -->
+          <div class="space-y-4 sm:space-y-6">
+            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+              <div
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-book text-white text-xs sm:text-sm"></i>
+              </div>
+              <h2
+                class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+              >
+                Book Information
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Title -->
+              <div class="space-y-2">
+                <label
+                  for="title"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Book Title <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="title"
+                    type="text"
+                    pInputText
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                    [(ngModel)]="newLog.title"
+                    name="title"
+                    placeholder="Enter book title"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Author -->
+              <div class="space-y-2">
+                <label
+                  for="author"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Author <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="author"
+                    type="text"
+                    pInputText
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                    [(ngModel)]="newLog.author"
+                    name="author"
+                    placeholder="Enter author name"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reading Details Section -->
+          <div class="space-y-4 sm:space-y-6">
+            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+              <div
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-calendar text-white text-xs sm:text-sm"></i>
+              </div>
+              <h2
+                class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+              >
+                Reading Details
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Status -->
+              <div class="space-y-2">
+                <label
+                  for="status"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Status <span class="text-red-500">*</span>
+                </label>
+                <p-select
+                  id="status"
+                  [options]="statusOptions"
+                  [(ngModel)]="newLog.status"
+                  name="status"
+                  placeholder="Select status"
+                  optionLabel="label"
+                  optionValue="value"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+
+              <!-- Start Date -->
+              <div class="space-y-2">
+                <label
+                  for="startDate"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Start Date
+                </label>
+                <p-datepicker
+                  id="startDate"
+                  [(ngModel)]="newLog.startDate"
+                  name="startDate"
+                  dateFormat="yy-mm-dd"
+                  showIcon="true"
+                  placeholder="Select start date"
+                  styleClass="w-full"
+                ></p-datepicker>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Finish Date -->
+              <div class="space-y-2">
+                <label
+                  for="finishDate"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Finish Date
+                </label>
+                <p-datepicker
+                  id="finishDate"
+                  [(ngModel)]="newLog.finishDate"
+                  name="finishDate"
+                  dateFormat="yy-mm-dd"
+                  showIcon="true"
+                  placeholder="Select finish date"
+                  styleClass="w-full"
+                ></p-datepicker>
+              </div>
+            </div>
+          </div>
+
+          <!-- Time Tracking Section -->
+          <div class="space-y-4 sm:space-y-6">
+            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+              <div
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-clock text-white text-xs sm:text-sm"></i>
+              </div>
+              <h2
+                class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+              >
+                Time Tracking
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Estimated Time -->
+              <div class="space-y-2">
+                <label
+                  for="estimatedTimeHrs"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Estimated Time (hours)
+                </label>
+                <div class="relative">
+                  <input
+                    id="estimatedTimeHrs"
+                    type="number"
+                    pInputText
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                    [(ngModel)]="newLog.estimatedTimeHrs"
+                    name="estimatedTimeHrs"
+                    placeholder="0"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              <!-- Actual Time -->
+              <div class="space-y-2">
+                <label
+                  for="actualTimeHrs"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Actual Time (hours)
+                </label>
+                <div class="relative">
+                  <input
+                    id="actualTimeHrs"
+                    type="number"
+                    pInputText
+                    class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                    [(ngModel)]="newLog.actualTimeHrs"
+                    name="actualTimeHrs"
+                    placeholder="0"
+                    min="1"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Section -->
+          <div class="space-y-4 sm:space-y-6">
+            <div class="flex items-center gap-3 mb-4 sm:mb-6">
+              <div
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center"
+              >
+                <i class="pi pi-file-edit text-white text-xs sm:text-sm"></i>
+              </div>
+              <h2
+                class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+              >
+                Additional Notes
+              </h2>
+            </div>
+
+            <div class="space-y-2">
+              <label
+                for="notes"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Notes & Thoughts
+              </label>
+              <textarea
+                id="notes"
+                rows="4"
+                pInputTextarea
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-700 dark:text-white transition-all duration-200 resize-none"
+                [(ngModel)]="newLog.notes"
+                name="notes"
+                placeholder="Write any thoughts, impressions, or context about your reading experience..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div
+            class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-6 sm:pt-8 border-t border-gray-200 dark:border-gray-700"
+          >
+            <button
+              type="button"
+              pButton
+              label="Cancel"
+              severity="contrast"
+              icon="pi pi-times"
+              class="p-button-text w-full sm:w-auto order-2 sm:order-1"
+              (click)="cancel()"
+            ></button>
+            <button
+              type="submit"
+              pButton
+              label="Save "
+              icon="pi pi-save"
+              class="p-button-success p-button-raised shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
+              [disabled]="!logForm.valid"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

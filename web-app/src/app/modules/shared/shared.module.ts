@@ -28,6 +28,7 @@ import { Avatar } from 'primeng/avatar';
 import { Chip } from 'primeng/chip';
 import { Knob } from 'primeng/knob';
 import { FileUploadModule } from 'primeng/fileupload';
+import { DatePickerModule } from 'primeng/datepicker';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
@@ -60,6 +61,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     Knob,
     FileUploadModule,
     ToastModule,
+    DatePickerModule,
   ],
   exports: [
     ButtonModule,
@@ -87,6 +89,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     Knob,
     FileUploadModule,
     ToastModule,
+    DatePickerModule,
   ],
 })
 export class SharedModule {}

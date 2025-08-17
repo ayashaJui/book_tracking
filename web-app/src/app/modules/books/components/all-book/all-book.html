@@ -303,7 +303,7 @@
       <!-- Enhanced Table View -->
       <div
         *ngIf="viewMode === 'table'"
-        class="rounded-2xl shadow-sm overflow-hidden"
+        class="rounded-2xl shadow-sm overflow-hidden bg-white dark:bg-gray-900"
       >
         <p-table
           stripedRows
@@ -316,84 +316,121 @@
           responsiveLayout="scroll"
           [globalFilterFields]="['title', 'author']"
           [tableStyle]="{ 'min-width': '70rem' }"
+          styleClass="p-datatable-sm dark:bg-gray-900"
         >
           <ng-template pTemplate="header">
-            <tr class="bg-gradient-to-r from-indigo-50 to-purple-50">
+            <tr class="bg-gray-50 dark:bg-gray-800">
+              <th
+                class="px-6 py-4 text-left font-semibold text-gray-700 dark:text-gray-300"
+              >
+                SL No
+              </th>
               <th
                 pSortableColumn="title"
-                class="px-6 py-4 text-left font-semibold"
+                class="px-6 py-4 text-left font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-book text-indigo-500"></i>
+                  <i
+                    class="pi pi-book text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Title
                   <p-sortIcon field="title"></p-sortIcon>
                 </div>
               </th>
               <th
                 pSortableColumn="author"
-                class="px-6 py-4 text-left font-semibold"
+                class="px-6 py-4 text-left font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-user text-indigo-500"></i>
+                  <i
+                    class="pi pi-user text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Author
                   <p-sortIcon field="author"></p-sortIcon>
                 </div>
               </th>
-              <th class="px-6 py-4 text-left font-semibold">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-tags text-indigo-500"></i>
+              <th
+                class="px-6 py-4 text-center font-semibold text-gray-700 dark:text-gray-300"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i
+                    class="pi pi-tags text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Genres
                 </div>
               </th>
               <th
-                class="text-center px-6 py-4 font-semibold"
+                class="text-center px-6 py-4 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 pSortableColumn="pages"
               >
                 <div class="flex items-center justify-center gap-2">
-                  <i class="pi pi-file text-indigo-500"></i>
+                  <i
+                    class="pi pi-file text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Pages
                   <p-sortIcon field="pages"></p-sortIcon>
                 </div>
               </th>
               <th
-                class="text-center px-6 py-4 font-semibold"
+                class="text-center px-6 py-4 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 pSortableColumn="price"
               >
                 <div class="flex items-center justify-center gap-2">
-                  <i class="pi pi-dollar text-indigo-500"></i>
+                  <i
+                    class="pi pi-dollar text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Price
                   <p-sortIcon field="price"></p-sortIcon>
                 </div>
               </th>
-              <th class="px-6 py-4 text-left font-semibold">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-bookmark text-indigo-500"></i>
+              <th
+                class="px-6 py-4 text-center font-semibold text-gray-700 dark:text-gray-300"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i
+                    class="pi pi-bookmark text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Series
                 </div>
               </th>
-              <th class="px-6 py-4 text-left font-semibold">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-shopping-cart text-indigo-500"></i>
+              <th
+                class="px-6 py-4 text-center font-semibold text-gray-700 dark:text-gray-300"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i
+                    class="pi pi-shopping-cart text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Source
                 </div>
               </th>
-              <th class="px-6 py-4 text-left font-semibold">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-flag text-indigo-500"></i>
+              <th
+                class="px-6 py-4 text-center font-semibold text-gray-700 dark:text-gray-300"
+              >
+                <div class="flex items-center justify-center gap-2">
+                  <i
+                    class="pi pi-flag text-indigo-500 dark:text-indigo-400"
+                  ></i>
                   Status
                 </div>
               </th>
-              <th class="text-center px-6 py-4 font-semibold text-gray-700">
+              <th
+                class="text-center px-6 py-4 font-semibold text-gray-700 dark:text-gray-300"
+              >
                 <div class="flex items-center justify-center gap-2">
-                  <i class="pi pi-cog text-indigo-500"></i>
+                  <i class="pi pi-cog text-indigo-500 dark:text-indigo-400"></i>
                   Actions
                 </div>
               </th>
             </tr>
           </ng-template>
 
-          <ng-template pTemplate="body" let-book>
-            <tr class="transition-all duration-200">
+          <ng-template pTemplate="body" let-book let-rowIndex="rowIndex">
+            <tr
+              class="transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
+                {{ rowIndex + 1 }}
+              </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
                   <div class="relative">
@@ -437,8 +474,8 @@
               <td class="px-6 py-4">
                 <div class="font-medium">{{ book.author }}</div>
               </td>
-              <td class="px-6 py-4">
-                <div class="flex flex-wrap gap-1">
+              <td class="px-6 py-4 text-center">
+                <div class="flex flex-wrap gap-1 justify-center">
                   <ng-container *ngFor="let g of book.genres; let i = index">
                     <span
                       class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-indigo-200 to-purple-300 text-indigo-800 dark:from-indigo-700 dark:to-purple-800 dark:text-indigo-100 hover:from-indigo-300 hover:to-purple-400 dark:hover:from-indigo-600 dark:hover:to-purple-700 transition-all duration-200"
@@ -456,14 +493,14 @@
                   {{ book.price | currency : "USD" : "symbol" }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 text-center">
                 <ng-container *ngIf="book.seriesId">
                   <div
-                    class="flex items-center gap-2 text-blue-600 hover:text-blue-800 cursor-pointer transition-colors duration-200"
+                    class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 cursor-pointer transition-colors duration-200"
                     (click)="viewSeries(book.seriesId)"
                   >
                     <i class="pi pi-bookmark text-sm"></i>
-                    <div>
+                    <div class="text-center">
                       <div class="font-medium">{{ book.seriesName }}</div>
                       <div class="text-xs text-gray-500">
                         ({{ getSeriesCompletion(book.seriesId) }})
@@ -475,15 +512,15 @@
                   >No series</span
                 >
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
+              <td class="px-6 py-4 text-center">
+                <div class="flex items-center justify-center gap-2">
                   <i class="pi pi-shopping-cart text-sm"></i>
                   <span class="font-medium">{{
                     book.source || "Unknown"
                   }}</span>
                 </div>
               </td>
-              <td class="px-6 py-4">
+              <td class="text-center px-6 py-4">
                 <span
                   [ngClass]="getStatusBadgeClass(book.status)"
                   class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
