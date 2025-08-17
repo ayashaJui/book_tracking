@@ -1,0 +1,428 @@
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-purple-50 to-pink-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(168, 85, 247, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
+
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-heart text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Add to Wishlist
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Add books you want to read to your personal wishlist
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class="lg:px-6 py-6 lg:py-8">
+    <div class="max-w-6.5xl mx-auto">
+      <!-- Form Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <!-- Form Header -->
+        <div
+          class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-600"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-plus text-white text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-800 dark:text-white">
+                Book Details
+              </h2>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Fill in the information about the book you want to add
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Content -->
+        <div class="p-6">
+          <form #wishForm="ngForm" (ngSubmit)="saveWish()">
+            <!-- Basic Information Section -->
+            <div class="mb-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div
+                  class="w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-info-circle text-blue-600 dark:text-blue-400 text-xs"
+                  ></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                  Basic Information
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Title -->
+                <div class="space-y-2">
+                  <label
+                    for="title"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-book text-purple-500"></i>
+                    Book Title *
+                  </label>
+                  <input
+                    id="title"
+                    type="text"
+                    pInputText
+                    class="w-full rounded-lg"
+                    [(ngModel)]="newWish.title"
+                    name="title"
+                    required
+                    placeholder="Enter book title"
+                  />
+                </div>
+
+                <!-- Author -->
+                <div class="space-y-2">
+                  <label
+                    for="author"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-user text-purple-500"></i>
+                    Author *
+                  </label>
+                  <input
+                    id="author"
+                    type="text"
+                    pInputText
+                    class="w-full rounded-lg"
+                    [(ngModel)]="newWish.author"
+                    name="author"
+                    required
+                    placeholder="Enter author name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Pricing Information Section -->
+            <div class="mb-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div
+                  class="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-dollar text-green-600 dark:text-green-400 text-xs"
+                  ></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                  Pricing Information
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Price -->
+                <div class="space-y-2">
+                  <label
+                    for="price"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-tag text-green-500"></i>
+                    Current Price
+                  </label>
+                  <input
+                    id="price"
+                    type="number"
+                    pInputText
+                    class="w-full rounded-lg"
+                    [(ngModel)]="newWish.price"
+                    name="price"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <!-- Target Price -->
+                <div class="space-y-2">
+                  <label
+                    for="targetPrice"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-bullseye text-green-500"></i>
+                    Target Price
+                  </label>
+                  <input
+                    id="targetPrice"
+                    type="number"
+                    pInputText
+                    class="w-full rounded-lg"
+                    [(ngModel)]="newWish.targetPrice"
+                    name="targetPrice"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <!-- Price Comparison -->
+              <div
+                *ngIf="newWish.price && newWish.targetPrice"
+                class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600 dark:text-gray-400"
+                    >Price Difference:</span
+                  >
+                  <span
+                    [class]="getPriceDifferenceClass()"
+                    class="text-sm font-semibold"
+                  >
+                    {{ getPriceDifference() }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status & Priority Section -->
+            <div class="mb-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div
+                  class="w-6 h-6 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-flag text-orange-600 dark:text-orange-400 text-xs"
+                  ></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                  Status & Priority
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Priority -->
+                <div class="space-y-2">
+                  <label
+                    for="priority"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-star text-orange-500"></i>
+                    Priority *
+                  </label>
+                  <p-select
+                    id="priority"
+                    [options]="priorityOptions"
+                    [(ngModel)]="newWish.priority"
+                    name="priority"
+                    placeholder="Select Priority"
+                    class="w-full"
+                    required
+                  ></p-select>
+                </div>
+
+                <!-- Status -->
+                <div class="space-y-2">
+                  <label
+                    for="status"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-circle text-orange-500"></i>
+                    Status *
+                  </label>
+                  <p-select
+                    id="status"
+                    [options]="statusOptions"
+                    [(ngModel)]="newWish.status"
+                    name="status"
+                    placeholder="Select Status"
+                    class="w-full"
+                    required
+                  ></p-select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Information Section -->
+            <div class="mb-8">
+              <div class="flex items-center gap-3 mb-6">
+                <div
+                  class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-tags text-indigo-600 dark:text-indigo-400 text-xs"
+                  ></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                  Additional Information
+                </h3>
+              </div>
+
+              <!-- Genre / Tags -->
+              <div class="space-y-2 mb-6">
+                <label
+                  for="genres"
+                  class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  <i class="pi pi-bookmark text-indigo-500"></i>
+                  Genres / Tags
+                </label>
+                <p-multiSelect
+                  [options]="genreOptions"
+                  [(ngModel)]="newWish.genres"
+                  name="genres"
+                  optionLabel="label"
+                  display="chip"
+                  placeholder="Select Genres"
+                  class="w-full"
+                ></p-multiSelect>
+              </div>
+
+              <!-- Notes -->
+              <div class="space-y-2">
+                <label
+                  for="notes"
+                  class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  <i class="pi pi-file-edit text-indigo-500"></i>
+                  Notes
+                </label>
+                <textarea
+                  id="notes"
+                  rows="4"
+                  pInputTextarea
+                  class="w-full rounded-lg"
+                  [(ngModel)]="newWish.notes"
+                  name="notes"
+                  placeholder="Why is this book on your wishlist? Any specific edition, thoughts, or reminders..."
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+              <div
+                class="flex flex-col sm:flex-row justify-between items-center gap-4"
+              >
+                <!-- Form Status -->
+                <div class="flex items-center gap-2 text-sm">
+                  <i [class]="getFormStatusIcon()" class="text-sm"></i>
+                  <span [class]="getFormStatusTextClass()">
+                    {{ getFormStatusText() }}
+                  </span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <button
+                    pButton
+                    type="button"
+                    label="Cancel"
+                    icon="pi pi-times"
+                    class="p-button-text hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 w-full sm:w-auto"
+                    routerLink="/wishlist"
+                  ></button>
+                  <!-- <button
+                    pButton
+                    type="button"
+                    label="Save as Draft"
+                    icon="pi pi-save"
+                    class="p-button-outlined hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
+                    (click)="saveDraft()"
+                  ></button> -->
+                  <button
+                    pButton
+                    type="submit"
+                    label="Save"
+                    icon="pi pi-heart"
+                    class="p-button-success p-button-raised shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
+                    [disabled]="!wishForm.form.valid"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Tips Section -->
+      <div class="mt-6">
+        <div
+          class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-6 border border-blue-200 dark:border-gray-600"
+        >
+          <div class="flex items-start gap-4">
+            <div
+              class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center flex-shrink-0"
+            >
+              <i class="pi pi-lightbulb text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <div>
+              <h3
+                class="text-lg font-semibold text-gray-800 dark:text-white mb-2"
+              >
+                Quick Tips
+              </h3>
+              <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <li class="flex items-center gap-2">
+                  <i class="pi pi-check-circle text-green-500 text-xs"></i>
+                  Set a target price to get notified when the book goes on sale
+                </li>
+                <li class="flex items-center gap-2">
+                  <i class="pi pi-check-circle text-green-500 text-xs"></i>
+                  Use priority levels to organize your wishlist effectively
+                </li>
+                <li class="flex items-center gap-2">
+                  <i class="pi pi-check-circle text-green-500 text-xs"></i>
+                  Add genres to help discover similar books
+                </li>
+                <li class="flex items-center gap-2">
+                  <i class="pi pi-check-circle text-green-500 text-xs"></i>
+                  Use notes to remember why you wanted this book
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
