@@ -1,22 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
+import { Book } from '../../models/book.model';
 
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  genres: string[];
-  pages: number;
-  rating: number; // 0-5
-  status: 'Read' | 'Reading' | 'Want to Read' | string;
-  cover?: string;
-  dateAdded?: string;
-  price?: number;
-  source?: string; // e.g., 'Amazon', 'Library', etc.
-  seriesId?: number; // optional series id
-  seriesName?: string; // optional series name
-}
+// Using the Book model from the books module instead of local interface
 
 @Component({
   selector: 'app-all-book',

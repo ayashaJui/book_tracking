@@ -13,24 +13,11 @@ import {
 import { LayoutService } from '../../../../layout/service/layout.service';
 import { Subscription } from 'rxjs';
 import { UiService } from '../../../shared/services/ui.service.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Series, SeriesBook } from '../../models/series.model';
+import { SeriesService } from '../../services/series.service';
 
-interface Book {
-  title: string;
-  status: 'Want to Read' | 'Reading' | 'Finished' | 'On Hold';
-  pagesRead?: number;
-  rating?: number;
-  finishedDate?: string;
-}
-
-interface Series {
-  title: string;
-  author: string;
-  totalBooks: number;
-  readBooks: number;
-  coverUrl: string;
-  genre?: string;
-  books: Book[];
-}
+// Using the feature-specific models instead of shared models
 
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
@@ -49,6 +36,7 @@ export type ChartOptions = {
 })
 export class AllSeries {
   showDialog: boolean = false;
+  isLoading: boolean = false;
   // Search term for filtering series (added for enhanced UI search)
   searchQuery: string = '';
   // View mode for switching between grid and list view
@@ -139,8 +127,11 @@ export class AllSeries {
   @ViewChild('piechart') piechart!: ChartComponent;
 
   constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
     private layoutService: LayoutService,
-    private uiService: UiService
+    private uiService: UiService,
+    private seriesService: SeriesService
   ) {
     this.updateChart();
   }
@@ -165,7 +156,7 @@ export class AllSeries {
     return 'bg-gray-400';
   }
 
-  getBookDotColor(book: Book) {
+  getBookDotColor(book: SeriesBook) {
     switch (book.status) {
       case 'Finished':
         return 'bg-green-500';
@@ -247,18 +238,21 @@ export class AllSeries {
       this.uiService.colorScheme$.subscribe((colorScheme) => {
         const newColor = colorScheme === 'dark' ? '#f2f3f4' : '#415B61';
 
-        this.piechart.updateOptions({
-          legend: {
-            labels: {
-              colors: [newColor, newColor, newColor],
+        // Check if piechart exists before updating
+        if (this.piechart && this.piechart.updateOptions) {
+          this.piechart.updateOptions({
+            legend: {
+              labels: {
+                colors: [newColor, newColor, newColor],
+              },
             },
-          },
-        });
+          });
+        }
       })
     );
   }
 
-  markBookAsRead(book: Book) {
+  markBookAsRead(book: SeriesBook) {
     book.status = 'Finished';
     this.selectedSeries!.readBooks = this.selectedSeries!.books.filter(
       (b) => b.status === 'Finished'
@@ -266,7 +260,7 @@ export class AllSeries {
     this.updateChart();
   }
 
-  markBookAsUnread(book: Book) {
+  markBookAsUnread(book: SeriesBook) {
     book.status = 'Want to Read';
     this.selectedSeries!.readBooks = this.selectedSeries!.books.filter(
       (b) => b.status === 'Finished'
@@ -365,5 +359,37 @@ export class AllSeries {
     return Math.round(
       (this.getCompletedSeries() / this.getTotalSeries()) * 100
     );
+  }
+
+  addSeries() {
+    console.log('Add Series button clicked!');
+    console.log('Current URL:', window.location.href);
+    console.log('Router:', this.router);
+
+    try {
+      // Try different navigation approaches
+      console.log('Attempting navigation to /series/add-series...');
+      this.router.navigate(['/series/add-series']).then(
+        (success) => {
+          console.log('Navigation result:', success);
+          if (success) {
+            console.log('Navigation successful!');
+          } else {
+            console.log('Navigation failed!');
+          }
+        },
+        (error) => {
+          console.error('Navigation error:', error);
+        }
+      );
+    } catch (error) {
+      console.error('Navigation exception:', error);
+    }
+  }
+
+  clearFilters() {
+    this.searchQuery = '';
+    this.filterStatus = 'All';
+    this.sortOption = 'Completion';
   }
 }

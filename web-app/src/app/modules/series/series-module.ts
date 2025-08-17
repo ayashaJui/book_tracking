@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { SeriesRoutingModule } from './series-routing-module';
 import { AllSeries } from './components/all-series/all-series';
 import { SharedModule } from '../shared/shared.module';
+import { AddSeries } from './components/add-series/add-series';
 
 @NgModule({
-  declarations: [AllSeries],
+  declarations: [AllSeries, AddSeries],
   imports: [CommonModule, SeriesRoutingModule, SharedModule],
 })
 export class SeriesModule {}

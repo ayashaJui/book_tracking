@@ -176,6 +176,193 @@
             </div>
           </div>
 
+          <!-- Series Information Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="pi pi-bookmark text-blue-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Series Information
+              </h2>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Series Toggle -->
+              <div class="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="seriesToggle"
+                  [(ngModel)]="isPartOfSeries"
+                  name="isPartOfSeries"
+                  (change)="onSeriesToggle()"
+                  class="w-5 h-5 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <label
+                  for="seriesToggle"
+                  class="text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-bookmark text-indigo-500 mr-2"></i>
+                  This book is part of a series
+                </label>
+              </div>
+
+              <!-- Series Selection (shown when toggle is on) -->
+              <div *ngIf="isPartOfSeries" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label
+                      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                    >
+                      <i class="pi pi-list text-indigo-500 mr-2"></i>
+                      Select Series
+                    </label>
+                    <p-select
+                      [options]="seriesOptions"
+                      [(ngModel)]="selectedSeriesId"
+                      name="selectedSeries"
+                      placeholder="Choose existing series"
+                      class="w-full"
+                      optionLabel="label"
+                      optionValue="value"
+                      (onChange)="onSeriesChange()"
+                    ></p-select>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label
+                      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                    >
+                      <i class="pi pi-sort-numeric-up text-indigo-500 mr-2"></i>
+                      Book Order in Series
+                    </label>
+                    <p-select
+                      [options]="seriesOrderOptions"
+                      [(ngModel)]="newBook.seriesOrder"
+                      name="seriesOrder"
+                      placeholder="Select position"
+                      class="w-full"
+                      optionLabel="label"
+                      optionValue="value"
+                      [disabled]="!selectedSeriesId"
+                    ></p-select>
+                  </div>
+                </div>
+
+                <!-- Create New Series Option -->
+                <div class="border-t border-gray-200 pt-4">
+                  <button
+                    type="button"
+                    pButton
+                    [label]="
+                      showCreateNewSeries
+                        ? 'Cancel New Series'
+                        : 'Create New Series'
+                    "
+                    [icon]="showCreateNewSeries ? 'pi pi-times' : 'pi pi-plus'"
+                    class="p-button-outlined p-button-secondary"
+                    (click)="toggleCreateNewSeries()"
+                  ></button>
+                </div>
+
+                <!-- New Series Form (shown when creating new series) -->
+                <div
+                  *ngIf="showCreateNewSeries"
+                  class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 space-y-4"
+                >
+                  <h3
+                    class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+                  >
+                    Create New Series
+                  </h3>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label
+                        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                      >
+                        Series Title *
+                      </label>
+                      <input
+                        type="text"
+                        pInputText
+                        [(ngModel)]="newSeriesData.title"
+                        name="newSeriesTitle"
+                        placeholder="Enter series title"
+                        class="w-full h-12 rounded-xl border-0 bg-white dark:bg-gray-600 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label
+                        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                      >
+                        Series Author *
+                      </label>
+                      <input
+                        type="text"
+                        pInputText
+                        [(ngModel)]="newSeriesData.author"
+                        name="newSeriesAuthor"
+                        placeholder="Enter series author"
+                        class="w-full h-12 rounded-xl border-0 bg-white dark:bg-gray-600 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label
+                        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                      >
+                        Total Books in Series
+                      </label>
+                      <input
+                        type="number"
+                        pInputText
+                        [(ngModel)]="newSeriesData.totalBooks"
+                        name="newSeriesTotalBooks"
+                        placeholder="Expected number of books"
+                        min="1"
+                        class="w-full h-12 rounded-xl border-0 bg-white dark:bg-gray-600 transition-all duration-200"
+                      />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label
+                        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                      >
+                        Genre
+                      </label>
+                      <input
+                        type="text"
+                        pInputText
+                        [(ngModel)]="newSeriesData.genre"
+                        name="newSeriesGenre"
+                        placeholder="e.g., Fantasy, Science Fiction"
+                        class="w-full h-12 rounded-xl border-0 bg-white dark:bg-gray-600 transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex justify-end">
+                    <button
+                      type="button"
+                      pButton
+                      label="Create Series"
+                      icon="pi pi-check"
+                      class="p-button-success"
+                      (click)="createNewSeries()"
+                      [disabled]="!newSeriesData.title || !newSeriesData.author"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Categorization Section -->
           <div class="space-y-6">
             <div class="flex items-center gap-3 pb-4 border-b border-gray-200">

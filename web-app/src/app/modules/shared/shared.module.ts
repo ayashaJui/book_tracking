@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { ToastMsg } from './components/toast-msg/toast-msg';
@@ -31,12 +31,14 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { DatePickerModule } from 'primeng/datepicker';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [ToastMsg, NotFoundComponent],
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     ButtonModule,
     Rating,
     ProgressBarModule,
@@ -63,9 +65,11 @@ import { NgApexchartsModule } from 'ng-apexcharts';
     ToastModule,
     DatePickerModule,
   ],
+  providers: [MessageService],
   exports: [
     ButtonModule,
     FormsModule,
+    ReactiveFormsModule,
     Rating,
     ProgressBarModule,
     ChartModule,
