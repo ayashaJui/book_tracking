@@ -52,7 +52,7 @@ export class AllSeries {
       totalBooks: 3,
       readBooks: 2,
       coverUrl: 'assets/images/product-not-found.png',
-      genre: 'Fantasy',
+      genres: ['Fantasy', 'Adventure'],
       books: [
         {
           title: 'Fellowship',
@@ -77,7 +77,7 @@ export class AllSeries {
       totalBooks: 7,
       readBooks: 4,
       coverUrl: 'assets/images/product-not-found.png',
-      genre: 'Fantasy',
+      genres: ['Fantasy', 'Young Adult'],
       books: [
         {
           title: "Philosopher's Stone",
@@ -179,7 +179,7 @@ export class AllSeries {
         (s) =>
           s.title.toLowerCase().includes(q) ||
           s.author.toLowerCase().includes(q) ||
-          (s.genre || '').toLowerCase().includes(q)
+          (s.genres || []).some(genre => genre.toLowerCase().includes(q))
       );
     }
     if (this.filterStatus !== 'All') {
@@ -318,8 +318,10 @@ export class AllSeries {
 
   getFavoriteGenre(): string {
     const genreCounts = this.seriesList.reduce((acc, series) => {
-      const genre = series.genre || 'Unknown';
-      acc[genre] = (acc[genre] || 0) + 1;
+      const genres = series.genres || ['Unknown'];
+      genres.forEach(genre => {
+        acc[genre] = (acc[genre] || 0) + 1;
+      });
       return acc;
     }, {} as { [key: string]: number });
 

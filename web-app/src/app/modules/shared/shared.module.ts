@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { ToastMsg } from './components/toast-msg/toast-msg';
 import { NotFoundComponent } from './components/not-found/not-found';
+import { GenreSelectorComponent } from './components/genre-selector.component';
 
 import { ButtonModule } from 'primeng/button';
 import { Rating } from 'primeng/rating';
@@ -29,12 +30,17 @@ import { Chip } from 'primeng/chip';
 import { Knob } from 'primeng/knob';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @NgModule({
-  declarations: [ToastMsg, NotFoundComponent],
+  declarations: [
+    ToastMsg,
+    NotFoundComponent,
+    GenreSelectorComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -64,8 +70,9 @@ import { MessageService } from 'primeng/api';
     FileUploadModule,
     ToastModule,
     DatePickerModule,
+    ConfirmDialogModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   exports: [
     ButtonModule,
     FormsModule,
@@ -94,6 +101,8 @@ import { MessageService } from 'primeng/api';
     FileUploadModule,
     ToastModule,
     DatePickerModule,
+    ConfirmDialogModule,
+    GenreSelectorComponent,
   ],
 })
 export class SharedModule {}

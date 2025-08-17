@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Book } from '../../models/book.model';
 import { Series } from '../../../series/models/series.model';
 import { SeriesService } from '../../../series/services/series.service';
+import { GenreService } from '../../../shared/services/genre.service';
 
 @Component({
   selector: 'app-add-book',
@@ -35,7 +36,7 @@ export class AddBook implements OnInit {
     title: '',
     author: '',
     totalBooks: 1,
-    genre: '',
+    genres: [] as string[],
   };
 
   statusOptions = [
@@ -45,34 +46,27 @@ export class AddBook implements OnInit {
     { label: 'On Hold', value: 'On Hold' },
   ];
 
-  genreOptions = [
-    { label: 'Fantasy', value: 'Fantasy' },
-    { label: 'Science Fiction', value: 'Science Fiction' },
-    { label: 'Mystery', value: 'Mystery' },
-    { label: 'Romance', value: 'Romance' },
-    { label: 'Thriller', value: 'Thriller' },
-    { label: 'Horror', value: 'Horror' },
-    { label: 'Self-help', value: 'Self-help' },
-    { label: 'History', value: 'History' },
-    { label: 'Non-Fiction', value: 'Non-Fiction' },
-    { label: 'Biography', value: 'Biography' },
-    { label: 'Science', value: 'Science' },
-    { label: 'Philosophy', value: 'Philosophy' },
-    { label: 'Poetry', value: 'Poetry' },
-    { label: 'Drama', value: 'Drama' },
-    { label: 'Young Adult', value: 'Young Adult' },
-    { label: 'Children', value: 'Children' },
-    // add more as needed
-  ];
+  genreOptions: { label: string; value: string }[] = [];
 
   constructor(
     private location: Location,
     private router: Router,
-    private seriesService: SeriesService
+    private seriesService: SeriesService,
+    private genreService: GenreService
   ) {}
 
   ngOnInit() {
     this.loadSeriesOptions();
+    this.loadGenreOptions();
+  }
+
+  loadGenreOptions() {
+    this.genreOptions = this.genreService.getGenreOptions();
+  }
+
+  onGenreCreated(genreName: string) {
+    // Refresh genre options when a new genre is created
+    this.loadGenreOptions();
   }
 
   // Getter for series order options
@@ -150,7 +144,7 @@ export class AddBook implements OnInit {
         author: this.newSeriesData.author,
         totalBooks: this.newSeriesData.totalBooks,
         readBooks: 0,
-        genre: this.newSeriesData.genre,
+        genres: this.newSeriesData.genres,
         books: [],
       };
 
@@ -167,7 +161,7 @@ export class AddBook implements OnInit {
         title: '',
         author: '',
         totalBooks: 1,
-        genre: '',
+        genres: [],
       };
     }
   }

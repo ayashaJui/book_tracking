@@ -5,7 +5,7 @@ export interface Series {
   totalBooks: number;
   readBooks: number;
   coverUrl?: string;
-  genre?: string;
+  genres?: string[];
   description?: string;
   books: SeriesBook[];
 }

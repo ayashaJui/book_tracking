@@ -14,7 +14,7 @@ export class SeriesService {
       totalBooks: 3,
       readBooks: 2,
       coverUrl: 'assets/images/product-not-found.png',
-      genre: 'Fantasy',
+      genres: ['Fantasy', 'Adventure'],
       books: [
         {
           title: 'Fellowship of the Ring',
@@ -47,7 +47,7 @@ export class SeriesService {
       totalBooks: 7,
       readBooks: 4,
       coverUrl: 'assets/images/product-not-found.png',
-      genre: 'Fantasy',
+      genres: ['Fantasy', 'Young Adult'],
       books: [
         {
           title: "Harry Potter and the Philosopher's Stone",

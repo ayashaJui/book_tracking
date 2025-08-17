@@ -216,7 +216,7 @@ export class AllBook implements OnInit {
     }
   }
 
-  getStatusBadgeClass(status: string) {
+  getStatusBadgeClass(status: string | undefined) {
     switch (status) {
       case 'Read':
         return 'bg-green-500 text-white';

@@ -489,16 +489,26 @@
                 {{ getCompletionPercentage(series) }}%
               </div>
 
-              <!-- Genre Tag -->
+              <!-- Genre Tags -->
               <div
                 class="absolute bottom-3 left-3 transform group-hover:translate-y-1 transition-transform duration-200"
-                *ngIf="series.genre"
+                *ngIf="series.genres && series.genres.length > 0"
               >
-                <span
-                  class="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm font-medium"
-                >
-                  {{ series.genre }}
-                </span>
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="let genre of series.genres; let i = index"
+                    class="bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium"
+                    [class.hidden]="i >= 2"
+                  >
+                    {{ genre }}
+                  </span>
+                  <span
+                    *ngIf="series.genres.length > 2"
+                    class="bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium"
+                  >
+                    +{{ series.genres.length - 2 }}
+                  </span>
+                </div>
               </div>
 
               <!-- Quick Action Button (Visible on Hover) -->
@@ -603,9 +613,21 @@
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ series.author }}
                   </p>
-                  <p class="text-xs text-gray-500" *ngIf="series.genre">
-                    {{ series.genre }}
-                  </p>
+                  <div class="flex flex-wrap gap-1" *ngIf="series.genres && series.genres.length > 0">
+                    <span
+                      *ngFor="let genre of series.genres; let i = index"
+                      class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"
+                      [class.hidden]="i >= 2"
+                    >
+                      {{ genre }}
+                    </span>
+                    <span
+                      *ngIf="series.genres.length > 2"
+                      class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"
+                    >
+                      +{{ series.genres.length - 2 }}
+                    </span>
+                  </div>
                 </div>
                 <div class="flex items-center gap-4 ml-4">
                   <div class="text-right">

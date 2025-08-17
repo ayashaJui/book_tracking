@@ -224,22 +224,20 @@
               </small>
             </div>
 
-            <!-- Genre -->
+            <!-- Genres -->
             <div class="space-y-2">
               <label
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Genre <span class="text-red-500">*</span>
+                Genres <span class="text-red-500">*</span>
               </label>
-              <p-select
-                [options]="genreOptions"
-                formControlName="genre"
-                placeholder="Select genre"
-                class="w-full"
-                [showClear]="true"
-              ></p-select>
-              <small class="text-red-500" *ngIf="isFieldInvalid('genre')">
-                {{ getFieldError("genre") }}
+              <app-genre-selector
+                formControlName="genres"
+                placeholder="Select genres"
+                (genreCreated)="onGenreCreated($event)"
+              ></app-genre-selector>
+              <small class="text-red-500" *ngIf="isFieldInvalid('genres')">
+                {{ getFieldError("genres") }}
               </small>
             </div>
 

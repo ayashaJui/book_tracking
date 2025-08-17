@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
 import { Series, SeriesBook } from '../../models/series.model';
+import { GenreService } from '../../../shared/services/genre.service';
 
 @Component({
   selector: 'app-add-series',
@@ -16,23 +17,8 @@ export class AddSeries implements OnInit {
   isSubmitting = false;
   previewMode = false;
 
-  // Genre options for dropdown
-  genreOptions = [
-    { label: 'Fantasy', value: 'Fantasy' },
-    { label: 'Science Fiction', value: 'Science Fiction' },
-    { label: 'Mystery', value: 'Mystery' },
-    { label: 'Thriller', value: 'Thriller' },
-    { label: 'Romance', value: 'Romance' },
-    { label: 'Historical Fiction', value: 'Historical Fiction' },
-    { label: 'Young Adult', value: 'Young Adult' },
-    { label: 'Horror', value: 'Horror' },
-    { label: 'Adventure', value: 'Adventure' },
-    { label: 'Drama', value: 'Drama' },
-    { label: 'Crime', value: 'Crime' },
-    { label: 'Biography', value: 'Biography' },
-    { label: 'Non-Fiction', value: 'Non-Fiction' },
-    { label: 'Other', value: 'Other' },
-  ];
+  // Genre options for dropdown - now handled by the unified component
+  genreOptions: { label: string; value: string }[] = [];
 
   // Status options for books
   statusOptions = [
@@ -46,11 +32,22 @@ export class AddSeries implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private messageService: MessageService,
-    private seriesService: SeriesService
+    private seriesService: SeriesService,
+    private genreService: GenreService
   ) {}
 
   ngOnInit() {
     this.initializeForm();
+    this.loadGenreOptions();
+  }
+
+  loadGenreOptions() {
+    this.genreOptions = this.genreService.getGenreOptions();
+  }
+
+  onGenreCreated(genreName: string) {
+    // Refresh genre options when a new genre is created
+    this.loadGenreOptions();
   }
 
   initializeForm() {
@@ -61,7 +58,7 @@ export class AddSeries implements OnInit {
         null,
         [Validators.required, Validators.min(1), Validators.max(100)],
       ],
-      genre: ['', Validators.required],
+      genres: [[], [Validators.required, Validators.minLength(1)]],
       description: [''],
       coverUrl: [''],
       books: this.fb.array([]),
@@ -138,7 +135,7 @@ export class AddSeries implements OnInit {
       const newSeries: Series = {
         title: formValue.title,
         author: formValue.author,
-        genre: formValue.genre,
+        genres: formValue.genres,
         description: formValue.description,
         coverUrl: formValue.coverUrl || 'assets/images/product-not-found.png',
         totalBooks: formValue.totalBooks, // Use the form value instead of calculating
