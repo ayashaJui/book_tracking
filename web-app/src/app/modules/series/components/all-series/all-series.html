@@ -613,10 +613,13 @@
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ series.author }}
                   </p>
-                  <div class="flex flex-wrap gap-1" *ngIf="series.genres && series.genres.length > 0">
+                  <div
+                    class="flex flex-wrap gap-1"
+                    *ngIf="series.genres && series.genres.length > 0"
+                  >
                     <span
                       *ngFor="let genre of series.genres; let i = index"
-                      class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"
+                      class="text-xs text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"
                       [class.hidden]="i >= 2"
                     >
                       {{ genre }}

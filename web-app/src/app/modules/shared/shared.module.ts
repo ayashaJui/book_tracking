@@ -36,11 +36,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @NgModule({
-  declarations: [
-    ToastMsg,
-    NotFoundComponent,
-    GenreSelectorComponent,
-  ],
+  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent],
   imports: [
     CommonModule,
     FormsModule,

@@ -179,7 +179,7 @@ export class AllSeries {
         (s) =>
           s.title.toLowerCase().includes(q) ||
           s.author.toLowerCase().includes(q) ||
-          (s.genres || []).some(genre => genre.toLowerCase().includes(q))
+          (s.genres || []).some((genre) => genre.toLowerCase().includes(q))
       );
     }
     if (this.filterStatus !== 'All') {
@@ -319,7 +319,7 @@ export class AllSeries {
   getFavoriteGenre(): string {
     const genreCounts = this.seriesList.reduce((acc, series) => {
       const genres = series.genres || ['Unknown'];
-      genres.forEach(genre => {
+      genres.forEach((genre) => {
         acc[genre] = (acc[genre] || 0) + 1;
       });
       return acc;
