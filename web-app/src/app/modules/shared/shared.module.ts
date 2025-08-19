@@ -32,6 +32,11 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { PaginatorModule } from 'primeng/paginator';
+import { MenuModule } from 'primeng/menu';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -69,6 +74,11 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DatePickerModule,
     ConfirmDialogModule,
     PaginatorModule,
+    MenuModule,
+    BreadcrumbModule,
+    FloatLabelModule,
+    ToggleButtonModule,
+    SelectButtonModule,
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -101,6 +111,11 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DatePickerModule,
     ConfirmDialogModule,
     PaginatorModule,
+    MenuModule,
+    BreadcrumbModule,
+    FloatLabelModule,
+    ToggleButtonModule,
+    SelectButtonModule,
     GenreSelectorComponent,
   ],
 })

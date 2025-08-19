@@ -1,135 +1,869 @@
-<div class="max-w-7xl mx-auto p-8">
-  <!-- Header -->
-  <div class="mb-12">
-    <h1 class="text-4xl font-semibold mb-2 tracking-tight">
-      Spending Analytics
-    </h1>
-    <p class="text-lg">Track and analyze your book purchases</p>
-  </div>
-
-  <!-- Stats Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+<div class="min-h-screen">
+  <!-- Main Content -->
+  <div class="animate-fade-in-up">
+    <!-- Modern Header Section -->
     <div
-      class="card-container card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+      class="relative overflow-hidden bg-white dark:bg-gray-800 rounded-lg border-b border-gray-200 dark:border-gray-700 shadow-sm mb-6 sm:mb-8"
     >
-      <div class="text-3xl font-bold mb-2">
-        ${{ totalSpent.toLocaleString() }}
+      <!-- Background Pattern -->
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-emerald-50/70 via-green-50/50 to-teal-50/70 dark:from-gray-800 dark:via-gray-800 dark:to-gray-700"
+      ></div>
+
+      <!-- Subtle Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div
+          class="w-full h-full"
+          style="
+            background-image: radial-gradient(
+              circle at 1px 1px,
+              rgba(34, 197, 94, 0.3) 1px,
+              transparent 0
+            );
+            background-size: 16px 16px;
+          "
+        ></div>
       </div>
-      <div class="text-sm uppercase tracking-wider font-medium">
-        Total Spent
+
+      <div class="relative px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8">
+        <div class="max-w-7xl mx-auto">
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          >
+            <!-- Left Side - Title and Description -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start sm:items-center gap-3 sm:gap-4">
+                <div
+                  class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0"
+                >
+                  <i class="pi pi-chart-bar text-white text-lg sm:text-xl"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h1
+                    class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight truncate"
+                  >
+                    Spending Analytics
+                  </h1>
+                  <p
+                    class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base"
+                  >
+                    Track and analyze your book purchases with detailed insights
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side - Actions -->
+            <div
+              class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto"
+            >
+              <div class="flex gap-2">
+                <p-button
+                  icon="pi pi-refresh"
+                  pTooltip="Refresh Data"
+                  tooltipPosition="bottom"
+                  [outlined]="true"
+                  severity="secondary"
+                  size="small"
+                  class="flex-1 sm:flex-none hover:shadow-sm transition-all duration-200"
+                  (onClick)="refreshData()"
+                >
+                  <span class="sm:hidden md:inline ml-1">Refresh</span>
+                </p-button>
+                <p-button
+                  icon="pi pi-download"
+                  pTooltip="Export to CSV"
+                  tooltipPosition="bottom"
+                  severity="success"
+                  size="small"
+                  class="flex-1 sm:flex-none hover:shadow-sm transition-all duration-200"
+                  (onClick)="exportToCSV()"
+                >
+                  <span class="sm:hidden md:inline ml-1">Export</span>
+                </p-button>
+              </div>
+
+              <!-- View Toggle -->
+              <p-selectbutton
+                [(ngModel)]="isYearly"
+                [options]="[
+                  { label: 'Monthly', value: false, icon: 'pi pi-clock' },
+                  { label: 'Yearly', value: true, icon: 'pi pi-calendar' }
+                ]"
+                optionLabel="label"
+                optionValue="value"
+                class="w-full sm:w-auto"
+              >
+                <ng-template pTemplate="option" let-item>
+                  <i [class]="item.icon" class="mr-1"></i>
+                  <span class="hidden md:inline">{{ item.label }}</span>
+                  <span class="md:hidden">{{ item.label.charAt(0) }}</span>
+                </ng-template>
+              </p-selectbutton>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div
-      class="card-container card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-    >
-      <div class="text-3xl font-bold mb-2">
-        ${{ thisMonth.toLocaleString() }}
-      </div>
-      <div class="text-sm uppercase tracking-wider font-medium">This Month</div>
-    </div>
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+      <!-- Enhanced Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:-translate-y-1"
+        >
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-2xs sm:text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5 sm:mb-1"
+              >
+                Total Spent
+              </p>
+              <p
+                class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate"
+              >
+                ${{ totalSpent.toLocaleString() }}
+              </p>
+            </div>
+            <div
+              class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            >
+              <i
+                class="pi pi-dollar text-white text-xs sm:text-sm md:text-base"
+              ></i>
+            </div>
+          </div>
+        </div>
 
-    <div
-      class="card-container card rounded-xl p-6 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-    >
-      <div class="text-3xl font-bold mb-2">
-        ${{ avgPerBook.toLocaleString() }}
-      </div>
-      <div class="text-sm uppercase tracking-wider font-medium">
-        Avg Per Book
-      </div>
-    </div>
+        <div
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 hover:-translate-y-1"
+        >
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-2xs sm:text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5 sm:mb-1"
+              >
+                This Month
+              </p>
+              <p
+                class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate"
+              >
+                ${{ thisMonth.toLocaleString() }}
+              </p>
+            </div>
+            <div
+              class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            >
+              <i
+                class="pi pi-calendar text-white text-xs sm:text-sm md:text-base"
+              ></i>
+            </div>
+          </div>
+        </div>
 
-    <div
-      class="card-container bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-    >
-      <div class="text-3xl font-bold mb-2">{{ mostExpensive }}</div>
-      <div class="text-sm text-indigo-100 uppercase tracking-wider font-medium">
-        Most Expensive
-      </div>
-    </div>
-  </div>
+        <div
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 hover:-translate-y-1"
+        >
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-2xs sm:text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5 sm:mb-1"
+              >
+                Avg Per Book
+              </p>
+              <p
+                class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate"
+              >
+                ${{ avgPerBook.toLocaleString() }}
+              </p>
+            </div>
+            <div
+              class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            >
+              <i
+                class="pi pi-chart-line text-white text-xs sm:text-sm md:text-base"
+              ></i>
+            </div>
+          </div>
+        </div>
 
-  <!-- Budget Section -->
-  <div class="card rounded-xl p-8 mb-12">
-    <h2 class="text-xl font-semibold mb-6">Monthly Budget</h2>
-    <div class="">
-      <p-inputnumber
-        [(ngModel)]="monthlyBudget" class="w-full"
-        inputId="currency-us"
-        mode="currency"
-        currency="USD"
-        locale="en-US"
-      />
-    </div>
-    <div
-      class="bg-amber-50 border-l-4 border-amber-400 p-4 mt-4 rounded-r-lg"
-      *ngIf="alertMessage"
-    >
-      <div class="flex items-center">
-        <i class="pi pi-exclamation-triangle text-amber-600 mr-2"></i>
-        <span class="text-amber-800 font-medium">{{ alertMessage }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts -->
-  <div class="space-y-6">
-    <div class="grid grid-cols-1 my-10 md:grid-cols-2 gap-4">
-      <div class="card-container">
-        <div class="card min-h-36 space-y-5">
-          <apx-chart
-            #piechart
-            [title]="categoryPieChartOptions.title"
-            [series]="categoryPieChartOptions.series"
-            [chart]="categoryPieChartOptions.chart"
-            [labels]="categoryPieChartOptions.labels"
-            [legend]="categoryPieChartOptions.legend"
-          ></apx-chart>
+        <div
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-red-300 dark:hover:border-red-600 transition-all duration-300 hover:-translate-y-1"
+        >
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-2xs sm:text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-0.5 sm:mb-1"
+              >
+                Most Expensive
+              </p>
+              <p
+                class="text-xs sm:text-sm md:text-base font-bold text-gray-900 dark:text-white truncate"
+              >
+                {{ mostExpensive }}
+              </p>
+            </div>
+            <div
+              class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            >
+              <i
+                class="pi pi-crown text-white text-xs sm:text-sm md:text-base"
+              ></i>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card-container">
-        <div class="card min-h-36 space-y-5">
-          <apx-chart
-            #historicalLineChart
-            [series]="historicalLineChartOptions.series"
-            [chart]="historicalLineChartOptions.chart"
-            [xaxis]="historicalLineChartOptions.xaxis"
-            [yaxis]="historicalLineChartOptions.yaxis"
-            [dataLabels]="historicalLineChartOptions.dataLabels"
-            [stroke]="historicalLineChartOptions.stroke"
-            [title]="historicalLineChartOptions.title"
-            [legend]="historicalLineChartOptions.legend"
-            [tooltip]="historicalLineChartOptions.tooltip"
-          ></apx-chart>
+      <!-- Modern Budget Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <div
+          class="bg-gradient-to-r from-indigo-500 to-purple-600 px-4 sm:px-6 py-3 sm:py-4"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0"
+            >
+              <i class="pi pi-wallet text-white text-sm sm:text-lg"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h2 class="text-lg sm:text-xl font-semibold text-white">
+                Monthly Budget
+              </h2>
+              <p class="text-indigo-100 text-xs sm:text-sm">
+                Set and track your monthly spending limit
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <!-- Budget Input -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Budget Amount</label
+            >
+            <p-inputnumber
+              [(ngModel)]="monthlyBudget"
+              (ngModelChange)="onBudgetChange()"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              [min]="0"
+              [step]="50"
+              placeholder="Enter your monthly budget"
+              class="w-full"
+            >
+            </p-inputnumber>
+          </div>
+
+          <!-- Budget Progress -->
+          <div class="space-y-4">
+            <div
+              class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm"
+            >
+              <span
+                class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+              >
+                <i class="pi pi-money-bill text-green-500"></i>
+                <span>Spent:</span>
+                <span class="font-semibold"
+                  >${{ thisMonth.toLocaleString() }}</span
+                >
+              </span>
+              <span
+                class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+              >
+                <i class="pi pi-target text-blue-500"></i>
+                <span>Budget:</span>
+                <span class="font-semibold"
+                  >${{ monthlyBudget.toLocaleString() }}</span
+                >
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <p-progressbar
+                [value]="budgetUsage"
+                [showValue]="true"
+                unit="%"
+                [style]="{ height: '12px' }"
+                [class]="
+                  budgetUsage >= 100
+                    ? 'budget-exceeded'
+                    : budgetUsage >= 75
+                    ? 'budget-warning'
+                    : 'budget-safe'
+                "
+              >
+              </p-progressbar>
+
+              <div
+                class="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0 text-xs text-gray-500 dark:text-gray-400"
+              >
+                <span
+                  >Remaining: ${{ getRemainingBudget().toLocaleString() }}</span
+                >
+                <span
+                  *ngIf="budgetUsage >= 100"
+                  class="text-red-600 font-medium"
+                >
+                  Over by ${{ (thisMonth - monthlyBudget).toLocaleString() }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Alert -->
+          <div
+            *ngIf="alertMessage"
+            class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg sm:rounded-xl p-3 sm:p-4"
+          >
+            <div class="flex items-start gap-3">
+              <i
+                class="pi pi-exclamation-triangle text-orange-500 text-sm sm:text-lg mt-0.5 flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="font-medium text-orange-800 dark:text-orange-200 mb-1 text-sm sm:text-base"
+                >
+                  Budget Alert
+                </p>
+                <p
+                  class="text-orange-700 dark:text-orange-300 text-xs sm:text-sm"
+                >
+                  {{ alertMessage }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="card-container">
-      <div class="card min-h-36 space-y-5">
-        <apx-chart
-          #vendorsBarChart
-          [series]="vendorsBarChartOptions.series"
-          [chart]="vendorsBarChartOptions.chart"
-          [xaxis]="vendorsBarChartOptions.xaxis"
-          [yaxis]="vendorsBarChartOptions.yaxis"
-          [title]="vendorsBarChartOptions.title"
-          [tooltip]="vendorsBarChartOptions.tooltip"
-        ></apx-chart>
+      <!-- Modern Charts Section -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+        <!-- Category Distribution Chart -->
+        <div
+          class="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-800 dark:to-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-indigo-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+        >
+          <div class="flex items-center mb-4 sm:mb-6">
+            <div
+              class="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-md flex-shrink-0"
+            >
+              <i class="pi pi-chart-pie text-sm sm:text-xl"></i>
+            </div>
+            <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+              <h3
+                class="text-base sm:text-lg font-medium text-gray-900 dark:text-white"
+              >
+                Category Distribution
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                Spending breakdown by book categories
+              </p>
+            </div>
+          </div>
+
+          <!-- Chart Controls -->
+          <div class="flex items-center justify-end gap-2">
+            <p-button
+              icon="pi pi-filter"
+              [label]="showAllCategories ? 'Top 3' : 'All'"
+              [outlined]="true"
+              severity="secondary"
+              size="small"
+              class="text-2xs sm:text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
+              pTooltip="Filter Categories"
+              tooltipPosition="bottom"
+              (onClick)="filterCategories()"
+            >
+            </p-button>
+            <p-button
+              icon="pi pi-sort"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              size="small"
+              pTooltip="Sort by Value"
+              tooltipPosition="bottom"
+              class="hover:bg-gray-100 dark:hover:bg-gray-700"
+              (onClick)="sortCategories()"
+            >
+            </p-button>
+          </div>
+
+          <!-- Chart Container - with properly sized responsive container -->
+          <div
+            class="flex justify-center items-center h-56 sm:h-64 md:h-72 lg:h-80 mt-2"
+          >
+            <apx-chart
+              #piechart
+              [series]="categoryPieChartOptions.series"
+              [chart]="categoryPieChartOptions.chart"
+              [labels]="categoryPieChartOptions.labels"
+              [legend]="categoryPieChartOptions.legend"
+            >
+            </apx-chart>
+          </div>
+
+          <!-- Category Stats -->
+          <div class="mt-8 p-2 space-y-2">
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Top Category</span>
+              <span
+                class="font-semibold text-gray-900 dark:text-white truncate ml-2"
+                >{{ getTopCategory() }}</span
+              >
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+              <span class="text-gray-600 dark:text-gray-400">Categories</span>
+              <span class="font-semibold text-gray-900 dark:text-white"
+                >{{ categoryLabels.length }} Total</span
+              >
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+              <span class="text-gray-600 dark:text-gray-400"
+                >Diversity Index</span
+              >
+              <span class="font-semibold text-gray-900 dark:text-white"
+                >{{ getCategoryDiversity() }}%</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Historical Spending Trend -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        >
+          <!-- Chart Header -->
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4"
+          >
+            <div class="min-w-0 flex-1">
+              <h3
+                class="text-base sm:text-lg font-medium text-gray-900 dark:text-white"
+              >
+                {{ isYearly ? "Yearly" : "Monthly" }} Spending Trend
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                Compare current vs previous {{ isYearly ? "years" : "months" }}
+              </p>
+            </div>
+
+            <!-- View Toggle for Monthly/Yearly -->
+            <p-selectbutton
+              [(ngModel)]="isYearly"
+              [options]="[
+                { label: 'Monthly', value: false, icon: 'pi pi-clock' },
+                { label: 'Yearly', value: true, icon: 'pi pi-calendar' }
+              ]"
+              optionLabel="label"
+              optionValue="value"
+              class="text-xs sm:text-sm w-full sm:w-auto"
+            >
+              <ng-template pTemplate="option" let-item>
+                <i [class]="item.icon" class="mr-1"></i>
+                <span class="hidden sm:inline">{{ item.label }}</span>
+                <span class="sm:hidden">{{ item.label.charAt(0) }}</span>
+              </ng-template>
+            </p-selectbutton>
+          </div>
+
+          <!-- Chart Container - with padding to fix x-axis labels -->
+          <div class="w-full justify-center">
+            <apx-chart
+              #historicalLineChart
+              [series]="
+                isYearly
+                  ? yearlyLineChartOptions.series
+                  : historicalLineChartOptions.series
+              "
+              [chart]="historicalLineChartOptions.chart"
+              [xaxis]="
+                isYearly
+                  ? yearlyLineChartOptions.xaxis
+                  : historicalLineChartOptions.xaxis
+              "
+              [yaxis]="historicalLineChartOptions.yaxis"
+              [dataLabels]="historicalLineChartOptions.dataLabels"
+              [stroke]="historicalLineChartOptions.stroke"
+              [legend]="historicalLineChartOptions.legend"
+              [tooltip]="historicalLineChartOptions.tooltip"
+              [grid]="historicalLineChartOptions.grid"
+            >
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendors Performance Chart -->
+      <div
+        class="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-amber-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300"
+      >
+        <div class="flex items-center mb-4 sm:mb-6">
+          <div
+            class="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-md flex-shrink-0"
+          >
+            <i class="pi pi-shop text-sm sm:text-xl"></i>
+          </div>
+          <div class="ml-3 sm:ml-4 min-w-0 flex-1">
+            <h3
+              class="text-base sm:text-lg font-medium text-gray-900 dark:text-white"
+            >
+              Vendor Performance
+            </h3>
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+              Spending distribution across different vendors
+            </p>
+          </div>
+        </div>
+
+        <!-- Chart Controls -->
+        <div class="flex items-center gap-2 justify-end">
+          <p-selectbutton
+            [(ngModel)]="vendorFilter"
+            [options]="[
+              { label: 'All', value: 'all', icon: 'pi pi-list' },
+              { label: 'Top 5', value: 'top5', icon: 'pi pi-star' },
+              { label: '6M', value: '6months', icon: 'pi pi-clock' }
+            ]"
+            optionLabel="label"
+            optionValue="value"
+            class="text-xs sm:text-sm"
+            (onChange)="filterVendors()"
+          >
+            <ng-template pTemplate="option" let-item>
+              <i [class]="item.icon" class="mr-1"></i>
+              <span class="hidden sm:inline">{{ item.label }}</span>
+              <span class="sm:hidden">{{
+                item.value === "6months" ? "6M" : item.label
+              }}</span>
+            </ng-template>
+          </p-selectbutton>
+
+          <!-- <p-button
+              icon="pi pi-refresh"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              size="small"
+              pTooltip="Refresh Data"
+              class="hover:bg-gray-100 dark:hover:bg-gray-700"
+              (onClick)="refreshChartData()"
+            >
+            </p-button> -->
+        </div>
+
+        <!-- Chart Container - with padding to fix axis labels -->
+        <div class="w-full">
+          <apx-chart
+            #vendorsBarChart
+            [series]="vendorsBarChartOptions.series"
+            [chart]="vendorsBarChartOptions.chart"
+            [xaxis]="vendorsBarChartOptions.xaxis"
+            [yaxis]="vendorsBarChartOptions.yaxis"
+            [tooltip]="vendorsBarChartOptions.tooltip"
+          >
+          </apx-chart>
+        </div>
+
+        <!-- Vendor Summary -->
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div
+            class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-2 sm:p-3 border border-orange-200 dark:border-orange-800"
+          >
+            <div class="flex items-center gap-2">
+              <i
+                class="pi pi-star text-orange-600 text-xs sm:text-sm flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs text-orange-600 dark:text-orange-400 font-medium"
+                >
+                  Top Vendor
+                </p>
+                <p
+                  class="text-xs sm:text-sm font-bold text-orange-700 dark:text-orange-300 truncate"
+                >
+                  {{ getTopVendor() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 sm:p-3 border border-amber-200 dark:border-amber-800"
+          >
+            <div class="flex items-center gap-2">
+              <i
+                class="pi pi-building text-amber-600 text-xs sm:text-sm flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs text-amber-600 dark:text-amber-400 font-medium"
+                >
+                  Total Vendors
+                </p>
+                <p
+                  class="text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-300"
+                >
+                  {{ vendorsLabels.length }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-2 sm:p-3 border border-yellow-200 dark:border-yellow-800"
+          >
+            <div class="flex items-center gap-2">
+              <i
+                class="pi pi-chart-bar text-yellow-600 text-xs sm:text-sm flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs text-yellow-600 dark:text-yellow-400 font-medium"
+                >
+                  Avg per Vendor
+                </p>
+                <p
+                  class="text-xs sm:text-sm font-bold text-yellow-700 dark:text-yellow-300 truncate"
+                >
+                  ${{ getAvgPerVendor().toLocaleString() }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4"
+      >
+        <p-button
+          icon="pi pi-download"
+          label="Export CSV"
+          severity="success"
+          size="large"
+          [raised]="true"
+          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
+          (onClick)="exportToCSV()"
+        >
+        </p-button>
+
+        <p-button
+          icon="pi pi-chart-bar"
+          label="View Detailed Report"
+          severity="info"
+          [outlined]="true"
+          size="large"
+          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
+          (onClick)="openDetailedReport()"
+        >
+        </p-button>
+
+        <p-button
+          icon="pi pi-share-alt"
+          label="Share Analytics"
+          severity="secondary"
+          [text]="true"
+          size="large"
+          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
+          (onClick)="shareAnalytics()"
+        >
+        </p-button>
       </div>
     </div>
-  </div>
 
-  <!-- Actions -->
-  <div class="text-center mt-8">
-    <button
-      (click)="exportToCSV()"
-      class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/25"
+    <!-- Toast for Notifications -->
+    <p-toast></p-toast>
+
+    <!-- Detailed Report Modal -->
+    <p-dialog
+      [(visible)]="showDetailedReport"
+      header="Detailed Spending Report"
+      [modal]="true"
+      [closable]="true"
+      [maximizable]="true"
+      [style]="{ width: '95vw', 'max-width': '1200px' }"
+      (onHide)="closeDetailedReport()"
     >
-      <span>Export CSV</span>
-      <i class="pi pi-download text-sm"></i>
-    </button>
+      <div class="space-y-4 sm:space-y-6">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0"
+        >
+          <div class="min-w-0 flex-1">
+            <h3
+              class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white"
+            >
+              Monthly Breakdown
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Comprehensive analysis of your spending patterns
+            </p>
+          </div>
+          <p-button
+            icon="pi pi-download"
+            label="Export Report"
+            severity="success"
+            [outlined]="true"
+            size="small"
+            class="w-full sm:w-auto"
+            (onClick)="exportDetailedReport()"
+          >
+          </p-button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <p-table
+            [value]="detailedReportData"
+            [paginator]="true"
+            [rows]="10"
+            styleClass="p-datatable-striped"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-left text-xs sm:text-sm">Month</th>
+                <th class="text-right text-xs sm:text-sm">Total Spent</th>
+                <th class="text-right text-xs sm:text-sm hidden sm:table-cell">
+                  Transactions
+                </th>
+                <th class="text-right text-xs sm:text-sm">Avg Per Book</th>
+                <th class="text-left text-xs sm:text-sm hidden md:table-cell">
+                  Top Category
+                </th>
+                <th class="text-left text-xs sm:text-sm hidden lg:table-cell">
+                  Top Vendor
+                </th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td class="font-medium text-xs sm:text-sm">{{ row.month }}</td>
+                <td
+                  class="text-right font-semibold text-green-600 dark:text-green-400 text-xs sm:text-sm"
+                >
+                  ${{ row.totalSpent.toLocaleString() }}
+                </td>
+                <td class="text-right text-xs sm:text-sm hidden sm:table-cell">
+                  {{ row.transactions }}
+                </td>
+                <td class="text-right text-xs sm:text-sm">
+                  ${{ row.avgPerBook }}
+                </td>
+                <td class="hidden md:table-cell">
+                  <p-tag
+                    [value]="row.topCategory"
+                    severity="info"
+                    [rounded]="true"
+                    class="text-xs"
+                  >
+                  </p-tag>
+                </td>
+                <td class="hidden lg:table-cell">
+                  <p-tag
+                    [value]="row.topVendor"
+                    severity="secondary"
+                    [rounded]="true"
+                    class="text-xs"
+                  >
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="empty">
+              <tr>
+                <td colspan="6" class="text-center py-8">
+                  <div class="text-gray-500 dark:text-gray-400">
+                    <i
+                      class="pi pi-info-circle text-xl sm:text-2xl mb-2 block"
+                    ></i>
+                    <span class="text-sm">No detailed data available</span>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- Summary Cards in Modal -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+        >
+          <div
+            class="bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200 dark:border-blue-800"
+          >
+            <div class="flex items-center gap-2 sm:gap-3">
+              <i
+                class="pi pi-chart-line text-blue-600 text-lg sm:text-xl flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium"
+                >
+                  Average Monthly
+                </p>
+                <p
+                  class="text-lg sm:text-xl font-bold text-blue-700 dark:text-blue-300 truncate"
+                >
+                  ${{ getAverageMonthlySpent().toLocaleString() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-green-50 dark:bg-green-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-green-200 dark:border-green-800"
+          >
+            <div class="flex items-center gap-2 sm:gap-3">
+              <i
+                class="pi pi-shopping-cart text-green-600 text-lg sm:text-xl flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium"
+                >
+                  Total Transactions
+                </p>
+                <p
+                  class="text-lg sm:text-xl font-bold text-green-700 dark:text-green-300"
+                >
+                  {{ getTotalTransactions() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-purple-50 dark:bg-purple-900/20 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-purple-200 dark:border-purple-800"
+          >
+            <div class="flex items-center gap-2 sm:gap-3">
+              <i
+                class="pi pi-star text-purple-600 text-lg sm:text-xl flex-shrink-0"
+              ></i>
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-medium"
+                >
+                  Peak Month
+                </p>
+                <p
+                  class="text-sm sm:text-lg font-bold text-purple-700 dark:text-purple-300 truncate"
+                >
+                  {{ getPeakMonth() }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-dialog>
   </div>
 </div>

@@ -28,24 +28,18 @@
         >
           <!-- Left Side - Title and Description -->
           <div class="flex-1">
-            <div class="flex items-center gap-4">
-              <div
-                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg"
+            <div class="flex flex-col gap-2">
+              <h1
+                class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight flex items-center gap-3"
               >
-                <i class="pi pi-plus text-white text-xl"></i>
-              </div>
-              <div>
-                <h1
-                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
-                >
-                  Add New Review
-                </h1>
-                <p
-                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
-                >
-                  Share your insights and rate your reading experience
-                </p>
-              </div>
+                <i
+                  class="pi pi-plus text-emerald-600 dark:text-emerald-400"
+                ></i>
+                Add New Review
+              </h1>
+              <p class="text-gray-600 dark:text-gray-300 text-sm lg:text-base">
+                Share your insights and rate your reading experience
+              </p>
             </div>
           </div>
 
@@ -71,7 +65,7 @@
   <!-- Main Content Container -->
   <div class="lg:px-6 py-6 lg:py-8">
     <!-- Main Form Card -->
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6.5xl mx-auto">
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
       >
@@ -89,12 +83,15 @@
                 <div class="space-y-2">
                   <label
                     for="book"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    class="block text-sm mb-2 font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
+                    <i
+                      class="pi pi-book text-emerald-600 dark:text-emerald-400"
+                    ></i>
                     Book Title <span class="text-red-500">*</span>
                   </label>
                   <span class="p-input-icon-left w-full">
-                    <i class="pi pi-book"></i>
+                    
                     <input
                       pInputText
                       id="book"
@@ -111,12 +108,14 @@
                 <div class="space-y-2">
                   <label
                     for="author"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    class="block text-sm mb-2 font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
+                    <i
+                      class="pi pi-user text-emerald-600 dark:text-emerald-400"
+                    ></i>
                     Author <span class="text-red-500">*</span>
                   </label>
                   <span class="p-input-icon-left w-full">
-                    <i class="pi pi-user"></i>
                     <input
                       pInputText
                       id="author"
@@ -135,8 +134,11 @@
               <div class="grid gap-6 md:grid-cols-2">
                 <div class="space-y-3">
                   <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
+                    <i
+                      class="pi pi-star text-emerald-600 dark:text-emerald-400"
+                    ></i>
                     Rating <span class="text-red-500">*</span>
                   </label>
                   <div
@@ -162,8 +164,11 @@
 
                 <div class="space-y-3">
                   <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
                   >
+                    <i
+                      class="pi pi-thumbs-up text-emerald-600 dark:text-emerald-400"
+                    ></i>
                     Would you recommend? <span class="text-red-500">*</span>
                   </label>
                   <div
@@ -213,8 +218,11 @@
               <div class="space-y-2">
                 <label
                   for="takeaways"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
                 >
+                  <i
+                    class="pi pi-lightbulb text-emerald-600 dark:text-emerald-400"
+                  ></i>
                   Key Takeaways & Insights <span class="text-red-500">*</span>
                 </label>
                 <textarea
@@ -233,170 +241,68 @@
               </div>
             </div>
 
-            <!-- Advanced Options Toggle -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <button
-                type="button"
-                pButton
-                [label]="
-                  showAdvanced
-                    ? 'Hide Advanced Options'
-                    : 'Show Advanced Options'
-                "
-                [icon]="
-                  showAdvanced ? 'pi pi-chevron-up' : 'pi pi-chevron-down'
-                "
-                class="p-button-link p-button-sm"
-                (click)="toggleAdvanced()"
-              ></button>
-            </div>
-
-            <!-- Advanced Options -->
+            <!-- Tags -->
             <div
-              *ngIf="showAdvanced"
-              class="space-y-6 border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-gray-50 dark:bg-gray-800"
+              class="space-y-2 border-t border-gray-200 dark:border-gray-700 pt-6"
             >
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                Additional Details
-              </h3>
-
-              <div class="grid gap-6 md:grid-cols-2">
-                <!-- Format -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              >
+                <i
+                  class="pi pi-tags text-emerald-600 dark:text-emerald-400"
+                ></i>
+                Tags
+              </label>
+              <div class="space-y-3">
+                <div class="flex flex-wrap gap-1">
+                  <p-tag
+                    *ngFor="let tag of newReview.tags"
+                    [value]="tag"
+                    severity="info"
+                    styleClass="text-xs"
                   >
-                    Format
-                  </label>
-                  <p-select
-                    [options]="formatOptions"
-                    [(ngModel)]="newReview.format"
-                    name="format"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Select format"
-                    class="w-full"
-                  ></p-select>
+                    <span>{{ tag }}</span>
+                    <i
+                      class="pi pi-times ml-1 cursor-pointer"
+                      (click)="removeTag(tag)"
+                    ></i>
+                  </p-tag>
                 </div>
-
-                <!-- Reading Date -->
                 <div class="space-y-2">
-                  <label
-                    for="readingDate"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Reading Completion Date
-                  </label>
-                  <input
-                    pInputText
-                    type="date"
-                    [(ngModel)]="newReview.readingDate"
-                    name="readingDate"
-                    placeholder="When did you finish?"
-                    class="w-full"
-                  />
-                </div>
-
-                <!-- Purchase Price -->
-                <div class="space-y-2">
-                  <label
-                    for="price"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Purchase Price
-                  </label>
-                  <p-inputNumber
-                    [(ngModel)]="newReview.purchasePrice"
-                    name="price"
-                    mode="currency"
-                    currency="USD"
-                    placeholder="How much did it cost?"
-                    class="w-full"
-                  ></p-inputNumber>
-                </div>
-
-                <!-- Anonymous -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Privacy
-                  </label>
-                  <div
-                    class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-                  >
-                    <input
-                      type="checkbox"
-                      [(ngModel)]="newReview.anonymous"
-                      name="anonymous"
-                      id="anonymous"
-                      class="rounded"
-                    />
-                    <label
-                      for="anonymous"
-                      class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
-                    >
-                      Post anonymously
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tags -->
-              <div class="space-y-2">
-                <label
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Tags
-                </label>
-                <div class="space-y-3">
+                  <div class="text-xs text-gray-500">Click to add tags:</div>
                   <div class="flex flex-wrap gap-1">
                     <p-tag
-                      *ngFor="let tag of newReview.tags"
+                      *ngFor="let tag of tagSuggestions.slice(0, 10)"
                       [value]="tag"
-                      severity="info"
-                      styleClass="text-xs"
-                    >
-                      <span>{{ tag }}</span>
-                      <i
-                        class="pi pi-times ml-1 cursor-pointer"
-                        (click)="removeTag(tag)"
-                      ></i>
-                    </p-tag>
-                  </div>
-                  <div class="space-y-2">
-                    <div class="text-xs text-gray-500">Click to add tags:</div>
-                    <div class="flex flex-wrap gap-1">
-                      <p-tag
-                        *ngFor="let tag of tagSuggestions.slice(0, 10)"
-                        [value]="tag"
-                        severity="secondary"
-                        styleClass="text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                        (click)="onTagSelect(tag)"
-                      ></p-tag>
-                    </div>
+                      severity="secondary"
+                      styleClass="text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                      (click)="onTagSelect(tag)"
+                    ></p-tag>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Additional Notes -->
-              <div class="space-y-2">
-                <label
-                  for="notes"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Additional Notes
-                </label>
-                <textarea
-                  pInputText
-                  id="notes"
-                  name="notes"
-                  rows="3"
-                  [(ngModel)]="newReview.notes"
-                  placeholder="Any other thoughts, context, or personal notes..."
-                  class="w-full resize-y"
-                ></textarea>
-              </div>
+            <!-- Additional Notes -->
+            <div class="space-y-2 pt-6">
+              <label
+                for="notes"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              >
+                <i
+                  class="pi pi-file-edit text-emerald-600 dark:text-emerald-400"
+                ></i>
+                Additional Notes
+              </label>
+              <textarea
+                pInputText
+                id="notes"
+                name="notes"
+                rows="3"
+                [(ngModel)]="newReview.notes"
+                placeholder="Any other thoughts, context, or personal notes..."
+                class="w-full resize-y"
+              ></textarea>
             </div>
 
             <!-- Action Buttons -->

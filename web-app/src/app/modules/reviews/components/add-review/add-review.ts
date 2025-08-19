@@ -10,11 +10,7 @@ interface Review {
   date: Date;
   book: string;
   author: string;
-  anonymous?: boolean;
   tags?: string[];
-  readingDate?: Date;
-  purchasePrice?: number;
-  format?: 'physical' | 'ebook' | 'audiobook';
   notes?: string;
 }
 
@@ -31,17 +27,9 @@ export class AddReview implements OnInit {
     wouldRecommend: null,
     book: '',
     author: '',
-    anonymous: false,
     tags: [],
-    format: 'physical',
     notes: '',
   };
-
-  formatOptions = [
-    { label: 'Physical Book', value: 'physical', icon: 'pi pi-book' },
-    { label: 'E-book', value: 'ebook', icon: 'pi pi-tablet' },
-    { label: 'Audiobook', value: 'audiobook', icon: 'pi pi-headphones' },
-  ];
 
   tagSuggestions = [
     'Self-Help',
@@ -65,7 +53,6 @@ export class AddReview implements OnInit {
   filteredTags: string[] = [];
 
   isSubmitting = false;
-  showAdvanced = false;
   maxDate = new Date();
   tagsInput = '';
 
@@ -97,11 +84,7 @@ export class AddReview implements OnInit {
         date: new Date(),
         book: this.newReview.book!,
         author: this.newReview.author!,
-        anonymous: this.newReview.anonymous,
         tags: this.newReview.tags,
-        readingDate: this.newReview.readingDate,
-        purchasePrice: this.newReview.purchasePrice,
-        format: this.newReview.format,
         notes: this.newReview.notes,
       };
 
@@ -136,12 +119,9 @@ export class AddReview implements OnInit {
       wouldRecommend: null,
       book: '',
       author: '',
-      anonymous: false,
       tags: [],
-      format: 'physical',
       notes: '',
     };
-    this.showAdvanced = false;
   }
 
   goBack() {
@@ -163,10 +143,6 @@ export class AddReview implements OnInit {
 
   removeTag(tag: string) {
     this.newReview.tags = this.newReview.tags?.filter((t) => t !== tag) || [];
-  }
-
-  toggleAdvanced() {
-    this.showAdvanced = !this.showAdvanced;
   }
 
   getRatingLabel(): string {
