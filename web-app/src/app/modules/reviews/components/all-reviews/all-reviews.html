@@ -1,349 +1,483 @@
-<div class="container mx-auto px-4 py-8 space-y-8">
-  <!-- Header -->
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
   <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4"
+    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
   >
-    <div>
-      <h1
-        class="text-3xl font-semibold tracking-tight bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent"
-      >
-        Reviews & Insights
-      </h1>
-      <p class="text-sm text-surface-500 dark:text-surface-300 mt-1">
-        Capture learnings, rate experiences, share value.
-      </p>
-    </div>
-    <div class="flex gap-2">
-      <button
-        pButton
-        label="Add Review"
-        icon="pi pi-plus"
-        class="p-button-sm"
-        (click)="showReviewForm = true"
-      ></button>
-    </div>
-  </div>
-
-  <!-- Stats Bar -->
-  <div
-    class="flex flex-wrap items-center justify-center gap-12 py-8 my-10 rounded-2xl"
-  >
-    <div class="flex flex-col items-center gap-3 min-w-[120px]">
-      <div class="flex items-center gap-4">
-        <i class="pi pi-comments text-3xl text-blue-500"></i>
-        <p-badge
-          [value]="reviews.length"
-          severity="info"
-          styleClass="text-xl px-3 py-2"
-        ></p-badge>
-      </div>
-      <p class="text-sm font-medium text-surface-700 dark:text-surface-300">
-        Total Reviews
-      </p>
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-emerald-50 to-teal-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(16, 185, 129, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
     </div>
 
-    <div class="flex flex-col items-center gap-3 min-w-[140px]">
-      <div class="flex items-center gap-4">
-        <i class="pi pi-star text-3xl text-amber-500"></i>
-        <div class="flex items-center gap-3">
-          <p-badge
-            [value]="averageRating"
-            severity="warn"
-            styleClass="text-xl px-3 py-2"
-          ></p-badge>
-          <p-rating
-            [readonly]="true"
-            [ngModel]="Math.round(averageRating)"
-            class="scale-90"
-          ></p-rating>
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-comments text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Reviews & Insights
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Capture learnings, rate experiences, share value
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Quick Stats -->
+          <div class="flex-shrink-0 w-full lg:w-auto">
+            <div class="grid grid-cols-3 gap-4 lg:gap-6">
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-300"
+                    >{{ reviews.length }}</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300"
+                >
+                  Reviews
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-amber-600 dark:text-amber-300"
+                    >{{ averageRating | number : "1.1-1" }}</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300"
+                >
+                  Avg Rating
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="w-14 h-14 lg:w-16 lg:h-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-gray-200 dark:border-gray-700 mx-auto"
+                >
+                  <span
+                    class="text-xl lg:text-2xl font-bold text-emerald-600 dark:text-emerald-300"
+                    >{{ recommendRate }}%</span
+                  >
+                </div>
+                <p
+                  class="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-300"
+                >
+                  Recommend
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="text-sm font-medium text-surface-700 dark:text-surface-300">
-        Average Rating
-      </p>
     </div>
+  </div>
 
-    <div class="flex flex-col items-center gap-3 min-w-[130px]">
-      <div class="flex items-center gap-4">
-        <i class="pi pi-thumbs-up text-3xl text-emerald-500"></i>
-        <p-badge
-          [value]="recommendRate + '%'"
-          severity="success"
-          styleClass="text-xl px-3 py-2"
-        ></p-badge>
+  <!-- Main Content Container -->
+  <div class="lg:px-6 py-6 lg:py-8">
+    <!-- Action Buttons -->
+    <div class="mb-8">
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+            All Reviews
+          </h2>
+        </div>
+        <div class="flex gap-2">
+          <button
+            pButton
+            label="Add Review"
+            icon="pi pi-plus"
+            class="p-button-sm"
+            (click)="addReviewPage()"
+          ></button>
+        </div>
       </div>
-      <p class="text-sm font-medium text-surface-700 dark:text-surface-300">
-        Recommend Rate
-      </p>
     </div>
-  </div>
 
-  <!-- Filters -->
-  <div class="rounded-xl flex flex-col md:flex-row gap-4 md:items-center">
-    <!-- <div class="flex flex-col sm:flex-row gap-3 flex-1"> -->
-    <span class="p-input-icon-left w-full sm:w-72">
-      <input
-        pInputText
-        type="text"
-        class="w-full"
-        placeholder="Search (book, author, takeaway)"
-        [(ngModel)]="filterText"
-        (input)="applyFilters()"
-        name="filterText"
-      />
-    </span>
-    <p-select
-      [options]="ratingOptions"
-      [(ngModel)]="filterRating"
-      placeholder="Rating"
-      (onChange)="applyFilters()"
-      [showClear]="true"
-      name="filterRating"
-      styleClass="w-full sm:w-44"
-    ></p-select>
-    <p-select
-      [options]="recommendOptions"
-      [(ngModel)]="filterRecommend"
-      placeholder="Recommend"
-      (onChange)="applyFilters()"
-      [showClear]="true"
-      name="filterRecommend"
-      styleClass="w-full sm:w-48"
-    ></p-select>
-    <!-- </div> -->
-
-    <button
-      pButton
-      label="Clear"
-      icon="pi pi-filter-slash"
-      class="p-button-outlined"
-      type="button"
-      (click)="clearFilters()"
-    ></button>
-  </div>
-
-  <!-- Reviews Grid -->
-  <div
-    *ngIf="filteredReviews.length; else emptyState"
-    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-  >
-    <p-card
-      *ngFor="let review of filteredReviews; trackBy: trackByReviewId"
-      styleClass="h-full"
+    <!-- Filters -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm mb-8"
     >
-      <ng-template pTemplate="header">
-        <div class="px-6 pt-6 pb-2">
-          <div class="flex items-start justify-between mb-2">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        Filter Reviews
+      </h3>
+      <div class="grid gap-4 md:grid-cols-4">
+        <div class="md:col-span-2">
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              class="w-full"
+              placeholder="Search by book, author, or takeaway..."
+              [(ngModel)]="filterText"
+              (input)="applyFilters()"
+              name="filterText"
+            />
+          </span>
+        </div>
+        <div>
+          <p-select
+            [options]="ratingOptions"
+            [(ngModel)]="filterRating"
+            placeholder="Filter by rating"
+            (onChange)="applyFilters()"
+            [showClear]="true"
+            name="filterRating"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+        <div>
+          <p-select
+            [options]="recommendOptions"
+            [(ngModel)]="filterRecommend"
+            placeholder="Recommendation status"
+            (onChange)="applyFilters()"
+            [showClear]="true"
+            name="filterRecommend"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+      </div>
+      <div
+        class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+      >
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          Showing {{ filteredReviews.length }} of {{ reviews.length }} reviews
+        </div>
+        <button
+          pButton
+          label="Clear Filters"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-sm"
+          type="button"
+          (click)="clearFilters()"
+          [disabled]="!filterText && !filterRating && !filterRecommend"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Reviews Grid -->
+    <div
+      *ngIf="filteredReviews.length; else emptyState"
+      class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <div
+        *ngFor="let review of filteredReviews; trackBy: trackByReviewId"
+        class="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+      >
+        <!-- Card Header -->
+        <div class="p-6 pb-4">
+          <div class="flex items-start justify-between mb-3">
             <div class="flex-1 min-w-0">
               <h3
-                class="text-lg font-semibold truncate text-surface-900 dark:text-surface-100"
+                class="text-lg font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors"
               >
                 {{ review.book }}
               </h3>
               <p
-                class="text-sm text-surface-600 dark:text-surface-400 truncate"
+                class="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1"
               >
                 by {{ review.author }}
               </p>
             </div>
-            <p-tag
-              [severity]="review.wouldRecommend ? 'success' : 'danger'"
-              [value]="review.wouldRecommend ? '👍' : '👎'"
-              styleClass="text-xs ml-2 flex-shrink-0"
-            >
-            </p-tag>
+            <div class="ml-3 flex-shrink-0">
+              <div
+                class="flex items-center gap-1 px-2 py-1 rounded-full"
+                [ngClass]="{
+                  'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300':
+                    review.wouldRecommend,
+                  'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300':
+                    !review.wouldRecommend
+                }"
+              >
+                <i
+                  [class]="
+                    review.wouldRecommend
+                      ? 'pi pi-thumbs-up'
+                      : 'pi pi-thumbs-down'
+                  "
+                  class="text-xs"
+                ></i>
+                <span class="text-xs font-medium">{{
+                  review.wouldRecommend ? "Yes" : "No"
+                }}</span>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
+
+          <!-- Rating -->
+          <div class="flex items-center gap-3 mb-4">
             <p-rating
               [ngModel]="review.rating"
               [readonly]="true"
-              class="scale-75 origin-left"
+              class="scale-90 origin-left"
             ></p-rating>
-            <span class="text-xs font-medium text-amber-600 dark:text-amber-400"
-              >{{ review.rating }}/5</span
-            >
+            <span class="text-sm font-bold text-amber-600 dark:text-amber-400">
+              {{ review.rating }}/5
+            </span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto">
+              {{ review.date | date : "MMM d, y" }}
+            </span>
           </div>
         </div>
-      </ng-template>
-      <ng-template pTemplate="content">
-        <div class="space-y-3">
-          <div>
+
+        <!-- Card Content -->
+        <div class="px-6 pb-4">
+          <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+            <h4
+              class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide"
+            >
+              Key Takeaways
+            </h4>
             <p
-              class="text-sm leading-relaxed text-surface-700 dark:text-surface-300 line-clamp-4"
+              class="text-sm leading-relaxed text-gray-700 dark:text-gray-300 line-clamp-4"
             >
               {{ review.takeaways }}
             </p>
           </div>
         </div>
-      </ng-template>
-      <ng-template pTemplate="footer">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs text-surface-500 dark:text-surface-400">
-            {{ review.date | date : "mediumDate" }}
-          </span>
-          <p-tag
-            [severity]="review.wouldRecommend ? 'success' : 'danger'"
-            [value]="review.wouldRecommend ? 'Recommended' : 'Not Recommended'"
-            styleClass="text-xs"
-          >
-          </p-tag>
-        </div>
-        <div class="flex gap-2">
-          <button
-            pButton
-            label="Details"
-            icon="pi pi-eye"
-            class="p-button-outlined p-button-sm flex-1"
-            (click)="viewReviewDetails(review)"
-          ></button>
-          <button
-            pButton
-            label="Edit"
-            icon="pi pi-pencil"
-            class="p-button-sm flex-1"
-            (click)="editReview(review)"
-          ></button>
-        </div>
-      </ng-template>
-    </p-card>
-  </div>
 
-  <ng-template #emptyState>
-    <div
-      class="flex flex-col items-center gap-4 py-16 rounded-xl border border-dashed border-surface-300 dark:border-surface-600 bg-white/40 dark:bg-surface-800/40"
-    >
-      <i class="pi pi-inbox text-4xl text-surface-400"></i>
-      <p class="text-sm text-surface-500 dark:text-surface-400">
-        No reviews yet. Start by adding your first one.
-      </p>
-      <button
-        pButton
-        label="Add Review"
-        icon="pi pi-plus"
-        class="p-button-sm"
-        (click)="showReviewForm = true"
-      ></button>
-    </div>
-  </ng-template>
-
-  <!-- Create / Edit Dialog -->
-  <p-dialog
-    [(visible)]="showReviewForm"
-    header="Add Review"
-    [modal]="true"
-    [draggable]="false"
-    [style]="{ width: '40rem' }"
-    [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
-    (onHide)="clearNewReview()"
-  >
-    <form (ngSubmit)="submitReview()" class="space-y-6">
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="flex flex-col gap-2">
-          <label for="book" class="text-sm font-medium">Book</label>
-          <input
-            pInputText
-            id="book"
-            name="book"
-            type="text"
-            [(ngModel)]="newReview.book"
-            required
-            placeholder="Deep Work"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="author" class="text-sm font-medium">Author</label>
-          <input
-            pInputText
-            id="author"
-            name="author"
-            type="text"
-            [(ngModel)]="newReview.author"
-            required
-            placeholder="Cal Newport"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium">Rating</label>
-          <div class="flex items-center gap-3">
-            <p-rating [(ngModel)]="newReview.rating" name="rating"></p-rating>
-            <span
-              class="text-xs font-semibold text-amber-600 dark:text-amber-400"
-              >{{ newReview.rating || 0 }}/5</span
-            >
-          </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium">Recommend?</label>
+        <!-- Card Footer -->
+        <div class="px-6 pb-6 pt-2">
           <div class="flex gap-2">
             <button
-              type="button"
               pButton
-              icon="pi pi-thumbs-up"
-              [severity]="
-                newReview.wouldRecommend === true ? 'success' : 'secondary'
-              "
-              (click)="newReview.wouldRecommend = true"
-              class="p-button-sm"
+              label="View Details"
+              icon="pi pi-eye"
+              class="p-button-outlined p-button-sm flex-1 hover:shadow-md transition-shadow"
+              (click)="viewReviewDetails(review)"
             ></button>
             <button
-              type="button"
               pButton
-              icon="pi pi-thumbs-down"
-              [severity]="
-                newReview.wouldRecommend === false ? 'danger' : 'secondary'
-              "
-              (click)="newReview.wouldRecommend = false"
-              class="p-button-sm"
+              label="Edit"
+              icon="pi pi-pencil"
+              class="p-button-sm flex-1 hover:shadow-md transition-shadow"
+              (click)="editReview(review)"
             ></button>
           </div>
         </div>
-        <div class="md:col-span-2 flex flex-col gap-2">
-          <label for="takeaways" class="text-sm font-medium"
-            >Key Takeaways / Insights</label
+      </div>
+    </div>
+
+    <ng-template #emptyState>
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12"
+      >
+        <div class="text-center max-w-md mx-auto">
+          <div
+            class="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6"
           >
-          <textarea
-            pInputText
-            id="takeaways"
-            name="takeaways"
-            rows="5"
-            [(ngModel)]="newReview.takeaways"
-            required
-            placeholder="What resonated? Action items or quotes?"
-            class="resize-y"
-          ></textarea>
+            <i class="pi pi-book text-3xl text-gray-400"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            No reviews yet
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Start building your reading insights by adding your first book
+            review.
+          </p>
+          <button
+            pButton
+            label="Add Your First Review"
+            icon="pi pi-plus"
+            class="px-8 py-3"
+            (click)="addReviewPage()"
+          ></button>
         </div>
       </div>
-      <div
-        class="flex items-center justify-end gap-2 pt-2 border-t border-surface-200 dark:border-surface-700"
-      >
-        <button
-          pButton
-          type="button"
-          label="Reset"
-          class="p-button-outlined p-button-sm"
-          (click)="clearNewReview()"
-        ></button>
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-text p-button-sm"
-          (click)="showReviewForm = false"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          label="Save"
-          class="p-button-sm"
-          [disabled]="
-            !newReview.rating ||
-            !newReview.book ||
-            !newReview.author ||
-            !newReview.takeaways ||
-            newReview.wouldRecommend === null
-          "
-        ></button>
-      </div>
-    </form>
-  </p-dialog>
+    </ng-template>
+
+    <!-- Quick Add Dialog -->
+    <p-dialog
+      [(visible)]="showReviewForm"
+      header="Quick Add Review"
+      [modal]="true"
+      [draggable]="false"
+      [style]="{ width: '32rem' }"
+      [breakpoints]="{ '960px': '90vw', '640px': '95vw' }"
+      (onHide)="clearNewReview()"
+      styleClass="border-0 shadow-2xl"
+    >
+      <form (ngSubmit)="submitReview()" class="space-y-4">
+        <div class="space-y-4">
+          <div>
+            <label
+              for="quickBook"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Book Title *
+            </label>
+            <input
+              pInputText
+              id="quickBook"
+              name="quickBook"
+              type="text"
+              [(ngModel)]="newReview.book"
+              required
+              placeholder="Enter book title"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              for="quickAuthor"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Author *
+            </label>
+            <input
+              pInputText
+              id="quickAuthor"
+              name="quickAuthor"
+              type="text"
+              [(ngModel)]="newReview.author"
+              required
+              placeholder="Enter author name"
+              class="w-full"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Rating *
+              </label>
+              <div class="flex items-center gap-2">
+                <p-rating
+                  [(ngModel)]="newReview.rating"
+                  name="quickRating"
+                ></p-rating>
+                <span
+                  class="text-sm font-medium text-amber-600 dark:text-amber-400"
+                >
+                  {{ newReview.rating || 0 }}/5
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Recommend? *
+              </label>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-thumbs-up"
+                  [severity]="
+                    newReview.wouldRecommend === true ? 'success' : 'secondary'
+                  "
+                  [outlined]="newReview.wouldRecommend !== true"
+                  (click)="newReview.wouldRecommend = true"
+                  class="p-button-sm flex-1"
+                  pTooltip="Yes"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-thumbs-down"
+                  [severity]="
+                    newReview.wouldRecommend === false ? 'danger' : 'secondary'
+                  "
+                  [outlined]="newReview.wouldRecommend !== false"
+                  (click)="newReview.wouldRecommend = false"
+                  class="p-button-sm flex-1"
+                  pTooltip="No"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="quickTakeaways"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Key Takeaways *
+            </label>
+            <textarea
+              pInputText
+              id="quickTakeaways"
+              name="quickTakeaways"
+              rows="4"
+              [(ngModel)]="newReview.takeaways"
+              required
+              placeholder="What did you learn? Any memorable quotes or insights?"
+              class="w-full resize-y"
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-between gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
+        >
+          <button
+            pButton
+            type="button"
+            label="Need more options?"
+            class="p-button-link p-button-sm"
+            (click)="goToFullForm()"
+          ></button>
+
+          <div class="flex gap-2">
+            <button
+              pButton
+              type="button"
+              label="Cancel"
+              class="p-button-text p-button-sm"
+              (click)="showReviewForm = false"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              label="Save Review"
+              icon="pi pi-check"
+              class="p-button-sm"
+              [disabled]="!isQuickFormValid()"
+            ></button>
+          </div>
+        </div>
+      </form>
+    </p-dialog>
+  </div>
 </div>

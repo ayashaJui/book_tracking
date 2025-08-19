@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface Review {
   id: number;
@@ -52,7 +53,43 @@ export class AllReviews implements OnInit {
     { label: 'Would Not Recommend', value: false },
   ];
 
+  constructor(private router: Router) {}
+
   ngOnInit(): void {
+    // Add some sample data for demonstration
+    this.reviews = [
+      {
+        id: 1,
+        rating: 5,
+        takeaways:
+          'This book completely changed my perspective on productivity. The concept of "deep work" - the ability to focus without distraction on cognitively demanding tasks - is revolutionary. Newport argues that this skill is becoming increasingly rare and valuable. Key insight: shallow work is inevitable, but deep work is optional - and that\'s what makes it so powerful.',
+        wouldRecommend: true,
+        date: new Date('2024-01-15'),
+        book: 'Deep Work',
+        author: 'Cal Newport',
+      },
+      {
+        id: 2,
+        rating: 4,
+        takeaways:
+          'Atomic Habits breaks down the science of habit formation into actionable steps. The 1% improvement philosophy is powerful - small changes compound over time. The habit loop (cue, craving, response, reward) provides a clear framework for building good habits and breaking bad ones. The book emphasizes systems over goals.',
+        wouldRecommend: true,
+        date: new Date('2024-02-03'),
+        book: 'Atomic Habits',
+        author: 'James Clear',
+      },
+      {
+        id: 3,
+        rating: 3,
+        takeaways:
+          'While the book has some interesting points about mindset and persistence, I found the examples repetitive and the writing style overly promotional. The core message about viewing challenges as opportunities for growth is valuable, but could have been conveyed more concisely.',
+        wouldRecommend: false,
+        date: new Date('2024-03-12'),
+        book: 'Mindset Revolution',
+        author: 'Sarah Johnson',
+      },
+    ];
+
     // Ensure filtered list reflects any preloaded reviews
     this.applyFilters();
   }
@@ -160,5 +197,24 @@ export class AllReviews implements OnInit {
 
     // TODO: Add logic to update existing review instead of creating new one
     console.log('Edit review:', review);
+  }
+
+  addReviewPage() {
+    this.router.navigate(['/reviews/add-review']);
+  }
+
+  goToFullForm() {
+    this.showReviewForm = false;
+    this.router.navigate(['/reviews/add-review']);
+  }
+
+  isQuickFormValid(): boolean {
+    return !!(
+      this.newReview.rating &&
+      this.newReview.book &&
+      this.newReview.author &&
+      this.newReview.takeaways &&
+      this.newReview.wouldRecommend !== null
+    );
   }
 }
