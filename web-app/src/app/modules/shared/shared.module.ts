@@ -31,6 +31,7 @@ import { Knob } from 'primeng/knob';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PaginatorModule } from 'primeng/paginator';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -67,6 +68,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ToastModule,
     DatePickerModule,
     ConfirmDialogModule,
+    PaginatorModule,
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -98,6 +100,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ToastModule,
     DatePickerModule,
     ConfirmDialogModule,
+    PaginatorModule,
     GenreSelectorComponent,
   ],
 })

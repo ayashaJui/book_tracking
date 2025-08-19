@@ -1,0 +1,396 @@
+<!-- Modern Header Section -->
+<div
+  class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 mb-8"
+>
+  <!-- Background Pattern -->
+  <div
+    class="absolute inset-0 bg-gradient-to-br from-gray-50 via-green-50 to-emerald-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+  ></div>
+  <div class="absolute inset-0 opacity-30 dark:opacity-10">
+    <div
+      class="w-full h-full"
+      style="
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          rgba(34, 197, 94, 0.3) 1px,
+          transparent 0
+        );
+        background-size: 20px 20px;
+      "
+    ></div>
+  </div>
+
+  <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <div class="max-w-4xl mx-auto">
+      <div
+        class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+      >
+        <!-- Left Side - Title and Description -->
+        <div class="flex-1">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg"
+            >
+              <i class="pi pi-plus text-white text-xl"></i>
+            </div>
+            <div>
+              <h1
+                class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+              >
+                Add New Quote
+              </h1>
+              <p
+                class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+              >
+                Capture and preserve your favorite quotes and insights
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side - Navigation -->
+        <div class="flex-shrink-0">
+          <button
+            pButton
+            label="Back to Quotes"
+            icon="pi pi-arrow-left"
+            class="p-button-outlined"
+            (click)="onCancel()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Container -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+  >
+    <!-- Form Header -->
+    <div
+      class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
+    >
+      <h3
+        class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2"
+      >
+        <i class="pi pi-comment text-green-500"></i>
+        Quote Information
+      </h3>
+    </div>
+
+    <!-- Form Content -->
+    <div class="p-6">
+      <form [formGroup]="quoteForm" (ngSubmit)="onSubmit()" class="space-y-8">
+        <!-- Quote Text Section -->
+        <div
+          class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-700"
+        >
+          <h4
+            class="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+          >
+            <i class="pi pi-comment text-blue-500"></i>
+            Quote Text
+          </h4>
+
+          <div class="space-y-3">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Quote <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              formControlName="quote"
+              rows="4"
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              [class.border-red-500]="isFieldInvalid('quote')"
+              placeholder="Enter the quote that inspired you..."
+            ></textarea>
+            <div *ngIf="isFieldInvalid('quote')" class="text-red-500 text-sm">
+              {{ getFieldError("quote") }}
+            </div>
+            <div
+              class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <i class="pi pi-info-circle"></i>
+              <span
+                >Include quotation marks if desired, or we'll add them
+                automatically</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Information Section -->
+        <div
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+        >
+          <h4
+            class="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+          >
+            <i class="pi pi-book text-green-500"></i>
+            Book Information
+          </h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Book Title -->
+            <div class="space-y-2 relative">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Book Title <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="book"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                [class.border-red-500]="isFieldInvalid('book')"
+                placeholder="Enter book title..."
+                (input)="onBookInput($event)"
+              />
+              <div *ngIf="isFieldInvalid('book')" class="text-red-500 text-sm">
+                {{ getFieldError("book") }}
+              </div>
+
+              <!-- Book Suggestions Dropdown -->
+              <div
+                *ngIf="filteredBookSuggestions.length > 0"
+                class="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-40 overflow-y-auto mt-1"
+              >
+                <button
+                  type="button"
+                  *ngFor="let book of filteredBookSuggestions"
+                  class="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                  (click)="selectBookSuggestion(book)"
+                >
+                  <div class="font-medium text-gray-800 dark:text-gray-200">
+                    {{ book.title }}
+                  </div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400">
+                    by {{ book.author }}
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Author -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Author <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="author"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                [class.border-red-500]="isFieldInvalid('author')"
+                placeholder="Enter author name..."
+              />
+              <div
+                *ngIf="isFieldInvalid('author')"
+                class="text-red-500 text-sm"
+              >
+                {{ getFieldError("author") }}
+              </div>
+            </div>
+
+            <!-- Page Number -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Page Number (Optional)</label
+              >
+              <input
+                type="number"
+                formControlName="pageNumber"
+                min="1"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                [class.border-red-500]="isFieldInvalid('pageNumber')"
+                placeholder="e.g., 42"
+              />
+              <div
+                *ngIf="isFieldInvalid('pageNumber')"
+                class="text-red-500 text-sm"
+              >
+                {{ getFieldError("pageNumber") }}
+              </div>
+            </div>
+
+            <!-- Favorite Toggle -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Mark as Favorite</label
+              >
+              <div
+                class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <input
+                  type="checkbox"
+                  id="favorite"
+                  formControlName="favorite"
+                  class="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-gray-600 border-gray-300 dark:border-gray-500 rounded focus:ring-blue-500"
+                />
+                <label
+                  for="favorite"
+                  class="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
+                >
+                  <i class="pi pi-star text-yellow-500"></i>
+                  Add to favorites
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags Section -->
+        <div
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+        >
+          <h4
+            class="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+          >
+            <i class="pi pi-tags text-purple-500"></i>
+            Tags & Categories
+          </h4>
+
+          <!-- Selected Tags -->
+          <div *ngIf="selectedTags.length > 0" class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Selected Tags:</label
+            >
+            <div class="flex flex-wrap gap-2">
+              <div
+                *ngFor="let tag of selectedTags"
+                class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm"
+              >
+                <span>{{ tag }}</span>
+                <button
+                  type="button"
+                  (click)="removeTag(tag)"
+                  class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+                >
+                  <i class="pi pi-times text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Available Tags -->
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Available Tags:</label
+            >
+            <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+              <button
+                type="button"
+                *ngFor="let tag of availableTags"
+                [class]="
+                  'px-3 py-1 rounded-full text-sm font-medium transition-all duration-200 ' +
+                  (selectedTags.includes(tag)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600')
+                "
+                (click)="toggleTag(tag)"
+              >
+                {{ tag }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Tag Input -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Add Custom Tag:</label
+            >
+            <div class="flex gap-2">
+              <input
+                type="text"
+                [(ngModel)]="customTag"
+                [ngModelOptions]="{ standalone: true }"
+                class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Type a new tag..."
+                (keyup.enter)="addCustomTag()"
+              />
+              <button
+                type="button"
+                (click)="addCustomTag()"
+                [disabled]="!customTag.trim()"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                <i class="pi pi-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+        >
+          <h4
+            class="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+          >
+            <i class="pi pi-file-edit text-orange-500"></i>
+            Personal Notes (Optional)
+          </h4>
+
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Your thoughts, reflections, or context about this quote:
+            </label>
+            <textarea
+              formControlName="notes"
+              rows="3"
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder="What does this quote mean to you? Why did it resonate with you? What context would help you remember it?"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div
+          class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-600"
+        >
+          <button
+            type="button"
+            (click)="resetForm()"
+            class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+          >
+            <i class="pi pi-refresh"></i>
+            Reset Form
+          </button>
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              (click)="onCancel()"
+              class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="pi pi-times"></i>
+              Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="quoteForm.invalid"
+              class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2 font-medium"
+            >
+              <i class="pi pi-check"></i>
+              Save Quote
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<p-toast></p-toast>

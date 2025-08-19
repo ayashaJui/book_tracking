@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 
 interface Quote {
@@ -22,8 +23,14 @@ interface Quote {
 export class AllQuotes implements OnInit {
   @ViewChild('dt') table!: Table;
 
+  constructor(private router: Router) {}
+
   quotes: Quote[] = [];
   filteredQuotes: Quote[] = [];
+  loading = false;
+  viewMode: 'table' | 'card' = 'table';
+  currentPageFirst = 0;
+  pageSize = 12;
 
   showFavoritesOnly: boolean = false;
 
@@ -39,42 +46,90 @@ export class AllQuotes implements OnInit {
   selectedQuote?: Quote;
   displayTagDialog = false;
   tagCounts: Record<string, number> = {};
+  newTagName = '';
 
   ngOnInit(): void {
-    // Sample data
-    this.quotes = [
-      {
-        id: 1,
-        quote:
-          'The quality of your life is determined by the quality of your thoughts.',
-        book: 'Atomic Habits',
-        author: 'James Clear',
-        pageNumber: 45,
-        tags: ['inspirational', 'self-help'],
-        dateAdded: new Date('2024-01-15'),
-      },
-      {
-        id: 2,
-        quote: 'Not all those who wander are lost.',
-        book: 'The Hobbit',
-        author: 'J.R.R. Tolkien',
-        tags: ['fiction', 'classic'],
-        dateAdded: new Date('2024-02-10'),
-      },
-      {
-        id: 3,
-        quote: 'History is written by the victors.',
-        book: 'Sapiens',
-        author: 'Yuval Noah Harari',
-        pageNumber: 103,
-        tags: ['history', 'philosophical'],
-        dateAdded: new Date('2024-03-05'),
-      },
-    ];
+    this.loadQuotes();
+  }
 
-    this.initializeFilters();
-    this.applyFilters();
-    this.calculateTagCounts();
+  loadQuotes(): void {
+    this.loading = true;
+
+    // Simulate loading delay
+    setTimeout(() => {
+      // Sample data with more quotes for better demonstration
+      this.quotes = [
+        {
+          id: 1,
+          quote:
+            'The quality of your life is determined by the quality of your thoughts.',
+          book: 'Atomic Habits',
+          author: 'James Clear',
+          pageNumber: 45,
+          tags: ['inspirational', 'self-help', 'mindset'],
+          dateAdded: new Date('2024-01-15'),
+          favorite: true,
+          notes:
+            'This really resonated with me during my morning routine development.',
+        },
+        {
+          id: 2,
+          quote: 'Not all those who wander are lost.',
+          book: 'The Fellowship of the Ring',
+          author: 'J.R.R. Tolkien',
+          tags: ['fiction', 'classic', 'adventure'],
+          dateAdded: new Date('2024-02-10'),
+          favorite: false,
+          notes: "Beautiful metaphor for life's journey.",
+        },
+        {
+          id: 3,
+          quote: 'History is written by the victors.',
+          book: 'Sapiens',
+          author: 'Yuval Noah Harari',
+          pageNumber: 103,
+          tags: ['history', 'philosophical', 'thought-provoking'],
+          dateAdded: new Date('2024-03-05'),
+          favorite: true,
+          notes: 'Makes me question everything I thought I knew about history.',
+        },
+        {
+          id: 4,
+          quote: 'The unexamined life is not worth living.',
+          book: 'Apology',
+          author: 'Plato',
+          pageNumber: 38,
+          tags: ['philosophy', 'classical', 'wisdom'],
+          dateAdded: new Date('2024-01-20'),
+          favorite: true,
+        },
+        {
+          id: 5,
+          quote:
+            'In the midst of winter, I found there was, within me, an invincible summer.',
+          book: 'The Stranger',
+          author: 'Albert Camus',
+          tags: ['existential', 'inspirational', 'resilience'],
+          dateAdded: new Date('2024-02-15'),
+          favorite: false,
+        },
+        {
+          id: 6,
+          quote: 'The way to get started is to quit talking and begin doing.',
+          book: 'The Disney Way',
+          author: 'Walt Disney',
+          pageNumber: 12,
+          tags: ['motivational', 'action', 'business'],
+          dateAdded: new Date('2024-03-10'),
+          favorite: true,
+        },
+      ];
+
+      this.initializeFilters();
+      this.applyFilters();
+      this.calculateTagCounts();
+      this.loading = false;
+    }, 1000);
   }
 
   calculateTagCounts() {
@@ -156,17 +211,8 @@ export class AllQuotes implements OnInit {
     this.applyFilters();
   }
 
-  openAddQuoteDialog() {
-    // this.editingQuote = null;
-    // this.quoteFormModel = {
-    //   quote: '',
-    //   book: '',
-    //   author: '',
-    //   pageNumber: undefined,
-    //   tags: [],
-    //   dateAdded: new Date(),
-    // };
-    this.displayQuoteDialog = true;
+  navigateToAddQuote() {
+    this.router.navigate(['/quotes/add']);
   }
 
   openTagDialog() {
@@ -236,6 +282,129 @@ export class AllQuotes implements OnInit {
 
   private capitalize(text: string) {
     return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  getTagCount(): number {
+    return Object.keys(this.tagCounts).length;
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.globalFilter ||
+      this.selectedBook ||
+      this.selectedTags.length > 0 ||
+      this.showFavoritesOnly
+    );
+  }
+
+  getFavoriteQuotes(): Quote[] {
+    return this.quotes.filter((quote) => quote.favorite);
+  }
+
+  onPageChange(event: any): void {
+    this.currentPageFirst = event.first;
+  }
+
+  getPaginatedQuotes(): Quote[] {
+    const start = this.currentPageFirst;
+    const end = start + this.pageSize;
+    return this.filteredQuotes.slice(start, end);
+  }
+
+  // Tag Management Methods
+  getMostUsedTag(): { tag: string; count: number } {
+    let maxCount = 0;
+    let mostUsedTag = '';
+
+    Object.entries(this.tagCounts).forEach(([tag, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostUsedTag = tag;
+      }
+    });
+
+    return { tag: mostUsedTag, count: maxCount };
+  }
+
+  getUnusedTags(): string[] {
+    const allTags = Object.keys(this.tagCounts);
+    return allTags.filter((tag) => this.tagCounts[tag] === 0);
+  }
+
+  addNewTag(): void {
+    const tagName = this.newTagName.trim().toLowerCase();
+    if (tagName && !this.tagCounts.hasOwnProperty(tagName)) {
+      this.tagCounts[tagName] = 0;
+      this.initializeFilters();
+      this.newTagName = '';
+    }
+  }
+
+  editTag(tagName: string): void {
+    const newName = prompt(`Edit tag "${tagName}":`, tagName);
+    if (newName && newName.trim() && newName.trim() !== tagName) {
+      const trimmedName = newName.trim().toLowerCase();
+
+      // Update all quotes with this tag
+      this.quotes.forEach((quote) => {
+        const tagIndex = quote.tags.indexOf(tagName);
+        if (tagIndex > -1) {
+          quote.tags[tagIndex] = trimmedName;
+        }
+      });
+
+      // Update tag counts
+      this.calculateTagCounts();
+      this.initializeFilters();
+      this.applyFilters();
+    }
+  }
+
+  deleteTag(tagName: string): void {
+    if (this.tagCounts[tagName] === 0) {
+      if (confirm(`Delete unused tag "${tagName}"?`)) {
+        delete this.tagCounts[tagName];
+        this.initializeFilters();
+      }
+    }
+  }
+
+  openMergeDialog(): void {
+    // Implementation for tag merging dialog
+    alert('Tag merging feature - to be implemented');
+  }
+
+  cleanUnusedTags(): void {
+    const unusedTags = this.getUnusedTags();
+    if (
+      unusedTags.length > 0 &&
+      confirm(`Delete ${unusedTags.length} unused tags?`)
+    ) {
+      unusedTags.forEach((tag) => delete this.tagCounts[tag]);
+      this.initializeFilters();
+    }
+  }
+
+  exportTags(): void {
+    const tagData = Object.entries(this.tagCounts).map(([tag, count]) => ({
+      tag,
+      count,
+      severity: this.getTagSeverity(tag),
+    }));
+
+    const csvContent =
+      'Tag,Usage Count,Severity\n' +
+      tagData
+        .map((item) => `${item.tag},${item.count},${item.severity}`)
+        .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'quote-tags.csv';
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 
   exportQuotesCSV() {
