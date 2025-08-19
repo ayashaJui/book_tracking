@@ -13,9 +13,19 @@ export class UserProfile {
     location: 'Dhaka, Bangladesh',
     joined: 'Jan 2023',
     avatarUrl: '',
-    stats: { booksRead: 120, quotes: 60, avgRating: 4.5 },
+    stats: {
+      booksRead: 120,
+      totalOwned: 200,
+      quotes: 60,
+      avgRating: 4.5,
+    },
     goals: { annual: 150, streak: 12 },
     readerStats: { topGenre: 'Fiction' },
+    social: {
+      goodreads: 'https://www.goodreads.com/user/show/1234567-ayasha',
+      instagram: 'https://www.instagram.com/ayasha',
+      linkedin: 'https://www.linkedin.com/in/ayasha-hossain',
+    },
   };
 
   featured = {
@@ -32,8 +42,17 @@ export class UserProfile {
   constructor(private router: Router) {}
 
   copyShareLink() {
-    navigator.clipboard.writeText('https://mybooks.app/ayasha');
-    alert('Link copied!');
+    // Enhanced copy functionality with toast message
+    const profileUrl = 'https://mybooks.app/ayasha';
+    navigator.clipboard
+      .writeText(profileUrl)
+      .then(() => {
+        // You can add a toast notification here
+        console.log('Profile link copied to clipboard!');
+      })
+      .catch((err) => {
+        console.error('Failed to copy link: ', err);
+      });
   }
 
   navigateTo(page: string) {
@@ -43,7 +62,29 @@ export class UserProfile {
   onAvatarChange(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // implement avatar upload logic
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        console.error(
+          'Invalid file type. Please select a JPEG, PNG, or WebP image.'
+        );
+        return;
+      }
+
+      if (file.size > maxSize) {
+        console.error('File too large. Please select an image under 5MB.');
+        return;
+      }
+
+      // Create preview and upload logic here
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.user.avatarUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
       console.log('Avatar selected:', file.name);
     }
   }

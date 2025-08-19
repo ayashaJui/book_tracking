@@ -1,268 +1,393 @@
-<!-- Modernized profile UI (Tailwind v3) -- added gradients, glass cards, motion, dark-mode friendly classes -->
-<div class="relative">
-  <!-- Soft radial background accent -->
-  <div class="pointer-events-none absolute inset-0 -z-10">
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
-    ></div>
-    <div
-      class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[40rem] h-[40rem] rounded-full bg-primary-400/10 dark:bg-primary-500/10 blur-3xl"
-    ></div>
-  </div>
-</div>
-<div class="max-w-5xl mx-auto px-4 md:px-8 py-10 space-y-10">
-  <!-- Profile Header -->
-  <div
-    class="flex flex-col md:flex-row items-center gap-6 bg-white/70 dark:bg-slate-800/60 backdrop-blur rounded-2xl px-6 py-6 shadow-sm ring-1 ring-slate-200/60 dark:ring-slate-700/60"
-  >
-    <div class="relative group">
-      <p-avatar
-        [image]="user.avatarUrl || 'assets/profile-avatar.jpg'"
-        shape="circle"
-        size="xlarge"
-        class="ring-4 ring-primary-500 transition duration-300 group-hover:scale-105"
-      ></p-avatar>
-      <!-- Decorative gradient ring -->
-      <span
-        class="absolute inset-0 -z-10 rounded-full p-[2px] bg-gradient-to-tr from-primary-400 via-primary-300 to-indigo-400 opacity-0 group-hover:opacity-70 transition"
-        aria-hidden="true"
-      ></span>
-      <span class="absolute bottom-0 right-0">
-        <p-button
-          icon="pi pi-upload"
-          size="small"
-          severity="primary"
-          [rounded]="true"
-          (onClick)="fileInput.click()"
-        ></p-button>
-        <input
-          #fileInput
-          type="file"
-          class="hidden"
-          (change)="onAvatarChange($event)"
-        />
-      </span>
-    </div>
-    <div class="flex-1 space-y-3">
-      <h2 class="text-3xl font-semibold tracking-tight flex items-center gap-2">
-        {{ user.name }}
-        <span
-          class="inline-flex items-center rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-700 dark:text-primary-200 px-2 py-0.5 text-xs font-medium"
-          >Pro Reader</span
-        >
-      </h2>
-      <p
-        class="text-slate-500 dark:text-slate-400 text-sm flex flex-wrap items-center gap-2"
-      >
-        📍 {{ user.location }} <span class="hidden sm:inline">·</span> Joined
-        {{ user.joined }}
-      </p>
-      <div class="flex gap-2 flex-wrap pt-1">
-        <p-button
-          label="Edit Profile"
-          icon="pi pi-user-edit"
-          severity="primary"
-          styleClass="!shadow-none hover:!shadow"
-        ></p-button>
-        <p-button
-          label="Share"
-          icon="pi pi-link"
-          severity="secondary"
-          (onClick)="copyShareLink()"
-          styleClass="!shadow-none hover:!shadow"
-        ></p-button>
-        <p-button
-          label="Settings"
-          icon="pi pi-cog"
-          severity="help"
-          styleClass="!shadow-none hover:!shadow"
-        ></p-button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Stats -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-    <div
-      class="relative group overflow-hidden rounded-xl bg-white/80 dark:bg-slate-800/70 backdrop-blur p-5 text-center ring-1 ring-slate-200/60 dark:ring-slate-700/60 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-    >
-      <div
-        class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-primary-50/60 to-transparent dark:from-primary-500/10 transition"
-      ></div>
-      <p class="text-gray-500 text-sm">Books Read</p>
-      <p class="text-3xl font-bold tracking-tight relative">
-        {{ user.stats.booksRead }}
-      </p>
-      <p
-        class="text-[10px] uppercase mt-1 text-primary-600 dark:text-primary-400 tracking-wider"
-      >
-        Total
-      </p>
-    </div>
-    <div
-      class="relative group overflow-hidden rounded-xl bg-white/80 dark:bg-slate-800/70 backdrop-blur p-5 text-center ring-1 ring-slate-200/60 dark:ring-slate-700/60 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-    >
-      <div
-        class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-fuchsia-50/70 to-transparent dark:from-fuchsia-500/10 transition"
-      ></div>
-      <p class="text-gray-500 text-sm">Quotes</p>
-      <p class="text-3xl font-bold tracking-tight relative">
-        {{ user.stats.quotes }}
-      </p>
-      <p
-        class="text-[10px] uppercase mt-1 text-fuchsia-600 dark:text-fuchsia-400 tracking-wider"
-      >
-        Saved
-      </p>
-    </div>
-    <div
-      class="relative group overflow-hidden rounded-xl bg-white/80 dark:bg-slate-800/70 backdrop-blur p-5 text-center ring-1 ring-slate-200/60 dark:ring-slate-700/60 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-    >
-      <div
-        class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-amber-50/70 to-transparent dark:from-amber-500/10 transition"
-      ></div>
-      <p class="text-gray-500 text-sm">Avg Rating</p>
-      <p
-        class="text-3xl font-bold tracking-tight relative flex items-center justify-center gap-1"
-      >
-        ⭐ <span>{{ user.stats.avgRating }}</span>
-      </p>
-      <p
-        class="text-[10px] uppercase mt-1 text-amber-600 dark:text-amber-400 tracking-wider"
-      >
-        Score
-      </p>
-    </div>
-  </div>
-
-  <!-- Mini Goals Overview -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-    <p-card class="modern-card">
-      <div class="flex justify-between items-center mb-2">
-        <span class="font-medium">Annual Goal</span>
-        <p-tag
-          severity="info"
-          [value]="annualProgressPct + '%'"
-          rounded
-        ></p-tag>
-      </div>
-      <p class="text-sm">
-        {{ user.stats.booksRead }} / {{ user.goals.annual }} books
-      </p>
-      <p-progressBar [value]="annualProgressPct"></p-progressBar>
-    </p-card>
-    <p-card class="modern-card">
-      <div class="flex justify-between items-center mb-2">
-        <span class="font-medium">Current Streak</span>
-        <p-tag
-          severity="success"
-          [value]="user.goals.streak + ' days'"
-          rounded
-        ></p-tag>
-      </div>
-      <div class="flex justify-center py-2">
-        <p-knob
-          [(ngModel)]="streakProgressPct"
-          valueTemplate="{value}%"
-          [readonly]="true"
-          size="70"
-          strokeWidth="10"
-          valueColor="var(--p-green-500)"
-          rangeColor="var(--p-surface-200)"
-        ></p-knob>
-      </div>
-    </p-card>
-    <p-card class="modern-card">
-      <div class="flex justify-between items-center mb-2">
-        <span class="font-medium">Top Genre</span>
-      </div>
-      <p class="text-sm">{{ user.readerStats.topGenre }}</p>
-    </p-card>
-  </div>
-
-  <!-- Featured Book -->
-  <p-card class="modern-card overflow-hidden relative">
-    <div
-      class="absolute -right-10 -top-10 w-40 h-40 bg-primary-400/10 dark:bg-primary-500/10 rounded-full blur-2xl"
-    ></div>
-    <div class="flex items-center gap-6 relative">
-      <img
-        [src]="featured.coverUrl"
-        alt="Featured book"
-        class="w-20 h-28 object-cover rounded-lg shadow-md ring-1 ring-slate-200/60 dark:ring-slate-700/60"
-      />
-      <div>
-        <h3 class="font-semibold mb-1 text-lg">Featured Book</h3>
-        <p class="text-sm font-medium">
-          {{ featured.title }}
-          <span class="text-gray-500 dark:text-slate-400"
-            >by {{ featured.author }}</span
+<!-- Modern User Profile UI - Clean & Functional -->
+<div class="min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Profile Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 mb-8">
+      <div class="flex flex-col lg:flex-row items-center gap-8">
+        <!-- Avatar Section -->
+        <div class="relative group">
+          <div
+            class="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-500 shadow-2xl"
           >
-        </p>
-        <p
-          class="text-xs italic text-gray-500 dark:text-slate-400 mt-2 leading-relaxed"
-        >
-          “{{ featured.quote }}”
-        </p>
+            <img
+              [src]="user.avatarUrl || 'assets/images/product-not-found.png'"
+              alt="Profile Avatar"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <button
+            (click)="fileInput.click()"
+            class="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+          >
+            <i class="pi pi-camera"></i>
+          </button>
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            class="hidden"
+            (change)="onAvatarChange($event)"
+          />
+        </div>
+
+        <!-- Profile Info -->
+        <div class="flex-1 text-center lg:text-left">
+          <div class="mb-4">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              {{ user.name }}
+            </h1>
+            <div
+              class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-gray-600 dark:text-gray-400"
+            >
+              <span class="flex items-center gap-2">
+                <i class="pi pi-map-marker text-blue-500"></i>
+                {{ user.location }}
+              </span>
+              <span class="flex items-center gap-2">
+                <i class="pi pi-calendar text-blue-500"></i>
+                Joined {{ user.joined }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+            <button icon="pi pi-pencil" pButton>Edit Profile</button>
+            <button
+              pButton
+              icon="pi pi-share-alt"
+              severity="contrast"
+              (click)="copyShareLink()"
+            >
+              Share Profile
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </p-card>
 
-  <!-- Shortcut Links to Detailed Pages -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-    <p-card
-      class="modern-card group cursor-pointer select-none"
-      (click)="navigateTo('reading-log')"
-      aria-label="Go to Reading Log"
-    >
-      <div class="flex flex-col items-center py-6 relative">
-        <div
-          class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-b from-primary-400/5 to-transparent transition"
-        ></div>
-        <i
-          class="pi pi-book text-2xl mb-2 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition"
-        ></i>
-        <span class="font-medium">Reading Log</span>
-        <span class="text-[11px] mt-1 text-slate-500 dark:text-slate-400"
-          >History & Progress</span
-        >
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Books Read -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center"
+          >
+            <i class="pi pi-book text-blue-600 dark:text-blue-400 text-xl"></i>
+          </div>
+        </div>
+        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+          {{ user.stats.booksRead }}
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Books Read</div>
       </div>
-    </p-card>
-    <p-card
-      class="modern-card group cursor-pointer select-none"
-      (click)="navigateTo('tags')"
-      aria-label="Go to Tag Management"
-    >
-      <div class="flex flex-col items-center py-6 relative">
-        <div
-          class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-b from-fuchsia-400/5 to-transparent transition"
-        ></div>
-        <i
-          class="pi pi-tags text-2xl mb-2 text-fuchsia-600 dark:text-fuchsia-400 group-hover:scale-110 transition"
-        ></i>
-        <span class="font-medium">Tag Management</span>
-        <span class="text-[11px] mt-1 text-slate-500 dark:text-slate-400"
-          >Organize</span
-        >
+
+      <!-- Total Owned -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900 rounded-full flex items-center justify-center"
+          >
+            <i
+              class="pi pi-home text-emerald-600 dark:text-emerald-400 text-xl"
+            ></i>
+          </div>
+        </div>
+        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+          {{ user.stats.totalOwned }}
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Total Owned</div>
       </div>
-    </p-card>
-    <p-card
-      class="modern-card group cursor-pointer select-none"
-      (click)="navigateTo('budget')"
-      aria-label="Go to Budget Control"
-    >
-      <div class="flex flex-col items-center py-6 relative">
-        <div
-          class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-b from-amber-400/5 to-transparent transition"
-        ></div>
-        <i
-          class="pi pi-wallet text-2xl mb-2 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition"
-        ></i>
-        <span class="font-medium">Budget Control</span>
-        <span class="text-[11px] mt-1 text-slate-500 dark:text-slate-400"
-          >Spending</span
-        >
+
+      <!-- Quotes -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center"
+          >
+            <i
+              class="pi pi-heart text-purple-600 dark:text-purple-400 text-xl"
+            ></i>
+          </div>
+        </div>
+        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+          {{ user.stats.quotes }}
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Quotes Saved</div>
       </div>
-    </p-card>
+
+      <!-- Average Rating -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div
+            class="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center"
+          >
+            <i
+              class="pi pi-star text-amber-600 dark:text-amber-400 text-xl"
+            ></i>
+          </div>
+        </div>
+        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+          {{ user.stats.avgRating }}
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">Avg Rating</div>
+      </div>
+    </div>
+
+    <!-- Goals Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        Reading Goals & Progress
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Annual Goal -->
+        <div class="text-center">
+          <div class="mb-4">
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+            >
+              Annual Goal
+            </h3>
+            <div
+              class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2"
+            >
+              {{ user.stats.booksRead }} / {{ user.goals.annual }}
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              books this year
+            </div>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+            <div
+              class="bg-blue-500 h-3 rounded-full transition-all duration-300"
+              [style.width.%]="annualProgressPct"
+            ></div>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            {{ annualProgressPct }}% complete
+          </div>
+        </div>
+
+        <!-- Reading Streak -->
+        <div class="text-center">
+          <div class="mb-4">
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+            >
+              Reading Streak
+            </h3>
+            <div
+              class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2"
+            >
+              {{ user.goals.streak }}
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              days in a row
+            </div>
+          </div>
+          <div
+            class="w-20 h-20 mx-auto border-4 border-emerald-500 rounded-full flex items-center justify-center"
+          >
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold"
+              >{{ streakProgressPct }}%</span
+            >
+          </div>
+        </div>
+
+        <!-- Top Genre -->
+        <div class="text-center">
+          <div class="mb-4">
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+            >
+              Reading Insights
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400">Top Genre:</span>
+                <span class="font-medium text-gray-900 dark:text-white">{{
+                  user.readerStats.topGenre
+                }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400"
+                  >Avg Rating:</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white"
+                  >{{ user.stats.avgRating }} ⭐</span
+                >
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400">Pages/Day:</span>
+                <span class="font-medium text-gray-900 dark:text-white"
+                  >45</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Book -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        Featured Book
+      </h2>
+
+      <div class="flex flex-col lg:flex-row items-center gap-8">
+        <div class="flex-shrink-0">
+          <img
+            [src]="featured.coverUrl || 'assets/images/product-not-found.png'"
+            alt="Featured book cover"
+            class="w-40 h-56 object-cover rounded-xl shadow-lg"
+          />
+        </div>
+
+        <div class="flex-1 text-center lg:text-left">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {{ featured.title }}
+          </h3>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
+            by {{ featured.author }}
+          </p>
+
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <blockquote class="italic text-gray-700 dark:text-gray-300">
+              "{{ featured.quote }}"
+            </blockquote>
+          </div>
+
+          <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
+            <button
+              class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            >
+              View Details
+            </button>
+            <button
+              class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Add Note
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        Quick Actions
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <!-- Reading Log -->
+        <div
+          (click)="navigateTo('reading-log')"
+          class="cursor-pointer group bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 hover:shadow-lg transition-all"
+        >
+          <div class="text-center">
+            <div
+              class="w-16 h-16 mx-auto bg-blue-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <i class="pi pi-book text-white text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-2">
+              Reading Log
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Track your reading history
+            </p>
+          </div>
+        </div>
+
+        <!-- Tag Management -->
+        <div
+          (click)="navigateTo('tags')"
+          class="cursor-pointer group bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 hover:shadow-lg transition-all"
+        >
+          <div class="text-center">
+            <div
+              class="w-16 h-16 mx-auto bg-purple-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <i class="pi pi-tags text-white text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-2">
+              Tag Management
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Organize your books
+            </p>
+          </div>
+        </div>
+
+        <!-- Budget Control -->
+        <div
+          (click)="navigateTo('budget')"
+          class="cursor-pointer group bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-6 hover:shadow-lg transition-all"
+        >
+          <div class="text-center">
+            <div
+              class="w-16 h-16 mx-auto bg-emerald-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+            >
+              <i class="pi pi-wallet text-white text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-2">
+              Budget Control
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Monitor spending
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="text-center">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg inline-flex items-center gap-4 px-8 py-4"
+      >
+        <span class="text-gray-600 dark:text-gray-400 font-medium"
+          >Connect:</span
+        >
+
+        <a
+          *ngIf="user.social.goodreads"
+          [href]="user.social.goodreads"
+          target="_blank"
+          class="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center text-white transition-colors"
+        >
+          <i class="pi pi-book"></i>
+        </a>
+
+        <a
+          *ngIf="user.social.instagram"
+          [href]="user.social.instagram"
+          target="_blank"
+          class="w-10 h-10 bg-pink-500 hover:bg-pink-600 rounded-full flex items-center justify-center text-white transition-colors"
+        >
+          <i class="pi pi-instagram"></i>
+        </a>
+
+        <a
+          *ngIf="user.social.linkedin"
+          [href]="user.social.linkedin"
+          target="_blank"
+          class="w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors"
+        >
+          <i class="pi pi-linkedin"></i>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
