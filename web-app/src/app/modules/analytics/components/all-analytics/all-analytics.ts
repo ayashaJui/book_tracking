@@ -255,22 +255,6 @@ export class AllAnalytics implements OnInit {
     console.log('Analytics data exported successfully');
   }
 
-  // Helper method to get filtered books
-  private getFilteredBooks() {
-    let filteredBooks = this.books;
-    if (this.selectedGenre !== 'All') {
-      filteredBooks = filteredBooks.filter(
-        (b) => b.genre === this.selectedGenre
-      );
-    }
-    if (this.selectedAuthor !== 'All') {
-      filteredBooks = filteredBooks.filter(
-        (b) => b.author === this.selectedAuthor
-      );
-    }
-    return filteredBooks;
-  }
-
   // Format number with commas
   formatNumber(num: number): string {
     return new Intl.NumberFormat().format(num);
@@ -1027,5 +1011,80 @@ export class AllAnalytics implements OnInit {
     //     },
     //   },
     // };
+  }
+
+  // Additional methods for the enhanced UI
+  getFilteredBooks() {
+    let filteredBooks = this.books;
+    if (this.selectedGenre !== 'All') {
+      filteredBooks = filteredBooks.filter(
+        (b) => b.genre === this.selectedGenre
+      );
+    }
+    if (this.selectedAuthor !== 'All') {
+      filteredBooks = filteredBooks.filter(
+        (b) => b.author === this.selectedAuthor
+      );
+    }
+    return filteredBooks;
+  }
+
+  refreshData() {
+    this.updateDashboard();
+    // You can add toast message here if needed
+    console.log('Data refreshed successfully');
+  }
+
+  exportToExcel() {
+    const data = this.getFilteredBooks();
+    const csv = this.convertToCSV(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reading-analytics-${
+      new Date().toISOString().split('T')[0]
+    }.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  private convertToCSV(data: any[]): string {
+    if (!data.length) return '';
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            return typeof value === 'string' && value.includes(',')
+              ? `"${value}"`
+              : value;
+          })
+          .join(',')
+      ),
+    ].join('\n');
+
+    return csvContent;
+  }
+
+  onGlobalFilter(event: Event, table: any) {
+    const target = event.target as HTMLInputElement;
+    table.filterGlobal(target.value, 'contains');
+  }
+
+  getGenreSeverity(genre: string): string {
+    const severityMap: { [key: string]: string } = {
+      Fiction: 'info',
+      'Self-Help': 'success',
+      Classic: 'warning',
+      Biography: 'secondary',
+      Mystery: 'danger',
+      Romance: 'help',
+      Science: 'contrast',
+    };
+    return severityMap[genre] || 'info';
   }
 }

@@ -37,6 +37,8 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DividerModule } from 'primeng/divider';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -79,6 +81,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     FloatLabelModule,
     ToggleButtonModule,
     SelectButtonModule,
+    ToolbarModule,
+    DividerModule,
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -116,6 +120,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     FloatLabelModule,
     ToggleButtonModule,
     SelectButtonModule,
+    ToolbarModule,
+    DividerModule,
     GenreSelectorComponent,
   ],
 })

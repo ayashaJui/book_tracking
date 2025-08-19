@@ -1,489 +1,788 @@
-<div class="min-h-screen from-slate-50 via-blue-50 to-indigo-50">
-  <!-- Modern Header Section with Tailwind -->
-  <header class="sticky top-0 z-50 w-full my-10">
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="analytics-header relative overflow-hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
     <div
-      class="container flex h-16 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8"
-    >
-      <div class="flex w-full items-center justify-between">
-        <!-- Brand Section -->
-        <div class="flex items-center gap-4">
-          <div
-            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 shadow-lg shadow-blue-500/25"
-          >
-            <svg
-              class="h-6 w-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              ></path>
-            </svg>
-          </div>
-          <div class="hidden md:block">
-            <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
-              Analytics Dashboard
-            </h1>
-            <p class="text-sm">Insights into your reading journey</p>
-          </div>
-        </div>
+      class="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-20 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(99, 102, 241, 0.4) 1px,
+            transparent 0
+          );
+          background-size: 24px 24px;
+        "
+      ></div>
+    </div>
 
-        <!-- Filters & Actions Section -->
-        <div class="flex items-center gap-3">
-          <!-- Genre Filter -->
-          <div
-            class="flex items-center gap-2 rounded-xl px-3 py-2 transition-all"
-          >
-            <p-select
-              [options]="genreOptions"
-              [(ngModel)]="selectedGenre"
-              optionLabel="label"
-              placeholder="All Genres"
-              class="w-32 text-sm lg:w-40"
-              (onChange)="updateDashboard()"
+    <div class="relative px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <div class="max-w-7xl mx-auto">
+        <!-- Title Section -->
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="header-icon w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl"
             >
-            </p-select>
-          </div>
-
-          <!-- Author Filter -->
-          <div
-            class="flex items-center gap-2 rounded-xl px-3 py-2 transition-all"
-          >
-            <p-select
-              [options]="authorOptions"
-              [(ngModel)]="selectedAuthor"
-              optionLabel="label"
-              placeholder="All Authors"
-              class="w-32 text-sm lg:w-40"
-              (onChange)="updateDashboard()"
-            >
-            </p-select>
+              <i class="pi pi-chart-line text-white text-2xl"></i>
+            </div>
+            <div>
+              <h1
+                class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white tracking-tight"
+              >
+                Analytics Dashboard
+              </h1>
+              <p
+                class="text-gray-600 dark:text-gray-300 text-sm sm:text-base mt-1"
+              >
+                Track your reading journey with detailed insights and statistics
+              </p>
+            </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex items-center gap-2">
-            <button
-              (click)="resetFilters()"
-              class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                ></path>
-              </svg>
-              <span class="hidden sm:inline">Reset</span>
-            </button>
+          <div class="flex items-center gap-3">
+            <p-button
+              icon="pi pi-refresh"
+              severity="secondary"
+              size="small"
+              (onClick)="resetFilters()"
+              [outlined]="true"
+              pTooltip="Reset all filters"
+            ></p-button>
 
-            <button
-              (click)="exportData()"
-              class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                ></path>
-              </svg>
-              <span class="hidden sm:inline">Export</span>
-            </button>
+            <p-button
+              icon="pi pi-download"
+              size="small"
+              (onClick)="exportData()"
+              pTooltip="Export analytics data"
+            ></p-button>
+          </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+        >
+          <div class="flex items-center gap-2 text-sm font-medium">
+            <i class="pi pi-filter text-gray-500"></i>
+            <span>Filter by:</span>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <div class="flex items-center gap-2">
+              <p-select
+                [options]="genreOptions"
+                [(ngModel)]="selectedGenre"
+                optionLabel="label"
+                placeholder="All Genres"
+                appendTo="body"
+                class="w-40"
+                (onChange)="updateDashboard()"
+                [showClear]="true"
+              ></p-select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <p-select
+                [options]="authorOptions"
+                [(ngModel)]="selectedAuthor"
+                appendTo="body"
+                optionLabel="label"
+                placeholder="All Authors"
+                class="w-40"
+                (onChange)="updateDashboard()"
+                [showClear]="true"
+              ></p-select>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </div>
 
-  <div class="max-w-7xl mx-auto px-6 py-8">
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <!-- Total Books Card -->
-      <div
-        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div
-            class="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors"
-          >
-            <i class="pi pi-book text-blue-600 text-xl"></i>
-          </div>
-          <span
-            class="text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full"
-            >TOTAL</span
-          >
-        </div>
-        <div class="space-y-1">
-          <p class="text-3xl font-bold dark:text-white">
-            {{ formatNumber(stats.totalBooks) }}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Books Read</p>
-          <div
-            class="flex items-center gap-1 text-xs"
-            [ngClass]="getTrendColor(stats.trends.books.isPositive)"
-          >
-            <i [ngClass]="getTrendIcon(stats.trends.books.isPositive)"></i>
-            <span>{{ stats.trends.books.value }}% vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pages Read Card -->
-      <div
-        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div
-            class="p-3 bg-emerald-100 rounded-xl group-hover:bg-emerald-200 transition-colors"
-          >
-            <i class="pi pi-file text-emerald-600 text-xl"></i>
-          </div>
-          <span
-            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
-            >PAGES</span
-          >
-        </div>
-        <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ formatNumber(stats.totalPages) }}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Pages Read</p>
-          <div
-            class="flex items-center gap-1 text-xs"
-            [ngClass]="getTrendColor(stats.trends.pages.isPositive)"
-          >
-            <i [ngClass]="getTrendIcon(stats.trends.pages.isPositive)"></i>
-            <span>{{ stats.trends.pages.value }}% vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Average Rating Card -->
-      <div
-        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div
-            class="p-3 bg-amber-100 rounded-xl group-hover:bg-amber-200 transition-colors"
-          >
-            <i class="pi pi-star text-amber-600 text-xl"></i>
-          </div>
-          <span
-            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
-            >RATING</span
-          >
-        </div>
-        <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ stats.avgRating }}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Average Rating</p>
-          <div class="flex items-center gap-1">
-            <div class="flex gap-1">
-              <i
-                class="pi pi-star-fill text-amber-400 text-xs"
-                *ngFor="let star of [1, 2, 3, 4]"
-              ></i>
-              <i class="pi pi-star text-amber-300 text-xs"></i>
+  <!-- Quick Stats Section -->
+  <div class="quick-stats">
+    <div class="max-w-7xl mx-auto py-6 lg:py-8">
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 lg:gap-6">
+        <div
+          class="bg-white dark:bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-book text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ formatNumber(stats.totalBooks) }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Books Read</p>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Reading Hours Card -->
-      <div
-        class="card-container card rounded-2xl p-6 transition-all duration-300 group"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div
-            class="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors"
-          >
-            <i class="pi pi-clock text-purple-600 text-xl"></i>
+        <div
+          class="bg-white dark:bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-file text-emerald-600 dark:text-emerald-400"></i>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ formatNumber(stats.totalPages) }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Pages Read</p>
+            </div>
           </div>
-          <span
-            class="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full"
-            >HOURS</span
-          >
         </div>
-        <div class="space-y-1">
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ formatNumber(stats.totalHours) }}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Reading Hours</p>
-          <div
-            class="flex items-center gap-1 text-xs"
-            [ngClass]="getTrendColor(stats.trends.hours.isPositive)"
-          >
-            <i [ngClass]="getTrendIcon(stats.trends.hours.isPositive)"></i>
-            <span>{{ stats.trends.hours.value }}% vs last month</span>
+
+        <div
+          class="bg-white dark:bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-star text-amber-600 dark:text-amber-400"></i>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.avgRating }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Avg Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center"
+            >
+              <i class="pi pi-clock text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <div>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ formatNumber(stats.totalHours) }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Hours Read</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Charts Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <!-- Reading Trend Chart -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-100 dark:bg-blue-200 rounded-lg">
-              <i class="pi pi-chart-line text-blue-600 dark:text-blue-400"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Reading Trend
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Monthly books & pages
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-              class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-200 text-green-700 dark:text-green-800 text-xs font-medium rounded-full"
-            >
-              <i class="pi pi-arrow-up text-xs"></i>
-              +23%
-            </span>
-          </div>
-        </div>
-
-        <apx-chart
-          #readingTrendChartComponent
-          [series]="readingTrendChart.series"
-          [chart]="readingTrendChart.chart"
-          [xaxis]="readingTrendChart.xaxis!"
-          [stroke]="readingTrendChart.stroke!"
-          [colors]="readingTrendChart.colors!"
-          [tooltip]="readingTrendChart.tooltip!"
-          [legend]="readingTrendChart.legend!"
-          [fill]="readingTrendChart.fill!"
-          [grid]="readingTrendChart.grid!"
-          [markers]="readingTrendChart.markers!"
-          [yaxis]="readingTrendChart.yaxis!"
-        >
-        </apx-chart>
-      </div>
-
-      <!-- Genre Distribution Chart -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-purple-100 dark:bg-purple-200 rounded-lg">
-              <i
-                class="pi pi-chart-pie text-purple-600 dark:text-purple-800"
-              ></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Genre Distribution
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Reading preferences
-              </p>
-            </div>
-          </div>
+  <!-- Main Content Container -->
+  <div class="lg:px-6 py-6 lg:py-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Trend Insights Section -->
+      <div class="trend-insights mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Reading Trend Insight -->
           <div
-            class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+            class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm"
           >
-            <i class="pi pi-info-circle"></i>
-            <span>Click to filter</span>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-trending-up text-blue-600 dark:text-blue-400 text-sm"
+                  ></i>
+                </div>
+                <span
+                  class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >Books Trend</span
+                >
+              </div>
+              <p-tag
+                [value]="stats.trends.books.value + '%'"
+                [severity]="
+                  stats.trends.books.isPositive ? 'success' : 'danger'
+                "
+                [icon]="getTrendIcon(stats.trends.books.isPositive)"
+              ></p-tag>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              vs last month
+            </p>
           </div>
-        </div>
 
-        <apx-chart
-          #genrePieChartComponent
-          [series]="genrePieChart.series"
-          [chart]="genrePieChart.chart"
-          [labels]="genrePieChart.labels!"
-          [legend]="genrePieChart.legend!"
-          [tooltip]="genrePieChart.tooltip!"
-          [colors]="genrePieChart.colors!"
-          [plotOptions]="genrePieChart.plotOptions!"
-          [dataLabels]="genrePieChart.dataLabels!"
-          [responsive]="genrePieChart.responsive!"
-          (dataPointSelection)="onGenreClick($event)"
-        >
-        </apx-chart>
-      </div>
-
-      <!-- Monthly Spending Chart -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-emerald-100 dark:bg-emerald-200 rounded-lg">
-              <i
-                class="pi pi-dollar text-emerald-600 dark:text-emerald-800"
-              ></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Monthly Spending
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Book purchases
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-              class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-200 text-red-700 dark:text-red-800 text-xs font-medium rounded-full"
-            >
-              <i class="pi pi-arrow-down text-xs"></i>
-              -5%
-            </span>
-          </div>
-        </div>
-        <apx-chart
-          #spendingBarChartComponent
-          [series]="spendingBarChart.series"
-          [chart]="spendingBarChart.chart"
-          [plotOptions]="spendingBarChart.plotOptions!"
-          [xaxis]="spendingBarChart.xaxis!"
-          [colors]="spendingBarChart.colors!"
-          [tooltip]="spendingBarChart.tooltip!"
-          [fill]="spendingBarChart.fill!"
-          [grid]="spendingBarChart.grid!"
-          [dataLabels]="spendingBarChart.dataLabels!"
-          [yaxis]="spendingBarChart.yaxis!"
-        >
-        </apx-chart>
-      </div>
-
-      <!-- Rating Distribution Chart -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-amber-100 dark:bg-amber-200 rounded-lg">
-              <i class="pi pi-star text-amber-600 dark:text-amber-800"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Rating Distribution
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Book ratings breakdown
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <i class="pi pi-star-fill text-amber-400 text-sm"></i>
-            <span
-              class="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >{{ stats.avgRating }}</span
-            >
-          </div>
-        </div>
-        <apx-chart
-          #ratingDistributionChartComponent
-          [series]="ratingDistributionChart.series"
-          [chart]="ratingDistributionChart.chart"
-          [xaxis]="ratingDistributionChart.xaxis!"
-          [yaxis]="ratingDistributionChart.yaxis!"
-          [plotOptions]="ratingDistributionChart.plotOptions!"
-          [tooltip]="ratingDistributionChart.tooltip!"
-        >
-        </apx-chart>
-      </div>
-
-      <!-- Author Leaderboard Chart -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-rose-100 dark:bg-rose-200 rounded-lg">
-              <i class="pi pi-users text-rose-600 dark:text-rose-800"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Top Authors
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Most read authors
-              </p>
-            </div>
-          </div>
+          <!-- Pages Trend Insight -->
           <div
-            class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+            class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm"
           >
-            <i class="pi pi-info-circle"></i>
-            <span>Click to filter</span>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-file text-emerald-600 dark:text-emerald-400 text-sm"
+                  ></i>
+                </div>
+                <span
+                  class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >Pages Trend</span
+                >
+              </div>
+              <p-tag
+                [value]="stats.trends.pages.value + '%'"
+                [severity]="
+                  stats.trends.pages.isPositive ? 'success' : 'danger'
+                "
+                [icon]="getTrendIcon(stats.trends.pages.isPositive)"
+              ></p-tag>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              vs last month
+            </p>
+          </div>
+
+          <!-- Hours Trend Insight -->
+          <div
+            class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-clock text-purple-600 dark:text-purple-400 text-sm"
+                  ></i>
+                </div>
+                <span
+                  class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >Hours Trend</span
+                >
+              </div>
+              <p-tag
+                [value]="stats.trends.hours.value + '%'"
+                [severity]="
+                  stats.trends.hours.isPositive ? 'success' : 'danger'
+                "
+                [icon]="getTrendIcon(stats.trends.hours.isPositive)"
+              ></p-tag>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              vs last month
+            </p>
+          </div>
+
+          <!-- Completion Rate Insight -->
+          <div
+            class="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center"
+                >
+                  <i
+                    class="pi pi-check-circle text-indigo-600 dark:text-indigo-400 text-sm"
+                  ></i>
+                </div>
+                <span
+                  class="text-sm font-medium text-gray-600 dark:text-gray-400"
+                  >Completion</span
+                >
+              </div>
+              <p-tag
+                [value]="stats.trends.completion.value + '%'"
+                [severity]="
+                  stats.trends.completion.isPositive ? 'success' : 'danger'
+                "
+                [icon]="getTrendIcon(stats.trends.completion.isPositive)"
+              ></p-tag>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              vs last month
+            </p>
           </div>
         </div>
-        <apx-chart
-          #authorLeaderboardChartComponent
-          [series]="authorLeaderboardChart.series"
-          [chart]="authorLeaderboardChart.chart"
-          [plotOptions]="authorLeaderboardChart.plotOptions!"
-          [xaxis]="authorLeaderboardChart.xaxis!"
-          [yaxis]="authorLeaderboardChart.yaxis!"
-          [tooltip]="authorLeaderboardChart.tooltip!"
-          (dataPointSelection)="onAuthorClick($event)"
-        >
-        </apx-chart>
       </div>
 
-      <!-- Completion Rate Card -->
-      <div class="card rounded-2xl p-6 transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-rose-100 dark:bg-rose-200 rounded-lg">
-              <i
-                class="pi pi-check-circle text-rose-600 dark:text-rose-800"
-              ></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                Reading Progress
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Books completion status
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-              class="inline-flex items-center gap-1 px-2 py-1 bg-rose-100 dark:bg-rose-200 text-rose-700 dark:text-rose-800 text-xs font-medium rounded-full"
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
+        <!-- Reading Trend Chart -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
             >
-              <i [class]="getTrendIcon(stats.trends.completion.isPositive)"></i>
-              {{ stats.trends.completion.value }}% vs last month
-            </span>
-          </div>
-        </div>
-        <div class="flex flex-col items-center justify-center">
-          <apx-chart
-            #completionRadialChartComponent
-            [series]="completionRadialChart.series"
-            [chart]="completionRadialChart.chart"
-            [plotOptions]="completionRadialChart.plotOptions!"
-            [labels]="completionRadialChart.labels!"
-            [tooltip]="completionRadialChart.tooltip!"
-            class="completion-radial-chart"
-          >
-          </apx-chart>
-        </div>
-      </div>
-    </div>
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-100 dark:bg-blue-200 rounded-lg">
+                  <i
+                    class="pi pi-chart-line text-blue-600 dark:text-blue-400"
+                  ></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Reading Trend
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Monthly books & pages
+                  </p>
+                </div>
+              </div>
+              <p-tag
+                value="+23%"
+                severity="success"
+                icon="pi pi-arrow-up"
+              ></p-tag>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <apx-chart
+              #readingTrendChartComponent
+              [series]="readingTrendChart.series"
+              [chart]="readingTrendChart.chart"
+              [xaxis]="readingTrendChart.xaxis!"
+              [stroke]="readingTrendChart.stroke!"
+              [colors]="readingTrendChart.colors!"
+              [tooltip]="readingTrendChart.tooltip!"
+              [legend]="readingTrendChart.legend!"
+              [fill]="readingTrendChart.fill!"
+              [grid]="readingTrendChart.grid!"
+              [markers]="readingTrendChart.markers!"
+              [yaxis]="readingTrendChart.yaxis!"
+            ></apx-chart>
+          </ng-template>
+        </p-card>
 
-    <!-- Full Width Reading Streak Section -->
-    <div class="w-full mt-8">
-      <app-reading-streak> </app-reading-streak>
+        <!-- Genre Distribution Chart -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-purple-100 dark:bg-purple-200 rounded-lg">
+                  <i
+                    class="pi pi-chart-pie text-purple-600 dark:text-purple-800"
+                  ></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Genre Distribution
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Reading preferences
+                  </p>
+                </div>
+              </div>
+              <p-tag
+                value="Click to filter"
+                severity="info"
+                icon="pi pi-info-circle"
+              ></p-tag>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <apx-chart
+              #genrePieChartComponent
+              [series]="genrePieChart.series"
+              [chart]="genrePieChart.chart"
+              [labels]="genrePieChart.labels!"
+              [legend]="genrePieChart.legend!"
+              [tooltip]="genrePieChart.tooltip!"
+              [colors]="genrePieChart.colors!"
+              [plotOptions]="genrePieChart.plotOptions!"
+              [dataLabels]="genrePieChart.dataLabels!"
+              [responsive]="genrePieChart.responsive!"
+              (dataPointSelection)="onGenreClick($event)"
+            ></apx-chart>
+          </ng-template>
+        </p-card>
+
+        <!-- Monthly Spending Chart -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-100 dark:bg-emerald-200 rounded-lg">
+                  <i
+                    class="pi pi-dollar text-emerald-600 dark:text-emerald-800"
+                  ></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Monthly Spending
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Book purchases
+                  </p>
+                </div>
+              </div>
+              <p-tag
+                value="-5%"
+                severity="danger"
+                icon="pi pi-arrow-down"
+              ></p-tag>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <apx-chart
+              #spendingBarChartComponent
+              [series]="spendingBarChart.series"
+              [chart]="spendingBarChart.chart"
+              [plotOptions]="spendingBarChart.plotOptions!"
+              [xaxis]="spendingBarChart.xaxis!"
+              [colors]="spendingBarChart.colors!"
+              [tooltip]="spendingBarChart.tooltip!"
+              [fill]="spendingBarChart.fill!"
+              [grid]="spendingBarChart.grid!"
+              [dataLabels]="spendingBarChart.dataLabels!"
+              [yaxis]="spendingBarChart.yaxis!"
+            ></apx-chart>
+          </ng-template>
+        </p-card>
+
+        <!-- Rating Distribution Chart -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-100 dark:bg-amber-200 rounded-lg">
+                  <i class="pi pi-star text-amber-600 dark:text-amber-800"></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Rating Distribution
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Book ratings breakdown
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="pi pi-star-fill text-amber-400 text-sm"></i>
+                <span
+                  class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >{{ stats.avgRating }}</span
+                >
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <apx-chart
+              #ratingDistributionChartComponent
+              [series]="ratingDistributionChart.series"
+              [chart]="ratingDistributionChart.chart"
+              [xaxis]="ratingDistributionChart.xaxis!"
+              [yaxis]="ratingDistributionChart.yaxis!"
+              [plotOptions]="ratingDistributionChart.plotOptions!"
+              [tooltip]="ratingDistributionChart.tooltip!"
+            ></apx-chart>
+          </ng-template>
+        </p-card>
+
+        <!-- Author Leaderboard Chart -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-rose-100 dark:bg-rose-200 rounded-lg">
+                  <i class="pi pi-users text-rose-600 dark:text-rose-800"></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Top Authors
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Most read authors
+                  </p>
+                </div>
+              </div>
+              <p-tag
+                value="Click to filter"
+                severity="info"
+                icon="pi pi-info-circle"
+              ></p-tag>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <apx-chart
+              #authorLeaderboardChartComponent
+              [series]="authorLeaderboardChart.series"
+              [chart]="authorLeaderboardChart.chart"
+              [plotOptions]="authorLeaderboardChart.plotOptions!"
+              [xaxis]="authorLeaderboardChart.xaxis!"
+              [yaxis]="authorLeaderboardChart.yaxis!"
+              [tooltip]="authorLeaderboardChart.tooltip!"
+              (dataPointSelection)="onAuthorClick($event)"
+            ></apx-chart>
+          </ng-template>
+        </p-card>
+
+        <!-- Completion Rate Card -->
+        <p-card class="chart-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-100 dark:bg-indigo-200 rounded-lg">
+                  <i
+                    class="pi pi-check-circle text-indigo-600 dark:text-indigo-800"
+                  ></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Reading Progress
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Books completion status
+                  </p>
+                </div>
+              </div>
+              <p-tag
+                [value]="stats.trends.completion.value + '% vs last month'"
+                [severity]="
+                  stats.trends.completion.isPositive ? 'success' : 'danger'
+                "
+                [icon]="getTrendIcon(stats.trends.completion.isPositive)"
+              ></p-tag>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <div class="flex flex-col items-center justify-center p-4">
+              <apx-chart
+                #completionRadialChartComponent
+                [series]="completionRadialChart.series"
+                [chart]="completionRadialChart.chart"
+                [plotOptions]="completionRadialChart.plotOptions!"
+                [labels]="completionRadialChart.labels!"
+                [tooltip]="completionRadialChart.tooltip!"
+                class="completion-radial-chart"
+              ></apx-chart>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- Full Width Reading Streak Section -->
+      <div class="w-full mt-8">
+        <p-card class="reading-streak-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="p-2 bg-orange-100 dark:bg-orange-200 rounded-lg">
+                <i
+                  class="pi pi-calendar text-orange-600 dark:text-orange-800"
+                ></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Reading Streak
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Your daily reading consistency
+                </p>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <app-reading-streak></app-reading-streak>
+          </ng-template>
+        </p-card>
+      </div>
+
+      <!-- Data Table Section -->
+      <div class="w-full mt-8">
+        <p-card class="data-table-card">
+          <ng-template pTemplate="header">
+            <div
+              class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-100 dark:bg-blue-200 rounded-lg">
+                  <i class="pi pi-table text-blue-600 dark:text-blue-800"></i>
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Reading Data
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300">
+                    Detailed view of your reading analytics
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <p-button
+                  icon="pi pi-refresh"
+                  severity="secondary"
+                  size="small"
+                  (onClick)="refreshData()"
+                  [rounded]="true"
+                  pTooltip="Refresh Data"
+                ></p-button>
+                <p-button
+                  icon="pi pi-file-excel"
+                  severity="success"
+                  size="small"
+                  (onClick)="exportToExcel()"
+                  [rounded]="true"
+                  pTooltip="Export to Excel"
+                ></p-button>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <p-table
+              #dt
+              [value]="getFilteredBooks()"
+              [paginator]="true"
+              [rows]="10"
+              [showCurrentPageReport]="true"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} books"
+              [globalFilterFields]="['title', 'author', 'genre']"
+              class="analytics-table"
+            >
+              <ng-template pTemplate="caption">
+                <div class="flex items-center justify-between mb-4">
+                  <span
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    Books Analytics ({{ getFilteredBooks().length }} total)
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="p-input-icon-left">
+                      <i class="pi pi-search"></i>
+                      <input
+                        pInputText
+                        type="text"
+                        #filter
+                        (input)="onGlobalFilter($event, dt)"
+                        placeholder="Search books..."
+                        class="w-64"
+                      />
+                    </span>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template pTemplate="header">
+                <tr>
+                  <th pSortableColumn="title">
+                    Title <p-sortIcon field="title"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="author">
+                    Author <p-sortIcon field="author"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="genre">
+                    Genre <p-sortIcon field="genre"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="pages">
+                    Pages <p-sortIcon field="pages"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="rating">
+                    Rating <p-sortIcon field="rating"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="spent">
+                    Cost <p-sortIcon field="spent"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="date">
+                    Date <p-sortIcon field="date"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="completed">
+                    Status <p-sortIcon field="completed"></p-sortIcon>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-book>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="font-medium text-gray-900 dark:text-white">
+                    {{ book.title }}
+                  </td>
+                  <td class="text-gray-600 dark:text-gray-300">
+                    {{ book.author }}
+                  </td>
+                  <td>
+                    <p-tag
+                      [value]="book.genre"
+                      [severity]="getGenreSeverity(book.genre)"
+                    ></p-tag>
+                  </td>
+                  <td class="text-right">{{ book.pages | number }}</td>
+                  <td>
+                    <div class="flex items-center gap-1">
+                      <p-rating
+                        [(ngModel)]="book.rating"
+                        [readonly]="true"
+                        [stars]="5"
+                      ></p-rating>
+                      <span class="text-sm text-gray-500 ml-2"
+                        >{{ book.rating }}/5</span
+                      >
+                    </div>
+                  </td>
+                  <td class="text-right">${{ book.spent }}</td>
+                  <td>{{ book.date | date : "mediumDate" }}</td>
+                  <td>
+                    <p-tag
+                      [value]="book.completed ? 'Completed' : 'In Progress'"
+                      [severity]="book.completed ? 'success' : 'warning'"
+                    ></p-tag>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="8" class="text-center py-8">
+                    <div class="flex flex-col items-center gap-3">
+                      <i class="pi pi-inbox text-4xl text-gray-300"></i>
+                      <span class="text-gray-500"
+                        >No books found matching your criteria</span
+                      >
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </ng-template>
+        </p-card>
+      </div>
     </div>
   </div>
 </div>
