@@ -314,24 +314,11 @@ export class AllReviews implements OnInit {
   }
 
   viewReviewDetails(review: Review) {
-    // TODO: Implement review details view
-    console.log('View details for review:', review);
-    // You could open a dialog with full review details here
+    this.router.navigate(['/reviews/view', review.id]);
   }
 
   editReview(review: Review) {
-    // Populate the form with the review data for editing
-    this.newReview = {
-      rating: review.rating,
-      takeaways: review.takeaways,
-      wouldRecommend: review.wouldRecommend,
-      book: review.book,
-      author: review.author,
-    };
-    this.showReviewForm = true;
-
-    // TODO: Add logic to update existing review instead of creating new one
-    console.log('Edit review:', review);
+    this.router.navigate(['/reviews/edit', review.id]);
   }
 
   addReviewPage() {
