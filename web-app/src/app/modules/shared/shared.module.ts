@@ -42,6 +42,7 @@ import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
+import { CheckboxModule } from 'primeng/checkbox';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -89,6 +90,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ProgressSpinnerModule,
     Select,
     Textarea,
+    CheckboxModule,
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -132,6 +134,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ProgressSpinnerModule,
     Select,
     Textarea,
+    CheckboxModule,
   ],
 })
 export class SharedModule {}

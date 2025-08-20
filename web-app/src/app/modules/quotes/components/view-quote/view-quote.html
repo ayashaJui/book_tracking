@@ -1,0 +1,402 @@
+<!-- Loading State -->
+<div
+  *ngIf="loading"
+  class="flex items-center justify-center min-h-screen bg-white/90 dark:bg-gray-900/90"
+>
+  <div class="text-center">
+    <div
+      class="p-8 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 mb-4"
+    >
+      <i
+        class="pi pi-spin pi-spinner text-4xl text-blue-600 dark:text-blue-400 mb-4 block"
+      ></i>
+      <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        Loading quote...
+      </h3>
+      <p class="text-gray-500 dark:text-gray-400">
+        Please wait while we fetch the quote details
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div *ngIf="!loading && quote" class="min-h-screen animate-fade-in-up">
+  <!-- Header Section -->
+  <div
+    class="relative overflow-hidden bg-white dark:bg-gray-900 rounded-2xl border-b border-gray-200 dark:border-gray-700 mb-8"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(147, 51, 234, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
+
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-6xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-eye text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Quote Details
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  View and explore your saved quote
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Actions -->
+          <div class="flex-shrink-0 w-full lg:w-auto">
+            <div class="flex items-center gap-3 flex-wrap">
+              <button
+                pButton
+                label="Back"
+                icon="pi pi-arrow-left"
+                class="p-button-outlined transition-all hover:-translate-y-1"
+                (click)="backToQuotes()"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-star-fill"
+                class="p-button-rounded transition-all hover:-translate-y-1"
+                [class]="
+                  quote.favorite ? 'p-button-warning' : 'p-button-outlined'
+                "
+                (click)="toggleFavorite()"
+                [pTooltip]="
+                  quote.favorite ? 'Remove from favorites' : 'Add to favorites'
+                "
+              ></button>
+              <button
+                pButton
+                label="Edit"
+                icon="pi pi-pencil"
+                class="p-button-primary transition-all hover:-translate-y-1"
+                (click)="editQuote()"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-share-alt"
+                class="p-button-outlined transition-all hover:-translate-y-1"
+                (click)="shareQuote()"
+                pTooltip="Share Quote"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-outlined p-button-danger transition-all hover:-translate-y-1"
+                (click)="deleteQuote()"
+                pTooltip="Delete Quote"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote Content -->
+  <div class="px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="max-w-6.5xl mx-auto">
+      <!-- Main Quote Display -->
+      <div
+        class="bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-lg border border-gray-200/80 dark:border-gray-700/80 rounded-3xl shadow-2xl p-8 lg:p-12 mb-8"
+      >
+        <div class="text-center">
+          <!-- Quote Icon -->
+          <div class="mb-6">
+            <i
+              class="pi pi-comments text-4xl lg:text-5xl text-blue-500 dark:text-blue-400 opacity-80"
+            ></i>
+          </div>
+
+          <!-- Quote Text -->
+          <blockquote
+            class="text-xl lg:text-3xl font-medium text-gray-800 dark:text-gray-200 mb-8 leading-relaxed text-center font-serif"
+          >
+            "{{ quote.quote }}"
+          </blockquote>
+
+          <!-- Attribution -->
+          <div
+            class="text-lg lg:text-xl text-gray-600 dark:text-gray-400 space-y-2 italic opacity-80"
+          >
+            <div class="font-semibold">— {{ quote.author }}</div>
+            <div class="flex items-center justify-center gap-2 text-base">
+              <i class="pi pi-book text-blue-500"></i>
+              <span>{{ quote.book }}</span>
+              <span *ngIf="quote.pageNumber" class="text-gray-500">
+                • Page {{ quote.pageNumber }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Quote Info -->
+        <div
+          class="bg-gray-50/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div class="flex items-center gap-4 mb-4">
+            <div
+              class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center"
+            >
+              <i
+                class="pi pi-info-circle text-blue-600 dark:text-blue-400 text-lg"
+              ></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              Quote Information
+            </h3>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400">Quote ID:</span>
+              <span class="font-medium text-gray-700 dark:text-gray-300"
+                >#{{ quote.id }}</span
+              >
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400">Date Added:</span>
+              <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                quote.dateAdded | date : "mediumDate"
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400">Time Added:</span>
+              <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                quote.dateAdded | date : "shortTime"
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400"
+                >Character Count:</span
+              >
+              <span class="font-medium text-gray-700 dark:text-gray-300"
+                >{{ quote.quote.length }} chars</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Details -->
+        <div
+          class="bg-gray-50/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div class="flex items-center gap-4 mb-4">
+            <div
+              class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center"
+            >
+              <i
+                class="pi pi-book text-green-600 dark:text-green-400 text-lg"
+              ></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              Book Details
+            </h3>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-gray-500 dark:text-gray-400 block mb-1"
+                >Title:
+                <span class="text-gray-700 dark:text-gray-300">{{
+                  quote.book
+                }}</span></span
+              >
+            </div>
+            <div>
+              <span class="text-gray-500 dark:text-gray-400 block mb-1"
+                >Author: <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                quote.author
+              }}</span></span
+              >
+              
+            </div>
+            <div *ngIf="quote.pageNumber">
+              <span class="text-gray-500 dark:text-gray-400 block mb-1"
+                >Page: <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                quote.pageNumber
+              }}</span></span
+              >
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Preferences -->
+        <div
+          class="bg-gray-50/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div class="flex items-center gap-4 mb-4">
+            <div
+              class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center"
+            >
+              <i
+                class="pi pi-heart text-purple-600 dark:text-purple-400 text-lg"
+              ></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              Preferences
+            </h3>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500 dark:text-gray-400">Favorite:</span>
+              <div class="flex items-center gap-2">
+                <i
+                  [class]="
+                    quote.favorite
+                      ? 'pi pi-star-fill text-yellow-500'
+                      : 'pi pi-star text-gray-400'
+                  "
+                ></i>
+                <span class="font-medium text-gray-700 dark:text-gray-300">
+                  {{ quote.favorite ? "Yes" : "No" }}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500 dark:text-gray-400">Tag Count:</span>
+              <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                quote.tags.length
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags Section -->
+      <div
+        *ngIf="quote.tags.length > 0"
+        class="bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-700/20 rounded-2xl p-6 mb-8"
+      >
+        <div class="flex items-center gap-4 mb-4">
+          <div
+            class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center"
+          >
+            <i class="pi pi-tags text-blue-600 dark:text-blue-400 text-lg"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Tags
+          </h3>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <p-tag
+            *ngFor="let tag of quote.tags"
+            [value]="tag"
+            [severity]="getTagSeverity(tag)"
+            class="text-sm px-3 py-1"
+          ></p-tag>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
+          These tags help categorize and organize your quotes for easy
+          discovery.
+        </p>
+      </div>
+
+      <!-- Notes Section -->
+      <div
+        *ngIf="quote.notes"
+        class="bg-yellow-50/60 dark:bg-yellow-900/10 border border-yellow-200/50 dark:border-yellow-700/20 rounded-2xl p-6"
+      >
+        <div class="flex items-center gap-4 mb-4">
+          <div
+            class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-xl flex items-center justify-center"
+          >
+            <i
+              class="pi pi-file-edit text-yellow-600 dark:text-yellow-400 text-lg"
+            ></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Personal Notes
+          </h3>
+        </div>
+        <div
+          class="bg-white/60 dark:bg-gray-800/60 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800"
+        >
+          <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {{ quote.notes }}
+          </p>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">
+          Your personal thoughts and reflections about this quote.
+        </p>
+      </div>
+
+      <!-- Empty Notes State -->
+      <div *ngIf="!quote.notes" class="text-center py-8">
+        <div
+          class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400"
+        >
+          <i class="pi pi-file-edit"></i>
+          <span class="text-sm">No personal notes added yet.</span>
+          <button
+            pButton
+            label="Add Notes"
+            icon="pi pi-plus"
+            class="p-button-text p-button-sm ml-2"
+            (click)="editQuote()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error State -->
+<div
+  *ngIf="!loading && !quote"
+  class="flex items-center justify-center min-h-screen"
+>
+  <div class="text-center">
+    <div
+      class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 mb-4"
+    >
+      <i
+        class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4 block"
+      ></i>
+      <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        Quote Not Found
+      </h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">
+        The quote you're looking for doesn't exist or has been removed.
+      </p>
+      <button
+        pButton
+        label="Back to Quotes"
+        icon="pi pi-arrow-left"
+        class="p-button-outlined"
+        (click)="backToQuotes()"
+      ></button>
+    </div>
+  </div>
+</div>

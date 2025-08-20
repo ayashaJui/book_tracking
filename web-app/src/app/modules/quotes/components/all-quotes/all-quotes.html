@@ -384,53 +384,24 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="quote" class="min-w-[300px]">
+              <th pSortableColumn="quote" class="min-w-[350px]">
                 <div class="flex items-center gap-2">
                   <i class="pi pi-comment text-gray-500"></i>
                   Quote
                   <p-sortIcon field="quote"></p-sortIcon>
                 </div>
               </th>
-              <th pSortableColumn="book" class="min-w-[180px]">
+              <th pSortableColumn="book" class="min-w-[200px]">
                 <div class="flex items-center gap-2">
                   <i class="pi pi-book text-gray-500"></i>
-                  Book
+                  Book & Author
                   <p-sortIcon field="book"></p-sortIcon>
                 </div>
               </th>
-              <th pSortableColumn="author" class="min-w-[150px]">
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-user text-gray-500"></i>
-                  Author
-                  <p-sortIcon field="author"></p-sortIcon>
-                </div>
-              </th>
-              <th
-                pSortableColumn="pageNumber"
-                style="width: 100px"
-                class="text-center"
-              >
-                <div class="flex items-center justify-center gap-2">
-                  <i class="pi pi-file text-gray-500"></i>
-                  Page
-                  <p-sortIcon field="pageNumber"></p-sortIcon>
-                </div>
-              </th>
-              <th class="min-w-[200px]">
+              <th class="min-w-[150px]">
                 <div class="flex items-center gap-2">
                   <i class="pi pi-tags text-gray-500"></i>
                   Tags
-                </div>
-              </th>
-              <th
-                pSortableColumn="dateAdded"
-                style="width: 140px"
-                class="text-center"
-              >
-                <div class="flex items-center justify-center gap-2">
-                  <i class="pi pi-calendar text-gray-500"></i>
-                  Date Added
-                  <p-sortIcon field="dateAdded"></p-sortIcon>
                 </div>
               </th>
               <th style="width: 80px" class="text-center">
@@ -439,7 +410,7 @@
                   Favorite
                 </div>
               </th>
-              <th style="width: 200px" class="text-center">
+              <th style="width: 160px" class="text-center">
                 <div class="flex items-center justify-center gap-2">
                   <i class="pi pi-cog text-gray-500"></i>
                   Actions
@@ -453,7 +424,7 @@
               class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
             >
               <td class="p-4">
-                <div class="max-w-sm">
+                <div class="max-w-md">
                   <p
                     class="text-gray-800 dark:text-gray-200 leading-relaxed line-clamp-3"
                     [pTooltip]="quote.quote"
@@ -463,24 +434,17 @@
                 </div>
               </td>
               <td class="p-4">
-                <span class="font-medium text-gray-700 dark:text-gray-300">{{
-                  quote.book
-                }}</span>
-              </td>
-              <td class="p-4">
-                <span class="text-gray-600 dark:text-gray-400">{{
-                  quote.author
-                }}</span>
-              </td>
-              <td class="text-center p-4">
-                <p-badge
-                  *ngIf="quote.pageNumber; else noPage"
-                  [value]="quote.pageNumber.toString()"
-                  severity="info"
-                ></p-badge>
-                <ng-template #noPage>
-                  <span class="text-gray-400">-</span>
-                </ng-template>
+                <div class="space-y-1">
+                  <div class="font-medium text-gray-700 dark:text-gray-300">
+                    {{ quote.book }}
+                  </div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400">
+                    by {{ quote.author }}
+                  </div>
+                  <div *ngIf="quote.pageNumber" class="text-xs text-gray-500">
+                    <i class="pi pi-file mr-1"></i>Page {{ quote.pageNumber }}
+                  </div>
+                </div>
               </td>
               <td class="p-4">
                 <div class="flex flex-wrap gap-1 max-w-xs">
@@ -491,11 +455,6 @@
                     class="text-xs"
                   ></p-tag>
                 </div>
-              </td>
-              <td class="text-center p-4">
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ quote.dateAdded | date : "mediumDate" }}
-                </span>
               </td>
               <td class="text-center p-4">
                 <button
@@ -530,13 +489,6 @@
                   ></button>
                   <button
                     pButton
-                    icon="pi pi-share-alt"
-                    class="p-button-rounded p-button-text p-button-sm text-green-600"
-                    (click)="shareQuote(quote)"
-                    pTooltip="Share Quote"
-                  ></button>
-                  <button
-                    pButton
                     icon="pi pi-trash"
                     class="p-button-rounded p-button-text p-button-sm text-red-600"
                     (click)="deleteQuote(quote)"
@@ -549,7 +501,7 @@
 
           <ng-template pTemplate="empty">
             <tr>
-              <td colspan="8" class="text-center p-8">
+              <td colspan="5" class="text-center p-8">
                 <div class="flex flex-col items-center gap-4">
                   <i class="pi pi-search text-4xl text-gray-300"></i>
                   <div>
@@ -896,179 +848,6 @@
         icon="pi pi-times"
         class="p-button-outlined p-button-sm w-full sm:w-auto"
         (click)="displayTagDialog = false"
-      ></button>
-    </div>
-  </ng-template>
-</p-dialog>
-<p-dialog
-  header="Quote Details"
-  [(visible)]="displayQuoteDialog"
-  [modal]="true"
-  [style]="{ width: '50vw', minWidth: '320px', maxWidth: '800px' }"
-  [closeOnEscape]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [resizable]="false"
->
-  <ng-template pTemplate="header">
-    <div class="flex items-center gap-3">
-      <div class="p-2 bg-blue-100 rounded-lg">
-        <i class="pi pi-comments text-blue-600"></i>
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold text-gray-800">Quote Details</h3>
-        <p class="text-sm text-gray-600">View and edit quote information</p>
-      </div>
-    </div>
-  </ng-template>
-
-  <div *ngIf="selectedQuote" class="space-y-6">
-    <!-- Quote Text -->
-    <div
-      class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border-l-4 border-blue-500"
-    >
-      <blockquote class="text-lg italic text-gray-800 leading-relaxed mb-4">
-        "{{ selectedQuote.quote }}"
-      </blockquote>
-      <div class="flex items-center gap-2 text-sm text-gray-600">
-        <i class="pi pi-user"></i>
-        <span>{{ selectedQuote.author }}</span>
-        <span class="text-gray-400">•</span>
-        <i class="pi pi-book"></i>
-        <span>{{ selectedQuote.book }}</span>
-        <span *ngIf="selectedQuote.pageNumber" class="text-gray-400">•</span>
-        <span *ngIf="selectedQuote.pageNumber"
-          >Page {{ selectedQuote.pageNumber }}</span
-        >
-      </div>
-    </div>
-
-    <!-- Metadata Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Book Info -->
-      <div class="space-y-4">
-        <h4 class="font-semibold text-gray-800 flex items-center gap-2">
-          <i class="pi pi-book text-blue-500"></i>
-          Book Information
-        </h4>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Book Title</label
-            >
-            <p class="text-gray-900 bg-gray-50 rounded-lg px-3 py-2">
-              {{ selectedQuote.book }}
-            </p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Author</label
-            >
-            <p class="text-gray-900 bg-gray-50 rounded-lg px-3 py-2">
-              {{ selectedQuote.author }}
-            </p>
-          </div>
-          <div *ngIf="selectedQuote.pageNumber">
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Page Number</label
-            >
-            <p class="text-gray-900 bg-gray-50 rounded-lg px-3 py-2">
-              {{ selectedQuote.pageNumber }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quote Meta -->
-      <div class="space-y-4">
-        <h4 class="font-semibold text-gray-800 flex items-center gap-2">
-          <i class="pi pi-info-circle text-blue-500"></i>
-          Quote Details
-        </h4>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Date Added</label
-            >
-            <p class="text-gray-900 bg-gray-50 rounded-lg px-3 py-2">
-              {{ selectedQuote.dateAdded | date : "fullDate" }}
-            </p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Favorite</label
-            >
-            <div
-              class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2"
-            >
-              <i
-                [class]="
-                  selectedQuote.favorite
-                    ? 'pi pi-star-fill text-yellow-500'
-                    : 'pi pi-star text-gray-400'
-                "
-              ></i>
-              <span class="text-gray-900">{{
-                selectedQuote.favorite ? "Yes" : "No"
-              }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tags Section -->
-    <div>
-      <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-        <i class="pi pi-tags text-blue-500"></i>
-        Tags
-      </h4>
-      <div class="flex flex-wrap gap-2">
-        <p-tag
-          *ngFor="let tag of selectedQuote.tags"
-          [value]="tag"
-          [severity]="getTagSeverity(tag)"
-        ></p-tag>
-        <span
-          *ngIf="selectedQuote.tags.length === 0"
-          class="text-gray-500 italic"
-          >No tags assigned</span
-        >
-      </div>
-    </div>
-
-    <!-- Notes Section -->
-    <div>
-      <label
-        class="block font-semibold text-gray-800 mb-3 flex items-center gap-2"
-      >
-        <i class="pi pi-file-edit text-blue-500"></i>
-        Personal Notes
-      </label>
-      <textarea
-        [(ngModel)]="selectedQuote.notes"
-        rows="4"
-        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        placeholder="Add your personal thoughts, reflections, or context about this quote..."
-      ></textarea>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="flex justify-end gap-3">
-      <button
-        pButton
-        label="Cancel"
-        icon="pi pi-times"
-        class="p-button-outlined"
-        (click)="displayQuoteDialog = false"
-      ></button>
-      <button
-        pButton
-        label="Save Changes"
-        icon="pi pi-check"
-        class="p-button-primary"
-        (click)="saveQuoteDetails()"
       ></button>
     </div>
   </ng-template>

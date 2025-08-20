@@ -42,8 +42,6 @@ export class AllQuotes implements OnInit {
   bookOptions: { label: string; value: string }[] = [];
 
   // Dialog controls
-  displayQuoteDialog = false;
-  selectedQuote?: Quote;
   displayTagDialog = false;
   tagCounts: Record<string, number> = {};
   newTagName = '';
@@ -219,10 +217,6 @@ export class AllQuotes implements OnInit {
     this.displayTagDialog = true;
   }
 
-  closeQuoteDialog() {
-    this.displayQuoteDialog = false;
-  }
-
   closeTagDialog() {
     this.displayTagDialog = false;
   }
@@ -269,8 +263,7 @@ export class AllQuotes implements OnInit {
   }
 
   editQuote(quote: Quote) {
-    alert(`Edit quote: "${quote.quote}"`);
-    // TODO: open edit dialog
+    this.router.navigate(['/quotes/edit', quote.id]);
   }
 
   deleteQuote(quote: Quote) {
@@ -460,17 +453,6 @@ export class AllQuotes implements OnInit {
   }
 
   viewQuoteDetails(quote: Quote) {
-    this.selectedQuote = { ...quote };
-    this.displayQuoteDialog = true;
-  }
-
-  saveQuoteDetails() {
-    if (!this.selectedQuote) return;
-    const idx = this.quotes.findIndex((q) => q.id === this.selectedQuote!.id);
-    if (idx !== -1) {
-      this.quotes[idx] = { ...this.selectedQuote };
-    }
-    this.displayQuoteDialog = false;
-    this.applyFilters();
+    this.router.navigate(['/quotes/view', quote.id]);
   }
 }
