@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import {
   ApexNonAxisChartSeries,
   ApexChart,
@@ -16,6 +16,7 @@ import { UiService } from '../../../shared/services/ui.service.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Series, SeriesBook } from '../../models/series.model';
 import { SeriesService } from '../../services/series.service';
+import { MessageService } from 'primeng/api';
 
 // Using the feature-specific models instead of shared models
 
@@ -33,8 +34,9 @@ export type ChartOptions = {
   standalone: false,
   templateUrl: './all-series.html',
   styleUrl: './all-series.scss',
+  providers: [MessageService],
 })
-export class AllSeries {
+export class AllSeries implements OnInit {
   showDialog: boolean = false;
   isLoading: boolean = false;
   // Search term for filtering series (added for enhanced UI search)
@@ -131,14 +133,62 @@ export class AllSeries {
     private activatedRoute: ActivatedRoute,
     private layoutService: LayoutService,
     private uiService: UiService,
-    private seriesService: SeriesService
+    private seriesService: SeriesService,
+    private messageService: MessageService
   ) {
     this.updateChart();
+  }
+
+  ngOnInit() {
+    this.loadSeriesData();
   }
 
   openSeries(series: Series) {
     this.selectedSeries = series;
     this.showDialog = true;
+  }
+
+  viewSeries(series: Series) {
+    this.router.navigate(['/series/view', series.id]);
+  }
+
+  editSeries(series: Series) {
+    this.router.navigate(['/series/edit', series.id]);
+  }
+
+  getNextBookToRead(series: Series): SeriesBook | null {
+    // Find the first book that is not finished and not currently being read
+    const nextBook = series.books
+      .filter((book) => book.status === 'Want to Read')
+      .sort((a, b) => (a.orderInSeries || 0) - (b.orderInSeries || 0))[0];
+
+    return nextBook || null;
+  }
+
+  startNextBook(series: Series) {
+    const nextBook = this.getNextBookToRead(series);
+    if (nextBook) {
+      // Update the book status to 'Reading'
+      nextBook.status = 'Reading';
+
+      // Update the series through the service
+      this.seriesService.updateSeries(series);
+
+      // Show success message
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Started Reading',
+        detail: `Started reading "${nextBook.title}" from ${series.title}`,
+      });
+
+      // Update local data to reflect changes
+      this.loadSeriesData();
+    }
+  }
+
+  loadSeriesData() {
+    // Reload the series data from the service
+    this.seriesList = this.seriesService.getAllSeries();
   }
 
   closeSeries() {

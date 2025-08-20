@@ -40,6 +40,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { ToolbarModule } from 'primeng/toolbar';
 import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Select } from 'primeng/select';
+import { Textarea } from 'primeng/textarea';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -84,7 +86,9 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     SelectButtonModule,
     ToolbarModule,
     DividerModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    Select,
+    Textarea,
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -125,7 +129,9 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ToolbarModule,
     DividerModule,
     GenreSelectorComponent,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    Select,
+    Textarea,
   ],
 })
 export class SharedModule {}

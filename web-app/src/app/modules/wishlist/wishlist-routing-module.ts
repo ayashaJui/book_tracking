@@ -8,10 +8,14 @@ const routes: Routes = [
     path: '',
     component: AllWishes,
   },
-
   {
-    path: 'add-wishlist', component: AddWishlist,
-  }
+    path: 'add-wishlist',
+    component: AddWishlist,
+  },
+  {
+    path: 'edit',
+    component: AddWishlist,
+  },
 ];
 
 @NgModule({

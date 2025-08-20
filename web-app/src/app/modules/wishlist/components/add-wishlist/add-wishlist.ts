@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-add-wishlist',
@@ -7,7 +7,10 @@ import { Router } from '@angular/router';
   templateUrl: './add-wishlist.html',
   styleUrl: './add-wishlist.scss',
 })
-export class AddWishlist {
+export class AddWishlist implements OnInit {
+  isEditMode = false;
+  pageTitle = 'Add New Book to Wishlist';
+
   newWish: any = {
     title: '',
     author: '',
@@ -46,11 +49,43 @@ export class AddWishlist {
     { label: 'Philosophy', value: 'Philosophy' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // Check if this is edit mode based on route
+    this.isEditMode = this.router.url.includes('/edit');
+    this.pageTitle = this.isEditMode ? 'Edit Book' : 'Add New Book to Wishlist';
+
+    if (this.isEditMode) {
+      // Get book data from query parameters
+      this.route.queryParams.subscribe((params) => {
+        if (params['title'] && params['author']) {
+          // In a real app, you'd fetch the full book data from a service
+          // For now, we'll populate with the basic info
+          this.newWish.title = params['title'];
+          this.newWish.author = params['author'];
+          // Note: You'd need to implement a service to get the full book data
+          this.loadBookData(params['title'], params['author']);
+        }
+      });
+    }
+  }
+
+  loadBookData(title: string, author: string) {
+    // This is a placeholder - in a real app, you'd call a service
+    // For now, we'll just set some default values
+    console.log('Loading book data for editing:', title, author);
+    // You could implement a service call here to get the full book data
+  }
 
   saveWish() {
-    console.log('New Wish:', this.newWish);
-    // TODO: call backend or service
+    if (this.isEditMode) {
+      console.log('Updating book:', this.newWish);
+      // TODO: call backend or service to update
+    } else {
+      console.log('Adding new book:', this.newWish);
+      // TODO: call backend or service to add
+    }
     this.router.navigate(['/wishlist']);
   }
 

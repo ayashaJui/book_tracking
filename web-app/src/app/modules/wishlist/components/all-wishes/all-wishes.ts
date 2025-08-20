@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 interface WishlistBook {
   title: string;
@@ -44,6 +45,17 @@ export class AllWishes {
   showBudgetDialog = false;
   showBudgetHistoryDialog = false;
   newBudgetAmount: number = 100;
+
+  // Import and view dialog properties
+  showImportDialog = false;
+  showViewDialog = false;
+  selectedBook: WishlistBook | null = null;
+
+  // Import properties
+  importFile: File | null = null;
+  importBooks: any[] = [];
+  importPreview = false;
+  importErrors: string[] = [];
 
   budgetSuggestions = [
     { label: '$50', value: 50 },
@@ -94,7 +106,11 @@ export class AllWishes {
     { label: 'This year', value: '1y' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     // Load saved budget from localStorage
@@ -324,9 +340,116 @@ export class AllWishes {
   }
 
   importData() {
-    // TODO: Implement import functionality
-    console.log('Import data functionality would be implemented here');
-    alert('Import feature coming soon!');
+    this.showImportDialog = true;
+    this.resetImport();
+  }
+
+  onFileSelect(event: any) {
+    const file = event.files[0];
+    if (file) {
+      this.importFile = file;
+      this.parseCSVFile(file);
+    }
+  }
+
+  parseCSVFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const csv = e.target.result;
+      const lines = csv.split('\n');
+      const headers = lines[0].split(',').map((h: string) => h.trim());
+
+      this.importBooks = [];
+      this.importErrors = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+          const values = lines[i].split(',');
+          const book: any = {};
+
+          headers.forEach((header: string, index: number) => {
+            book[header.toLowerCase()] = values[index]?.trim() || '';
+          });
+
+          // Validate required fields
+          if (!book.title || !book.author) {
+            this.importErrors.push(`Row ${i + 1}: Missing title or author`);
+          } else {
+            // Set defaults and validate
+            book.price = parseFloat(book.price) || 0;
+            book.priority = ['High', 'Medium', 'Low'].includes(book.priority)
+              ? book.priority
+              : 'Medium';
+            book.status = [
+              'Planned',
+              'Purchased',
+              'Reading',
+              'On Hold',
+            ].includes(book.status)
+              ? book.status
+              : 'Planned';
+            book.dateAdded = new Date();
+
+            this.importBooks.push(book);
+          }
+        }
+      }
+
+      this.importPreview = true;
+    };
+    reader.readAsText(file);
+  }
+
+  confirmImport() {
+    this.wishlist = [...this.wishlist, ...this.importBooks];
+    this.applyFilters();
+    this.showImportDialog = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Import Successful',
+      detail: `Successfully imported ${this.importBooks.length} books to your wishlist`,
+      life: 4000,
+    });
+    this.resetImport();
+  }
+
+  cancelImport() {
+    this.showImportDialog = false;
+    this.resetImport();
+  }
+
+  resetImport() {
+    this.importFile = null;
+    this.importBooks = [];
+    this.importPreview = false;
+    this.importErrors = [];
+  }
+
+  downloadSampleCSV() {
+    const sampleData = [
+      'title,author,price,priority,status,notes',
+      'Clean Code,Robert C. Martin,30,High,Planned,Essential reading for software developers',
+      'The Psychology of Money,Morgan Housel,25,Medium,Planned,Understanding financial behavior',
+      'Atomic Habits,James Clear,18,Low,Reading,Building better habits',
+    ].join('\n');
+
+    const blob = new Blob([sampleData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'wishlist_sample.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Sample Downloaded',
+      detail:
+        'Sample CSV file has been downloaded. Use it as a template for your import.',
+      life: 3000,
+    });
   }
 
   // Quick filter methods
@@ -454,24 +577,55 @@ export class AllWishes {
   }
 
   viewBook(book: WishlistBook) {
-    // TODO: open a dialog with full details (review/rating/quotes)
-    alert(`Viewing ${book.title}`);
+    this.selectedBook = { ...book };
+    this.showViewDialog = true;
   }
 
   editBook(book: WishlistBook) {
-    // TODO: open edit dialog
-    alert(`Editing ${book.title}`);
+    // Navigate to edit page with book data
+    this.router.navigate(['/wishlist/edit'], {
+      queryParams: {
+        title: book.title,
+        author: book.author,
+      },
+    });
   }
 
-  deleteBook(book: WishlistBook) {
-    if (confirm(`Delete "${book.title}" from wishlist?`)) {
-      this.wishlist = this.wishlist.filter((b) => b !== book);
-      this.applyFilters();
+  editBookFromView() {
+    if (this.selectedBook) {
+      this.showViewDialog = false;
+      this.editBook(this.selectedBook);
     }
   }
 
+  deleteBookFromView() {
+    if (this.selectedBook) {
+      this.showViewDialog = false;
+      this.deleteBook(this.selectedBook);
+    }
+  }
+
+  deleteBook(book: WishlistBook) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete "${book.title}" from your wishlist?`,
+      header: 'Delete Book',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-text p-button-sm',
+      accept: () => {
+        this.wishlist = this.wishlist.filter((b) => b !== book);
+        this.applyFilters();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: `"${book.title}" removed from wishlist`,
+          life: 3000,
+        });
+      },
+    });
+  }
+
   addWish() {
-    // quick prompt-based add (replace with dialog/form as needed)
     this.router.navigate(['/wishlist/add-wishlist']);
   }
 
