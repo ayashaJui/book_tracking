@@ -129,13 +129,11 @@ export class AllLogs implements OnInit {
   }
 
   viewLog(log: ReadingLog) {
-    // implement viewing details modal/dialog here
-    alert(`View details for: ${log.title}`);
+    this.router.navigate([`/reading-logs/view-log/${log.id}`]);
   }
 
   editLog(log: ReadingLog) {
-    // implement edit modal/dialog here
-    alert(`Edit: ${log.title}`);
+    this.router.navigate([`/reading-logs/edit-log/${log.id}`]);
   }
 
   deleteLog(log: ReadingLog) {

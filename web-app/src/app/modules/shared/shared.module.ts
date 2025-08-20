@@ -39,6 +39,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ToolbarModule } from 'primeng/toolbar';
 import { DividerModule } from 'primeng/divider';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -83,6 +84,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     SelectButtonModule,
     ToolbarModule,
     DividerModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -123,6 +125,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ToolbarModule,
     DividerModule,
     GenreSelectorComponent,
+    ProgressSpinnerModule
   ],
 })
 export class SharedModule {}

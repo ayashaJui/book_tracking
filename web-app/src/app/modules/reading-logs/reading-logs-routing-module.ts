@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AllLogs } from './components/all-logs/all-logs';
 import { AddLog } from './components/add-log/add-log';
+import { ViewLog } from './components/view-log/view-log';
+import { EditLog } from './components/edit-log/edit-log';
 
 
 const routes: Routes = [
@@ -12,6 +14,14 @@ const routes: Routes = [
   {
     path: 'add-log',
     component: AddLog
+  },
+  {
+    path: 'view-log/:id',
+    component: ViewLog
+  },
+  {
+    path: 'edit-log/:id',
+    component: EditLog
   }
 ];
 
