@@ -1,0 +1,360 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <!-- Header -->
+  <div
+    class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col lg:flex-row items-start gap-8">
+        <!-- Book Cover -->
+        <div class="flex-shrink-0 mx-auto lg:mx-0">
+          <img
+            [src]="book.coverImage || 'assets/images/product-not-found.png'"
+            [alt]="book.title"
+            class="w-40 h-60 object-cover rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
+          />
+        </div>
+
+        <!-- Book Info -->
+        <div class="flex-1 w-full text-center lg:text-left">
+          <h1
+            class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3"
+          >
+            {{ book.title || "Untitled Book" }}
+          </h1>
+          <p class="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            by {{ book.author || "Unknown Author" }}
+          </p>
+
+          <div
+            class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8"
+          >
+            <span
+              class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-semibold"
+            >
+              {{ book.genre || "General" }}
+            </span>
+            <div class="flex items-center gap-2">
+              <p-rating
+                [(ngModel)]="book.rating"
+                [readonly]="true"
+                styleClass="text-yellow-400"
+              >
+              </p-rating>
+              <span
+                class="text-sm text-gray-500 dark:text-gray-400 font-medium"
+              >
+                ({{ book.rating || 0 }}/5)
+              </span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <div
+                class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              >
+                {{ book.estimatedTime || "0" }}h
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                Est. Time
+              </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <div
+                class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              >
+                {{ book.actualTime || "0" }}h
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                Actual Time
+              </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <div class="mb-1">
+                <span
+                  class="inline-block px-3 py-1 rounded-lg text-sm font-semibold"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200':
+                      book.status === 'Completed',
+                    'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200':
+                      book.status === 'Reading',
+                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200':
+                      book.status === 'Not Started',
+                    'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200':
+                      book.status === 'Abandoned'
+                  }"
+                >
+                  {{ book.status || "Not Started" }}
+                </span>
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <div
+                class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              >
+                ${{ book.price || "0.00" }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Price</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div
+            class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
+          >
+            <button
+              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-200 shadow-md"
+            >
+              Edit Book
+            </button>
+            <button
+              class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-colors duration-200"
+            >
+              Add Log
+            </button>
+            <button
+              class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-colors duration-200"
+            >
+              Add Quote
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Main Content Column -->
+      <div class="lg:col-span-3 space-y-6">
+        <!-- Description -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-info-circle text-blue-500 mr-3"></i>
+            Description
+          </h2>
+          <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {{ book.title }} is a great book by {{ book.author }}. This section
+            would contain the book's description and summary.
+          </p>
+        </div>
+
+        <!-- Reading Timeline -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center"
+          >
+            <i class="pi pi-calendar text-green-500 mr-3"></i>
+            Reading Timeline
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Start Date
+              </div>
+              <div class="font-semibold text-gray-900 dark:text-white">
+                {{ (book.startDate | date : "MMM dd, yyyy") || "Not set" }}
+              </div>
+            </div>
+            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Finish Date
+              </div>
+              <div class="font-semibold text-gray-900 dark:text-white">
+                {{
+                  (book.finishDate | date : "MMM dd, yyyy") || "Not finished"
+                }}
+              </div>
+            </div>
+            <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Time Spent
+              </div>
+              <div class="font-semibold text-gray-900 dark:text-white">
+                {{ book.actualTime || "0" }}h
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Review -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+          *ngIf="book.review || book.rating"
+        >
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-star text-yellow-500 mr-3"></i>
+            My Review
+          </h2>
+          <div class="space-y-4">
+            <div class="flex items-center gap-3" *ngIf="book.rating">
+              <p-rating
+                [(ngModel)]="book.rating"
+                [readonly]="true"
+                styleClass="text-yellow-400"
+              ></p-rating>
+              <span class="text-gray-600 dark:text-gray-400 font-medium"
+                >{{ book.rating }}/5 stars</span
+              >
+            </div>
+            <div
+              *ngIf="book.review"
+              class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
+            >
+              <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                {{ book.review }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quotes -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+          *ngIf="book.quotes"
+        >
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-quote-left text-purple-500 mr-3"></i>
+            Favorite Quotes
+          </h2>
+          <div
+            class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border-l-4 border-purple-500"
+          >
+            <blockquote
+              class="text-gray-800 dark:text-gray-200 italic leading-relaxed"
+            >
+              "{{ book.quotes }}"
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- Reading Logs -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
+          *ngIf="book.readingLogs && book.readingLogs.length > 0"
+        >
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-clock text-orange-500 mr-3"></i>
+            Reading Logs
+          </h2>
+          <div class="space-y-3">
+            <div
+              *ngFor="let log of book.readingLogs"
+              class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
+            >
+              <div class="flex justify-between items-center mb-2">
+                <span
+                  class="text-sm font-semibold text-gray-600 dark:text-gray-400"
+                  >{{ log.date | date : "mediumDate" }}</span
+                >
+                <span class="text-sm text-gray-500 dark:text-gray-400"
+                  >{{ log.pagesRead }} pages</span
+                >
+              </div>
+              <p
+                class="text-gray-700 dark:text-gray-300 text-sm"
+                *ngIf="log.notes"
+              >
+                {{ log.notes }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Book Details -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-info-circle text-blue-500 mr-2"></i>
+            Book Details
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Genre</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white">{{
+                book.genre || "Unknown"
+              }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Status</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white">{{
+                book.status || "Unknown"
+              }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Estimated Time</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white"
+                >{{ book.estimatedTime || "0" }}h</span
+              >
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Actual Time</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white"
+                >{{ book.actualTime || "0" }}h</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Purchase Info -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-shopping-cart text-orange-500 mr-2"></i>
+            Purchase
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Price</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white"
+                >${{ book.price || "0.00" }}</span
+              >
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Purchase Date</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white">{{
+                (book.purchaseDate | date : "MMM dd, yyyy") || "Unknown"
+              }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Source</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white">{{
+                book.source || "Unknown"
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

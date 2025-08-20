@@ -235,8 +235,8 @@ export class AllBook implements OnInit {
   }
 
   // placeholder actions
-  viewBook(book: Book) {
-    console.log('view', book);
+  viewBook(id: any) {
+    this.router.navigate([`/books/${id}`]);
     // open sidepanel / dialog
   }
   editBook(book: Book) {

@@ -535,7 +535,7 @@
                     pRipple
                     icon="pi pi-eye"
                     class="p-button-rounded p-button-text p-button-info p-button-sm hover:scale-110 transition-all duration-200"
-                    (click)="viewBook(book)"
+                    (click)="viewBook(book.id)"
                     pTooltip="View Details"
                   ></button>
                   <button
@@ -648,7 +648,7 @@
                   pButton
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-info p-button-sm bg-white/20 border-white/30 hover:bg-white/30 transition-all duration-200"
-                  (click)="viewBook(book); $event.stopPropagation()"
+                  (click)="viewBook(book.id); $event.stopPropagation()"
                   pTooltip="View Details"
                 ></button>
                 <button
