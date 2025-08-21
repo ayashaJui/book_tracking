@@ -1,5 +1,8 @@
-<div class="min-h-screen ">
+<div class="min-h-screen">
   <div class="max-w-6xl mx-auto p-6">
+    <!-- Confirmation Dialog -->
+    <p-confirmDialog></p-confirmDialog>
+
     <!-- Modern Header -->
     <div class="mb-8">
       <div class="flex items-center space-x-4">
@@ -54,6 +57,7 @@
                 ]"
                 placeholder="Select Language"
                 class="w-full"
+                (onChange)="onLanguageChange($event.value)"
               >
               </p-select>
             </div>
@@ -72,6 +76,7 @@
                 ]"
                 placeholder="Select Timezone"
                 class="w-full"
+                (onChange)="onTimezoneChange($event.value)"
               >
               </p-select>
             </div>
@@ -90,6 +95,7 @@
                 ]"
                 placeholder="Select Currency"
                 class="w-full"
+                (onChange)="onCurrencyChange($event.value)"
               >
               </p-select>
             </div>
@@ -130,6 +136,7 @@
                   { label: 'Auto', value: 'Auto' }
                 ]"
                 class="w-full"
+                (onChange)="onThemeChange($event.value)"
               >
               </p-selectButton>
             </div>
@@ -148,6 +155,7 @@
                 ]"
                 placeholder="Select Font Size"
                 class="w-full"
+                (onChange)="onFontSizeChange($event.value)"
               >
               </p-select>
             </div>
@@ -163,6 +171,7 @@
                 [(ngModel)]="settings.showCovers"
                 onLabel="Yes"
                 offLabel="No"
+                (onChange)="onShowCoversChange(!!$event.checked)"
               >
               </p-toggleButton>
             </div>
@@ -200,6 +209,7 @@
                 pInputText
                 [(ngModel)]="settings.dailyReminder"
                 class="w-full"
+                (ngModelChange)="onReminderTimeChange($event)"
               />
             </div>
 
@@ -214,6 +224,7 @@
                 [(ngModel)]="settings.wishlistAlerts"
                 onLabel="On"
                 offLabel="Off"
+                (onChange)="toggleNotification('wishlistAlerts')"
               >
               </p-toggleButton>
             </div>
@@ -229,6 +240,7 @@
                 [(ngModel)]="settings.goalAlerts"
                 onLabel="On"
                 offLabel="Off"
+                (onChange)="toggleNotification('goalAlerts')"
               >
               </p-toggleButton>
             </div>
@@ -268,6 +280,7 @@
                   { label: 'Private', value: 'Private' }
                 ]"
                 class="w-full"
+                (onChange)="onPrivacyChange($event.value)"
               >
               </p-selectButton>
             </div>
@@ -283,6 +296,7 @@
                 [(ngModel)]="settings.twoFA"
                 onLabel="On"
                 offLabel="Off"
+                (onChange)="toggleTwoFA()"
               >
               </p-toggleButton>
             </div>
@@ -301,6 +315,7 @@
                 icon="pi pi-key"
                 severity="secondary"
                 size="small"
+                (onClick)="changePassword()"
               >
               </p-button>
             </div>
@@ -313,11 +328,19 @@
               settings.connectedDevices && settings.connectedDevices.length > 0
             "
           >
-            <h4
-              class="text-md font-semibold text-gray-900 dark:text-white mb-3"
-            >
-              Connected Devices
-            </h4>
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-md font-semibold text-gray-900 dark:text-white">
+                Connected Devices
+              </h4>
+              <p-button
+                label="Refresh"
+                icon="pi pi-refresh"
+                severity="secondary"
+                size="small"
+                (onClick)="refreshDeviceList()"
+              >
+              </p-button>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div
                 *ngFor="let device of settings.connectedDevices; let i = index"
@@ -377,6 +400,7 @@
                 ]"
                 placeholder="Select Frequency"
                 class="w-full"
+                (onChange)="onBackupFrequencyChange($event.value)"
               >
               </p-select>
             </div>
@@ -424,6 +448,60 @@
               >
               </p-button>
             </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-900 dark:text-white"
+                  >Manual Backup</label
+                >
+                <p class="text-xs text-gray-500">Create backup now</p>
+              </div>
+              <p-button
+                label="Backup"
+                icon="pi pi-cloud-upload"
+                severity="info"
+                size="small"
+                (onClick)="createManualBackup()"
+              >
+              </p-button>
+            </div>
+          </div>
+
+          <!-- Backup Actions -->
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-900 dark:text-white"
+                  >Restore from Backup</label
+                >
+                <p class="text-xs text-gray-500">Restore previous backup</p>
+              </div>
+              <p-button
+                label="Restore"
+                icon="pi pi-cloud-download"
+                severity="warn"
+                size="small"
+                (onClick)="restoreFromBackup()"
+              >
+              </p-button>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-900 dark:text-white"
+                  >Download Account Data</label
+                >
+                <p class="text-xs text-gray-500">Export all data</p>
+              </div>
+              <p-button
+                label="Download"
+                icon="pi pi-download"
+                severity="secondary"
+                size="small"
+                (onClick)="downloadAccountData()"
+              >
+              </p-button>
+            </div>
           </div>
         </div>
       </div>
@@ -462,17 +540,28 @@
                   <p class="text-xs text-gray-500">Sync reading progress</p>
                 </div>
               </div>
-              <p-button
-                [label]="
-                  settings.integrations.goodreads ? 'Connected' : 'Connect'
-                "
-                [severity]="
-                  settings.integrations.goodreads ? 'success' : 'secondary'
-                "
-                size="small"
-                (onClick)="connectIntegration('Goodreads')"
-              >
-              </p-button>
+              <div class="flex space-x-2">
+                <p-button
+                  [label]="
+                    settings.integrations.goodreads ? 'Disconnect' : 'Connect'
+                  "
+                  [severity]="
+                    settings.integrations.goodreads ? 'danger' : 'secondary'
+                  "
+                  size="small"
+                  (onClick)="connectIntegration('Goodreads')"
+                >
+                </p-button>
+                <p-button
+                  *ngIf="settings.integrations.goodreads"
+                  label="Sync"
+                  icon="pi pi-sync"
+                  severity="info"
+                  size="small"
+                  (onClick)="syncIntegrationData('Goodreads')"
+                >
+                </p-button>
+              </div>
             </div>
 
             <div
@@ -489,17 +578,28 @@
                   <p class="text-xs text-gray-500">Cloud backup</p>
                 </div>
               </div>
-              <p-button
-                [label]="
-                  settings.integrations.googleDrive ? 'Connected' : 'Connect'
-                "
-                [severity]="
-                  settings.integrations.googleDrive ? 'success' : 'secondary'
-                "
-                size="small"
-                (onClick)="connectIntegration('Google Drive')"
-              >
-              </p-button>
+              <div class="flex space-x-2">
+                <p-button
+                  [label]="
+                    settings.integrations.googleDrive ? 'Disconnect' : 'Connect'
+                  "
+                  [severity]="
+                    settings.integrations.googleDrive ? 'danger' : 'secondary'
+                  "
+                  size="small"
+                  (onClick)="connectIntegration('Google Drive')"
+                >
+                </p-button>
+                <p-button
+                  *ngIf="settings.integrations.googleDrive"
+                  label="Sync"
+                  icon="pi pi-sync"
+                  severity="info"
+                  size="small"
+                  (onClick)="syncIntegrationData('Google Drive')"
+                >
+                </p-button>
+              </div>
             </div>
 
             <div
@@ -518,6 +618,120 @@
                 </div>
               </div>
               <i class="pi pi-chevron-right text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Tag Management Section -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-md font-semibold text-gray-900 dark:text-white">
+                Quick Tag Management
+              </h4>
+              <p-button
+                label="Add Tag"
+                icon="pi pi-plus"
+                severity="success"
+                size="small"
+                (onClick)="showAddTagDialog = true"
+              >
+              </p-button>
+            </div>
+
+            <!-- Current Tags Display -->
+            <div
+              class="flex flex-wrap gap-2 mb-4"
+              *ngIf="settings.tags.length > 0"
+            >
+              <div
+                *ngFor="let tag of settings.tags; let i = index"
+                class="flex items-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
+              >
+                <span
+                  class="mr-2 cursor-pointer"
+                  (click)="editTagInline(i, tag)"
+                  [title]="'Click to edit: ' + tag"
+                >
+                  {{ tag }}
+                </span>
+                <button
+                  class="text-blue-600 dark:text-blue-300 hover:text-red-500 ml-1"
+                  (click)="removeTag(tag)"
+                  [title]="'Remove tag: ' + tag"
+                >
+                  <i class="pi pi-times text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div
+              *ngIf="settings.tags.length === 0"
+              class="text-center py-4 text-gray-500 dark:text-gray-400"
+            >
+              <i class="pi pi-tags text-3xl mb-2 block"></i>
+              <p class="text-sm">No tags created yet. Add your first tag!</p>
+            </div>
+
+            <!-- Add Tag Input (Inline) -->
+            <div class="mt-4" *ngIf="showAddTagDialog">
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  pInputText
+                  [(ngModel)]="newTagName"
+                  placeholder="Enter tag name"
+                  class="flex-1"
+                  (keyup.enter)="addNewTag()"
+                  (keyup.escape)="cancelAddTag()"
+                  #tagInput
+                />
+                <p-button
+                  icon="pi pi-check"
+                  severity="success"
+                  size="small"
+                  (onClick)="addNewTag()"
+                  [disabled]="!newTagName.trim()"
+                >
+                </p-button>
+                <p-button
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  (onClick)="cancelAddTag()"
+                >
+                </p-button>
+              </div>
+            </div>
+
+            <!-- Edit Tag Input (Inline) -->
+            <div class="mt-4" *ngIf="editingTagIndex !== -1">
+              <div class="flex items-center space-x-2">
+                <input
+                  type="text"
+                  pInputText
+                  [(ngModel)]="editingTagName"
+                  placeholder="Edit tag name"
+                  class="flex-1"
+                  (keyup.enter)="saveEditedTag()"
+                  (keyup.escape)="cancelEditTag()"
+                  #editTagInput
+                />
+                <p-button
+                  icon="pi pi-check"
+                  severity="success"
+                  size="small"
+                  (onClick)="saveEditedTag()"
+                  [disabled]="!editingTagName.trim()"
+                >
+                </p-button>
+                <p-button
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  (onClick)="cancelEditTag()"
+                >
+                </p-button>
+              </div>
             </div>
           </div>
         </div>
@@ -560,6 +774,7 @@
                 ]"
                 placeholder="Select Default Sort"
                 class="w-full"
+                (onChange)="onSortingChange($event.value)"
               >
               </p-select>
             </div>
@@ -576,6 +791,7 @@
                   { label: 'List', value: 'List' }
                 ]"
                 class="w-full"
+                (onChange)="onViewChange($event.value)"
               >
               </p-selectButton>
             </div>
@@ -595,8 +811,67 @@
                 ]"
                 placeholder="Select Items Per Page"
                 class="w-full"
+                (onChange)="onItemsPerPageChange($event.value)"
               >
               </p-select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Management Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center space-x-3">
+            <i class="pi pi-user text-xl text-red-600"></i>
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                Account Management
+              </h2>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Manage your account and data
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm font-medium text-gray-900 dark:text-white"
+                  >Account Data</label
+                >
+                <p class="text-xs text-gray-500">Download all your data</p>
+              </div>
+              <p-button
+                label="Download"
+                icon="pi pi-download"
+                severity="info"
+                size="small"
+                (onClick)="downloadAccountData()"
+              >
+              </p-button>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <label
+                  class="text-sm font-medium text-red-600 dark:text-red-400"
+                  >Delete Account</label
+                >
+                <p class="text-xs text-red-500">Permanently delete account</p>
+              </div>
+              <p-button
+                label="Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                (onClick)="deleteAccount()"
+              >
+              </p-button>
             </div>
           </div>
         </div>

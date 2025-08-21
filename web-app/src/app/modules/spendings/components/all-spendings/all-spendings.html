@@ -60,26 +60,26 @@
               <div class="flex gap-2">
                 <p-button
                   icon="pi pi-refresh"
+                  label="Refresh"
                   pTooltip="Refresh Data"
                   tooltipPosition="bottom"
                   [outlined]="true"
                   severity="secondary"
                   size="small"
-                  class="flex-1 sm:flex-none hover:shadow-sm transition-all duration-200"
+                  class="flex-1 sm:flex-none"
                   (onClick)="refreshData()"
                 >
-                  <span class="sm:hidden md:inline ml-1">Refresh</span>
                 </p-button>
                 <p-button
                   icon="pi pi-download"
+                  label="Export"
                   pTooltip="Export to CSV"
                   tooltipPosition="bottom"
                   severity="success"
                   size="small"
-                  class="flex-1 sm:flex-none hover:shadow-sm transition-all duration-200"
+                  class="flex-1 sm:flex-none"
                   (onClick)="exportToCSV()"
                 >
-                  <span class="sm:hidden md:inline ml-1">Export</span>
                 </p-button>
               </div>
 
@@ -95,9 +95,8 @@
                 class="w-full sm:w-auto"
               >
                 <ng-template pTemplate="option" let-item>
-                  <i [class]="item.icon" class="mr-1"></i>
-                  <span class="hidden md:inline">{{ item.label }}</span>
-                  <span class="md:hidden">{{ item.label.charAt(0) }}</span>
+                  <i [class]="item.icon" class="mr-2"></i>
+                  <span>{{ item.label }}</span>
                 </ng-template>
               </p-selectbutton>
             </div>
@@ -111,7 +110,8 @@
       <!-- Enhanced Stats Grid -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <div
-          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:-translate-y-1"
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          (click)="viewCategoryDetails('Total')"
         >
           <div class="flex items-center justify-between">
             <div class="min-w-0 flex-1">
@@ -137,7 +137,8 @@
         </div>
 
         <div
-          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 hover:-translate-y-1"
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-green-300 dark:hover:border-green-600 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          (click)="viewCategoryDetails('Monthly')"
         >
           <div class="flex items-center justify-between">
             <div class="min-w-0 flex-1">
@@ -163,7 +164,8 @@
         </div>
 
         <div
-          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 hover:-translate-y-1"
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          (click)="viewCategoryDetails('Average')"
         >
           <div class="flex items-center justify-between">
             <div class="min-w-0 flex-1">
@@ -189,7 +191,8 @@
         </div>
 
         <div
-          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-red-300 dark:hover:border-red-600 transition-all duration-300 hover:-translate-y-1"
+          class="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-red-300 dark:hover:border-red-600 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          (click)="viewCategoryDetails('Expensive')"
         >
           <div class="flex items-center justify-between">
             <div class="min-w-0 flex-1">
@@ -242,10 +245,32 @@
         <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
           <!-- Budget Input -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >Budget Amount</label
-            >
+            <div class="flex items-center justify-between">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >Budget Amount</label
+              >
+              <div class="flex gap-1">
+                <p-button
+                  icon="pi pi-bell"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  pTooltip="Set Budget Alert"
+                  (onClick)="setSpendingAlert()"
+                >
+                </p-button>
+                <p-button
+                  icon="pi pi-target"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  pTooltip="Set Budget Goal"
+                  (onClick)="setBudgetGoal()"
+                >
+                </p-button>
+              </div>
+            </div>
             <p-inputnumber
               [(ngModel)]="monthlyBudget"
               (ngModelChange)="onBudgetChange()"
@@ -368,14 +393,13 @@
           </div>
 
           <!-- Chart Controls -->
-          <div class="flex items-center justify-end gap-2">
+          <div class="flex items-center justify-end gap-2 mb-4">
             <p-button
               icon="pi pi-filter"
               [label]="showAllCategories ? 'Top 3' : 'All'"
               [outlined]="true"
               severity="secondary"
               size="small"
-              class="text-2xs sm:text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
               pTooltip="Filter Categories"
               tooltipPosition="bottom"
               (onClick)="filterCategories()"
@@ -384,13 +408,31 @@
             <p-button
               icon="pi pi-sort"
               [text]="true"
-              [rounded]="true"
               severity="secondary"
               size="small"
               pTooltip="Sort by Value"
               tooltipPosition="bottom"
-              class="hover:bg-gray-100 dark:hover:bg-gray-700"
               (onClick)="sortCategories()"
+            >
+            </p-button>
+            <p-button
+              icon="pi pi-download"
+              [text]="true"
+              severity="secondary"
+              size="small"
+              pTooltip="Export Chart Data"
+              tooltipPosition="bottom"
+              (onClick)="exportCategoryChart()"
+            >
+            </p-button>
+            <p-button
+              icon="pi pi-chart-bar"
+              [text]="true"
+              severity="secondary"
+              size="small"
+              pTooltip="Toggle Chart Type"
+              tooltipPosition="bottom"
+              (onClick)="toggleChartType()"
             >
             </p-button>
           </div>
@@ -463,12 +505,11 @@
               ]"
               optionLabel="label"
               optionValue="value"
-              class="text-xs sm:text-sm w-full sm:w-auto"
+              class="w-full sm:w-auto"
             >
               <ng-template pTemplate="option" let-item>
-                <i [class]="item.icon" class="mr-1"></i>
-                <span class="hidden sm:inline">{{ item.label }}</span>
-                <span class="sm:hidden">{{ item.label.charAt(0) }}</span>
+                <i [class]="item.icon" class="mr-2"></i>
+                <span>{{ item.label }}</span>
               </ng-template>
             </p-selectbutton>
           </div>
@@ -523,7 +564,7 @@
         </div>
 
         <!-- Chart Controls -->
-        <div class="flex items-center gap-2 justify-end">
+        <div class="flex items-center gap-2 justify-end mb-4">
           <p-selectbutton
             [(ngModel)]="vendorFilter"
             [options]="[
@@ -533,29 +574,46 @@
             ]"
             optionLabel="label"
             optionValue="value"
-            class="text-xs sm:text-sm"
+            class="mr-2"
             (onChange)="filterVendors()"
           >
             <ng-template pTemplate="option" let-item>
               <i [class]="item.icon" class="mr-1"></i>
-              <span class="hidden sm:inline">{{ item.label }}</span>
-              <span class="sm:hidden">{{
-                item.value === "6months" ? "6M" : item.label
-              }}</span>
+              <span>{{ item.value === "6months" ? "6M" : item.label }}</span>
             </ng-template>
           </p-selectbutton>
 
-          <!-- <p-button
-              icon="pi pi-refresh"
-              [text]="true"
-              [rounded]="true"
-              severity="secondary"
-              size="small"
-              pTooltip="Refresh Data"
-              class="hover:bg-gray-100 dark:hover:bg-gray-700"
-              (onClick)="refreshChartData()"
-            >
-            </p-button> -->
+          <p-button
+            icon="pi pi-download"
+            [text]="true"
+            severity="secondary"
+            size="small"
+            pTooltip="Export Vendor Data"
+            tooltipPosition="bottom"
+            (onClick)="exportVendorChart()"
+          >
+          </p-button>
+
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            severity="secondary"
+            size="small"
+            pTooltip="View Details"
+            tooltipPosition="bottom"
+            (onClick)="viewVendorDetails()"
+          >
+          </p-button>
+
+          <p-button
+            icon="pi pi-refresh"
+            [text]="true"
+            severity="secondary"
+            size="small"
+            pTooltip="Refresh Data"
+            (onClick)="refreshChartData()"
+          >
+          </p-button>
         </div>
 
         <!-- Chart Container - with padding to fix axis labels -->
@@ -642,41 +700,93 @@
       </div>
 
       <!-- Action Buttons -->
-      <div
-        class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4"
-      >
-        <p-button
-          icon="pi pi-download"
-          label="Export CSV"
-          severity="success"
-          size="large"
-          [raised]="true"
-          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
-          (onClick)="exportToCSV()"
+      <div class="space-y-4 pt-6">
+        <!-- Primary Action Buttons -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
         >
-        </p-button>
+          <p-button
+            icon="pi pi-download"
+            label="Export CSV"
+            severity="success"
+            size="large"
+            [raised]="true"
+            class="w-full sm:w-auto"
+            (onClick)="exportToCSV()"
+          >
+          </p-button>
 
-        <p-button
-          icon="pi pi-chart-bar"
-          label="View Detailed Report"
-          severity="info"
-          [outlined]="true"
-          size="large"
-          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
-          (onClick)="openDetailedReport()"
-        >
-        </p-button>
+          <p-button
+            icon="pi pi-chart-bar"
+            label="View Detailed Report"
+            severity="info"
+            [outlined]="true"
+            size="large"
+            class="w-full sm:w-auto"
+            (onClick)="openDetailedReport()"
+          >
+          </p-button>
 
-        <p-button
-          icon="pi pi-share-alt"
-          label="Share Analytics"
-          severity="secondary"
-          [text]="true"
-          size="large"
-          class="w-full sm:w-auto hover:shadow-lg transition-all duration-200"
-          (onClick)="shareAnalytics()"
+          <p-button
+            icon="pi pi-share-alt"
+            label="Share Analytics"
+            severity="secondary"
+            [text]="true"
+            size="large"
+            class="w-full sm:w-auto"
+            (onClick)="shareAnalytics()"
+          >
+          </p-button>
+        </div>
+
+        <!-- Secondary Action Buttons -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3"
         >
-        </p-button>
+          <p-button
+            icon="pi pi-print"
+            label="Print Report"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            class="w-full sm:w-auto"
+            (onClick)="printReport()"
+          >
+          </p-button>
+
+          <p-button
+            icon="pi pi-file-export"
+            label="Export All Data"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            class="w-full sm:w-auto"
+            (onClick)="exportAllData()"
+          >
+          </p-button>
+
+          <p-button
+            icon="pi pi-history"
+            label="Compare YoY"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            class="w-full sm:w-auto"
+            (onClick)="compareWithPrevious()"
+          >
+          </p-button>
+
+          <p-button
+            icon="pi pi-filter-slash"
+            label="Reset Filters"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            class="w-full sm:w-auto"
+            (onClick)="resetFilters()"
+          >
+          </p-button>
+        </div>
       </div>
     </div>
 

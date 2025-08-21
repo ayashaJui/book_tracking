@@ -6,6 +6,7 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
+  ApexYAxis,
   ApexDataLabels,
   ApexStroke,
   ApexTitleSubtitle,
@@ -454,15 +455,40 @@ export class AllSpendings implements OnInit {
     });
   }
 
-  // New methods for enhanced UI
   refreshData() {
     this.messageService.add({
       severity: 'info',
       summary: 'Refreshing Data',
       detail: 'Updating analytics data...',
     });
-    // Simulate data refresh
+
+    // Simulate API call to refresh data
     setTimeout(() => {
+      // Update stats with simulated new data
+      this.totalSpent = this.totalSpent + Math.floor(Math.random() * 100) - 50;
+      this.thisMonth = this.thisMonth + Math.floor(Math.random() * 50) - 25;
+      this.avgPerBook = Math.round(this.totalSpent / 100); // Simulate avg calculation
+
+      // Update chart data
+      this.categoryData = this.categoryData.map((val) =>
+        Math.max(0, val + Math.floor(Math.random() * 100) - 50)
+      );
+      this.vendorsData = this.vendorsData.map((val) =>
+        Math.max(0, val + Math.floor(Math.random() * 100) - 50)
+      );
+
+      // Update charts
+      this.updateCategoryChart();
+      this.vendorsBarChart?.updateSeries([
+        {
+          name: 'Spending',
+          data: this.vendorsData,
+        },
+      ]);
+
+      // Re-check budget after data refresh
+      this.checkBudgetAlert();
+
       this.messageService.add({
         severity: 'success',
         summary: 'Data Updated',
@@ -573,12 +599,66 @@ export class AllSpendings implements OnInit {
   }
 
   shareAnalytics() {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Sharing Analytics',
-      detail: 'Preparing analytics data for sharing...',
-    });
-    // Implement sharing functionality
+    const analyticsData = {
+      totalSpent: this.totalSpent,
+      thisMonth: this.thisMonth,
+      avgPerBook: this.avgPerBook,
+      topCategory: this.getTopCategory(),
+      topVendor: this.getTopVendor(),
+      budgetUsage: this.budgetUsage,
+      spendingTrend: this.getSpendingTrend(),
+      lastUpdated: this.getLastUpdated(),
+    };
+
+    // Create a shareable text summary
+    const shareText = `My Book Spending Analytics:
+💰 Total Spent: $${this.totalSpent.toLocaleString()}
+📅 This Month: $${this.thisMonth.toLocaleString()}
+📚 Avg per Book: $${this.avgPerBook}
+🏆 Top Category: ${this.getTopCategory()}
+🛒 Top Vendor: ${this.getTopVendor()}
+📊 Budget Usage: ${this.budgetUsage.toFixed(1)}%
+📈 Trend: ${this.getSpendingTrend()}`;
+
+    // Try to use Web Share API if available, otherwise copy to clipboard
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'My Book Spending Analytics',
+          text: shareText,
+        })
+        .then(() => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Analytics Shared',
+            detail: 'Analytics data shared successfully!',
+          });
+        })
+        .catch(() => {
+          this.copyToClipboard(shareText);
+        });
+    } else {
+      this.copyToClipboard(shareText);
+    }
+  }
+
+  private copyToClipboard(text: string) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Copied to Clipboard',
+          detail: 'Analytics data copied to clipboard!',
+        });
+      })
+      .catch(() => {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Copy Failed',
+          detail: 'Unable to copy to clipboard. Please try again.',
+        });
+      });
   }
 
   getCurrentPeriod(): string {
@@ -725,10 +805,190 @@ export class AllSpendings implements OnInit {
   }
 
   exportCategoryChart(): void {
+    // Create CSV data for category chart
+    const csvData = this.categoryLabels
+      .map((label, index) => `${label},${this.categoryData[index]}`)
+      .join('\n');
+
+    const fullCsv = 'Category,Amount\n' + csvData;
+    const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'category_spending_chart.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
     this.messageService.add({
       severity: 'success',
       summary: 'Chart Exported',
-      detail: 'Category chart exported successfully!',
+      detail: 'Category chart data exported successfully!',
+    });
+  }
+
+  exportVendorChart(): void {
+    // Create CSV data for vendor chart
+    const csvData = this.vendorsLabels
+      .map((label, index) => `${label},${this.vendorsData[index]}`)
+      .join('\n');
+
+    const fullCsv = 'Vendor,Amount\n' + csvData;
+    const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vendor_spending_chart.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Chart Exported',
+      detail: 'Vendor chart data exported successfully!',
+    });
+  }
+
+  printReport(): void {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Print Failed',
+        detail: 'Unable to open print window. Please check popup settings.',
+      });
+      return;
+    }
+
+    const reportHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Spending Analytics Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .stats { display: flex; justify-content: space-around; margin: 20px 0; }
+          .stat-card { text-align: center; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+          .section { margin: 20px 0; }
+          table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Book Spending Analytics Report</h1>
+          <p>Generated on ${new Date().toLocaleDateString()}</p>
+        </div>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <h3>Total Spent</h3>
+            <p>$${this.totalSpent.toLocaleString()}</p>
+          </div>
+          <div class="stat-card">
+            <h3>This Month</h3>
+            <p>$${this.thisMonth.toLocaleString()}</p>
+          </div>
+          <div class="stat-card">
+            <h3>Avg Per Book</h3>
+            <p>$${this.avgPerBook}</p>
+          </div>
+          <div class="stat-card">
+            <h3>Budget Usage</h3>
+            <p>${this.budgetUsage.toFixed(1)}%</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Category Breakdown</h2>
+          <table>
+            <thead>
+              <tr><th>Category</th><th>Amount</th><th>Percentage</th></tr>
+            </thead>
+            <tbody>
+              ${this.categoryLabels
+                .map((label, index) => {
+                  const percentage = (
+                    (this.categoryData[index] / this.totalSpent) *
+                    100
+                  ).toFixed(1);
+                  return `<tr><td>${label}</td><td>$${this.categoryData[
+                    index
+                  ].toLocaleString()}</td><td>${percentage}%</td></tr>`;
+                })
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <h2>Vendor Performance</h2>
+          <table>
+            <thead>
+              <tr><th>Vendor</th><th>Amount</th><th>Percentage</th></tr>
+            </thead>
+            <tbody>
+              ${this.vendorsLabels
+                .map((label, index) => {
+                  const total = this.vendorsData.reduce((a, b) => a + b, 0);
+                  const percentage = (
+                    (this.vendorsData[index] / total) *
+                    100
+                  ).toFixed(1);
+                  return `<tr><td>${label}</td><td>$${this.vendorsData[
+                    index
+                  ].toLocaleString()}</td><td>${percentage}%</td></tr>`;
+                })
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(reportHtml);
+    printWindow.document.close();
+    printWindow.print();
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Print Ready',
+      detail: 'Report opened in print window!',
+    });
+  }
+
+  resetFilters(): void {
+    this.categoryFilter = 'all';
+    this.vendorFilter = 'all';
+    this.showAllCategories = true;
+    this.showAllVendors = true;
+    this.isYearly = false;
+
+    // Reset charts to original data
+    this.updateCategoryChart();
+    this.filterVendors();
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Filters Reset',
+      detail: 'All filters have been reset to default values.',
+    });
+  }
+
+  toggleChartType(): void {
+    // Toggle between donut and bar chart for categories
+    this.categoryPieChartOptions.chart.type =
+      this.categoryPieChartOptions.chart.type === 'donut' ? 'bar' : 'donut';
+
+    this.updateCategoryChart();
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Chart Type Changed',
+      detail: `Switched to ${this.categoryPieChartOptions.chart.type} chart view`,
     });
   }
 
@@ -786,23 +1046,172 @@ export class AllSpendings implements OnInit {
   }
 
   refreshChartData(): void {
-    // Simulate data refresh
+    // Simulate data refresh with random variations
+    this.categoryData = this.categoryData.map((val) =>
+      Math.max(50, val + Math.floor(Math.random() * 200) - 100)
+    );
+    this.vendorsData = this.vendorsData.map((val) =>
+      Math.max(50, val + Math.floor(Math.random() * 200) - 100)
+    );
+
+    // Update historical data
+    this.historicalSpendingThisYear = this.historicalSpendingThisYear.map(
+      (val) => Math.max(100, val + Math.floor(Math.random() * 100) - 50)
+    );
+
+    // Update all charts
+    this.updateCategoryChart();
+    this.vendorsBarChart?.updateSeries([
+      {
+        name: 'Spending',
+        data: this.vendorsData,
+      },
+    ]);
+    this.historicalLineChart?.updateSeries([
+      { name: 'This Year', data: this.historicalSpendingThisYear },
+      { name: 'Last Year', data: this.historicalSpendingLastYear },
+    ]);
+
     this.messageService.add({
       severity: 'success',
-      summary: 'Data Refreshed',
-      detail: 'Chart data updated successfully!',
+      summary: 'Charts Refreshed',
+      detail: 'All chart data updated successfully!',
     });
   }
 
   viewVendorDetails(): void {
+    const vendorDetails = this.vendorsLabels
+      .map((label, index) => ({
+        name: label,
+        spending: this.vendorsData[index],
+        percentage: (
+          (this.vendorsData[index] /
+            this.vendorsData.reduce((a, b) => a + b, 0)) *
+          100
+        ).toFixed(1),
+        rank: index + 1,
+      }))
+      .sort((a, b) => b.spending - a.spending);
+
+    let detailsMessage = 'Vendor Performance Details:\n\n';
+    vendorDetails.forEach((vendor, index) => {
+      detailsMessage += `${index + 1}. ${
+        vendor.name
+      }: $${vendor.spending.toLocaleString()} (${vendor.percentage}%)\n`;
+    });
+
     this.messageService.add({
       severity: 'info',
       summary: 'Vendor Details',
-      detail: 'Opening vendor details view...',
+      detail: detailsMessage,
+      life: 8000,
     });
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((s) => s.unsubscribe());
+  }
+
+  // Additional utility methods
+  setBudgetGoal(): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Budget Goal',
+      detail: 'Budget goal feature coming soon!',
+    });
+  }
+
+  viewCategoryDetails(categoryName?: string): void {
+    const category = categoryName || this.getTopCategory();
+    const index = this.categoryLabels.indexOf(category);
+
+    if (index !== -1) {
+      const amount = this.categoryData[index];
+      const percentage = ((amount / this.totalSpent) * 100).toFixed(1);
+
+      this.messageService.add({
+        severity: 'info',
+        summary: `${category} Details`,
+        detail: `Amount: $${amount.toLocaleString()} (${percentage}% of total spending)`,
+        life: 5000,
+      });
+    }
+  }
+
+  compareWithPrevious(): void {
+    const currentTotal = this.historicalSpendingThisYear.reduce(
+      (a, b) => a + b,
+      0
+    );
+    const previousTotal = this.historicalSpendingLastYear.reduce(
+      (a, b) => a + b,
+      0
+    );
+    const change = currentTotal - previousTotal;
+    const changePercent = ((change / previousTotal) * 100).toFixed(1);
+
+    const comparisonMessage =
+      change >= 0
+        ? `Spending increased by $${change.toLocaleString()} (${changePercent}%) compared to last year`
+        : `Spending decreased by $${Math.abs(
+            change
+          ).toLocaleString()} (${Math.abs(
+            parseFloat(changePercent)
+          )}%) compared to last year`;
+
+    this.messageService.add({
+      severity: change >= 0 ? 'warn' : 'success',
+      summary: 'Year-over-Year Comparison',
+      detail: comparisonMessage,
+      life: 8000,
+    });
+  }
+
+  setSpendingAlert(): void {
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Spending Alerts',
+      detail: 'Custom spending alert feature coming soon!',
+    });
+  }
+
+  exportAllData(): void {
+    const allData = {
+      summary: {
+        totalSpent: this.totalSpent,
+        thisMonth: this.thisMonth,
+        avgPerBook: this.avgPerBook,
+        mostExpensive: this.mostExpensive,
+        budgetUsage: this.budgetUsage,
+      },
+      categories: this.categoryLabels.map((label, index) => ({
+        name: label,
+        amount: this.categoryData[index],
+      })),
+      vendors: this.vendorsLabels.map((label, index) => ({
+        name: label,
+        amount: this.vendorsData[index],
+      })),
+      historicalData: {
+        thisYear: this.historicalSpendingThisYear,
+        lastYear: this.historicalSpendingLastYear,
+      },
+      detailedReport: this.detailedReportData,
+    };
+
+    const dataStr = JSON.stringify(allData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'complete_spending_analytics.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Complete Export',
+      detail: 'All analytics data exported successfully!',
+    });
   }
 }

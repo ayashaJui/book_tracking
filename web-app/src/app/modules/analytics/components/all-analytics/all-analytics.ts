@@ -167,6 +167,20 @@ export class AllAnalytics implements OnInit {
     private uiService: UiService
   ) {}
 
+  // Message handling methods
+  showSuccessMessage(message: string) {
+    // You can implement toast notifications here if available
+    console.log('✅ ' + message);
+  }
+
+  showInfoMessage(message: string) {
+    console.log('ℹ️ ' + message);
+  }
+
+  showWarningMessage(message: string) {
+    console.log('⚠️ ' + message);
+  }
+
   ngOnInit(): void {
     this.updateDashboard();
   }
@@ -196,6 +210,9 @@ export class AllAnalytics implements OnInit {
     this.selectedGenre = 'All';
     this.selectedAuthor = 'All';
     this.updateDashboard();
+
+    // Show success message
+    this.showSuccessMessage('Filters have been reset successfully');
   }
 
   onGenreClick(event: any) {
@@ -207,6 +224,7 @@ export class AllAnalytics implements OnInit {
       const genre = this.genrePieChart.labels[event.dataPointIndex];
       this.selectedGenre = genre;
       this.updateDashboard();
+      this.showInfoMessage(`Filtered by genre: ${genre}`);
     }
   }
 
@@ -220,39 +238,141 @@ export class AllAnalytics implements OnInit {
         this.authorLeaderboardChart.xaxis.categories[event.dataPointIndex];
       this.selectedAuthor = author as string;
       this.updateDashboard();
+      this.showInfoMessage(`Filtered by author: ${author}`);
     }
   }
 
   exportData() {
-    // Create CSV data from current filtered view
-    const csvData = this.getFilteredBooks().map((book) => ({
-      Title: book.title,
-      Genre: book.genre,
-      Author: book.author,
-      Pages: book.pages,
-      Rating: book.rating,
-      Spent: book.spent,
-      Date: book.date,
-      Completed: book.completed ? 'Yes' : 'No',
-    }));
+    try {
+      // Create CSV data from current filtered view
+      const filteredBooks = this.getFilteredBooks();
 
-    // Convert to CSV string
-    const headers = Object.keys(csvData[0]).join(',');
-    const rows = csvData.map((row) => Object.values(row).join(','));
-    const csvContent = [headers, ...rows].join('\n');
+      if (filteredBooks.length === 0) {
+        this.showWarningMessage(
+          'No data to export. Please adjust your filters.'
+        );
+        return;
+      }
 
-    // Create download
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reading-analytics-${
-      new Date().toISOString().split('T')[0]
-    }.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+      const csvData = filteredBooks.map((book) => ({
+        Title: book.title,
+        Genre: book.genre,
+        Author: book.author,
+        Pages: book.pages,
+        Rating: book.rating,
+        'Amount Spent': book.spent,
+        'Date Read': book.date,
+        Status: book.completed ? 'Completed' : 'In Progress',
+      }));
 
-    console.log('Analytics data exported successfully');
+      // Add summary statistics
+      const summaryData = [
+        {
+          Title: '--- SUMMARY ---',
+          Genre: '',
+          Author: '',
+          Pages: '',
+          Rating: '',
+          'Amount Spent': '',
+          'Date Read': '',
+          Status: '',
+        },
+        {
+          Title: 'Total Books',
+          Genre: '',
+          Author: '',
+          Pages: filteredBooks.length,
+          Rating: '',
+          'Amount Spent': '',
+          'Date Read': '',
+          Status: '',
+        },
+        {
+          Title: 'Total Pages',
+          Genre: '',
+          Author: '',
+          Pages: filteredBooks.reduce((a, b) => a + b.pages, 0),
+          Rating: '',
+          'Amount Spent': '',
+          'Date Read': '',
+          Status: '',
+        },
+        {
+          Title: 'Total Spent',
+          Genre: '',
+          Author: '',
+          Pages: '',
+          Rating: '',
+          'Amount Spent': `$${filteredBooks.reduce((a, b) => a + b.spent, 0)}`,
+          'Date Read': '',
+          Status: '',
+        },
+        {
+          Title: 'Average Rating',
+          Genre: '',
+          Author: '',
+          Pages: '',
+          Rating: (
+            filteredBooks.reduce((a, b) => a + b.rating, 0) /
+            filteredBooks.length
+          ).toFixed(1),
+          'Amount Spent': '',
+          'Date Read': '',
+          Status: '',
+        },
+        {
+          Title: 'Completion Rate',
+          Genre: '',
+          Author: '',
+          Pages: '',
+          Rating: '',
+          'Amount Spent': '',
+          'Date Read': '',
+          Status: `${Math.round(
+            (filteredBooks.filter((b) => b.completed).length /
+              filteredBooks.length) *
+              100
+          )}%`,
+        },
+      ];
+
+      const allData = [...csvData, ...summaryData];
+
+      // Convert to CSV string
+      const headers = Object.keys(allData[0]).join(',');
+      const rows = allData.map((row) => Object.values(row).join(','));
+      const csvContent = [headers, ...rows].join('\n');
+
+      // Create download
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      const filterSuffix =
+        this.selectedGenre !== 'All' || this.selectedAuthor !== 'All'
+          ? `_filtered_${
+              this.selectedGenre !== 'All' ? this.selectedGenre : ''
+            }${
+              this.selectedAuthor !== 'All'
+                ? '_' + this.selectedAuthor.replace(/\s+/g, '')
+                : ''
+            }`
+          : '';
+
+      link.download = `reading-analytics${filterSuffix}_${
+        new Date().toISOString().split('T')[0]
+      }.csv`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      this.showSuccessMessage(
+        `Analytics data exported successfully! (${filteredBooks.length} books)`
+      );
+    } catch (error) {
+      console.error('Export failed:', error);
+      this.showWarningMessage('Export failed. Please try again.');
+    }
   }
 
   // Format number with commas
@@ -1030,23 +1150,174 @@ export class AllAnalytics implements OnInit {
   }
 
   refreshData() {
-    this.updateDashboard();
-    // You can add toast message here if needed
-    console.log('Data refreshed successfully');
+    try {
+      this.showInfoMessage('Refreshing analytics data...');
+
+      // Simulate data refresh (in real app, this would fetch from API)
+      setTimeout(() => {
+        this.updateDashboard();
+
+        // Update charts
+        this.readingTrendChartComponent?.updateSeries(
+          this.readingTrendChart.series
+        );
+        this.genrePieChartComponent?.updateSeries(this.genrePieChart.series);
+        this.spendingBarChartComponent?.updateSeries(
+          this.spendingBarChart.series
+        );
+        this.ratingDistributionChartComponent?.updateSeries(
+          this.ratingDistributionChart.series
+        );
+        this.authorLeaderboardChartComponent?.updateSeries(
+          this.authorLeaderboardChart.series
+        );
+        this.completionRadialChartComponent?.updateSeries(
+          this.completionRadialChart.series
+        );
+
+        this.showSuccessMessage('Analytics data refreshed successfully!');
+      }, 500); // Small delay to show loading state
+    } catch (error) {
+      console.error('Refresh failed:', error);
+      this.showWarningMessage('Failed to refresh data. Please try again.');
+    }
   }
 
   exportToExcel() {
-    const data = this.getFilteredBooks();
-    const csv = this.convertToCSV(data);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reading-analytics-${
-      new Date().toISOString().split('T')[0]
-    }.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    try {
+      const filteredBooks = this.getFilteredBooks();
+
+      if (filteredBooks.length === 0) {
+        this.showWarningMessage(
+          'No data to export to Excel. Please adjust your filters.'
+        );
+        return;
+      }
+
+      // Prepare data with better formatting for Excel
+      const excelData = filteredBooks.map((book, index) => ({
+        'S.No': index + 1,
+        'Book Title': book.title,
+        'Author Name': book.author,
+        Genre: book.genre,
+        Pages: book.pages,
+        'Rating (out of 5)': book.rating,
+        'Amount Spent ($)': book.spent,
+        'Date Read': book.date,
+        'Reading Status': book.completed ? 'Completed' : 'In Progress',
+        'Reading Hours (Est.)': Math.round((book.pages / 40) * 10) / 10, // Estimated reading time
+      }));
+
+      // Add summary sheet data
+      const summaryStats = [
+        { Metric: 'Total Books Read', Value: filteredBooks.length },
+        {
+          Metric: 'Total Pages Read',
+          Value: filteredBooks.reduce((a, b) => a + b.pages, 0),
+        },
+        {
+          Metric: 'Total Amount Spent',
+          Value: `$${filteredBooks.reduce((a, b) => a + b.spent, 0)}`,
+        },
+        {
+          Metric: 'Average Rating',
+          Value: (
+            filteredBooks.reduce((a, b) => a + b.rating, 0) /
+            filteredBooks.length
+          ).toFixed(1),
+        },
+        {
+          Metric: 'Books Completed',
+          Value: filteredBooks.filter((b) => b.completed).length,
+        },
+        {
+          Metric: 'Books In Progress',
+          Value: filteredBooks.filter((b) => !b.completed).length,
+        },
+        {
+          Metric: 'Completion Rate',
+          Value: `${Math.round(
+            (filteredBooks.filter((b) => b.completed).length /
+              filteredBooks.length) *
+              100
+          )}%`,
+        },
+        {
+          Metric: 'Estimated Reading Hours',
+          Value:
+            Math.round(
+              filteredBooks.reduce((a, b) => a + b.pages / 40, 0) * 10
+            ) / 10,
+        },
+      ];
+
+      // Create workbook with multiple sheets
+      const workbookData = {
+        'Reading Data': excelData,
+        'Summary Statistics': summaryStats,
+      };
+
+      // Convert to CSV format (Excel compatible)
+      let csvContent = '';
+
+      // Add Reading Data sheet
+      csvContent += 'READING DATA\n';
+      const headers = Object.keys(excelData[0]);
+      csvContent += headers.join(',') + '\n';
+      excelData.forEach((row) => {
+        csvContent +=
+          headers
+            .map((header) => {
+              const value = row[header as keyof typeof row];
+              return typeof value === 'string' && value.includes(',')
+                ? `"${value}"`
+                : value;
+            })
+            .join(',') + '\n';
+      });
+
+      csvContent += '\n\nSUMMARY STATISTICS\n';
+      csvContent += 'Metric,Value\n';
+      summaryStats.forEach((stat) => {
+        csvContent += `"${stat.Metric}","${stat.Value}"\n`;
+      });
+
+      // Add export metadata
+      csvContent += '\n\nEXPORT DETAILS\n';
+      csvContent += `"Export Date","${new Date().toLocaleDateString()}"\n`;
+      csvContent += `"Export Time","${new Date().toLocaleTimeString()}"\n`;
+      csvContent += `"Filters Applied","Genre: ${this.selectedGenre}, Author: ${this.selectedAuthor}"\n`;
+      csvContent += `"Total Records","${filteredBooks.length}"\n`;
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      const filterSuffix =
+        this.selectedGenre !== 'All' || this.selectedAuthor !== 'All'
+          ? `_filtered_${
+              this.selectedGenre !== 'All' ? this.selectedGenre : ''
+            }${
+              this.selectedAuthor !== 'All'
+                ? '_' + this.selectedAuthor.replace(/\s+/g, '')
+                : ''
+            }`
+          : '';
+
+      link.download = `reading-analytics-excel${filterSuffix}_${
+        new Date().toISOString().split('T')[0]
+      }.csv`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      this.showSuccessMessage(
+        `Excel-compatible data exported successfully! (${filteredBooks.length} books with summary statistics)`
+      );
+    } catch (error) {
+      console.error('Excel export failed:', error);
+      this.showWarningMessage('Excel export failed. Please try again.');
+    }
   }
 
   private convertToCSV(data: any[]): string {
@@ -1086,5 +1357,301 @@ export class AllAnalytics implements OnInit {
       Science: 'contrast',
     };
     return severityMap[genre] || 'info';
+  }
+
+  // Additional utility methods for enhanced functionality
+
+  // Print Analytics Report
+  printReport() {
+    try {
+      const filteredBooks = this.getFilteredBooks();
+      if (filteredBooks.length === 0) {
+        this.showWarningMessage(
+          'No data to print. Please adjust your filters.'
+        );
+        return;
+      }
+
+      // Create a print-friendly version
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const printContent = this.generatePrintableReport(filteredBooks);
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.print();
+        this.showSuccessMessage('Print dialog opened successfully!');
+      }
+    } catch (error) {
+      console.error('Print failed:', error);
+      this.showWarningMessage('Print failed. Please try again.');
+    }
+  }
+
+  private generatePrintableReport(books: any[]): string {
+    const totalPages = books.reduce((a, b) => a + b.pages, 0);
+    const totalSpent = books.reduce((a, b) => a + b.spent, 0);
+    const avgRating = (
+      books.reduce((a, b) => a + b.rating, 0) / books.length
+    ).toFixed(1);
+    const completedBooks = books.filter((b) => b.completed).length;
+    const completionRate = Math.round((completedBooks / books.length) * 100);
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Reading Analytics Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+            h2 { color: #555; margin-top: 30px; }
+            .summary { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #007bff; color: white; }
+            .filters { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 10px 0; }
+            .print-date { color: #666; font-size: 12px; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>📚 Reading Analytics Report</h1>
+          
+          <div class="filters">
+            <strong>Applied Filters:</strong> 
+            Genre: ${this.selectedGenre} | Author: ${this.selectedAuthor}
+          </div>
+
+          <div class="summary">
+            <h2>📊 Summary Statistics</h2>
+            <p><strong>Total Books:</strong> ${books.length}</p>
+            <p><strong>Total Pages:</strong> ${totalPages.toLocaleString()}</p>
+            <p><strong>Total Spent:</strong> $${totalSpent}</p>
+            <p><strong>Average Rating:</strong> ${avgRating}/5</p>
+            <p><strong>Completion Rate:</strong> ${completionRate}% (${completedBooks}/${
+      books.length
+    })</p>
+            <p><strong>Estimated Reading Hours:</strong> ${Math.round(
+              totalPages / 40
+            )} hours</p>
+          </div>
+
+          <h2>📖 Book Details</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre</th>
+                <th>Pages</th>
+                <th>Rating</th>
+                <th>Cost</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${books
+                .map(
+                  (book) => `
+                <tr>
+                  <td>${book.title}</td>
+                  <td>${book.author}</td>
+                  <td>${book.genre}</td>
+                  <td>${book.pages}</td>
+                  <td>${book.rating}/5</td>
+                  <td>$${book.spent}</td>
+                  <td>${new Date(book.date).toLocaleDateString()}</td>
+                  <td>${book.completed ? 'Completed' : 'In Progress'}</td>
+                </tr>
+              `
+                )
+                .join('')}
+            </tbody>
+          </table>
+
+          <div class="print-date">
+            Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  // Share Analytics Summary
+  shareAnalytics() {
+    try {
+      const filteredBooks = this.getFilteredBooks();
+      if (filteredBooks.length === 0) {
+        this.showWarningMessage(
+          'No data to share. Please adjust your filters.'
+        );
+        return;
+      }
+
+      const summary = this.generateShareableSummary(filteredBooks);
+
+      if (navigator.share) {
+        // Use Web Share API if available
+        navigator
+          .share({
+            title: 'My Reading Analytics',
+            text: summary,
+            url: window.location.href,
+          })
+          .then(() => {
+            this.showSuccessMessage('Analytics shared successfully!');
+          })
+          .catch((error) => {
+            console.error('Share failed:', error);
+            this.fallbackShare(summary);
+          });
+      } else {
+        this.fallbackShare(summary);
+      }
+    } catch (error) {
+      console.error('Share failed:', error);
+      this.showWarningMessage('Share failed. Please try again.');
+    }
+  }
+
+  private generateShareableSummary(books: any[]): string {
+    const totalPages = books.reduce((a, b) => a + b.pages, 0);
+    const avgRating = (
+      books.reduce((a, b) => a + b.rating, 0) / books.length
+    ).toFixed(1);
+    const completionRate = Math.round(
+      (books.filter((b) => b.completed).length / books.length) * 100
+    );
+
+    return `📚 My Reading Analytics Summary
+
+📖 Books Read: ${books.length}
+📄 Pages Read: ${totalPages.toLocaleString()}
+⭐ Average Rating: ${avgRating}/5
+✅ Completion Rate: ${completionRate}%
+⏱️ Estimated Hours: ${Math.round(totalPages / 40)}
+
+Top Genre: ${this.getMostReadGenre(books)}
+Favorite Author: ${this.getMostReadAuthor(books)}
+
+#ReadingGoals #BookLovers #Analytics`;
+  }
+
+  private getMostReadGenre(books: any[]): string {
+    const genreCount = books.reduce((acc, book) => {
+      acc[book.genre] = (acc[book.genre] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.keys(genreCount).reduce((a, b) =>
+      genreCount[a] > genreCount[b] ? a : b
+    );
+  }
+
+  private getMostReadAuthor(books: any[]): string {
+    const authorCount = books.reduce((acc, book) => {
+      acc[book.author] = (acc[book.author] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.keys(authorCount).reduce((a, b) =>
+      authorCount[a] > authorCount[b] ? a : b
+    );
+  }
+
+  private fallbackShare(summary: string) {
+    // Fallback to clipboard copy
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(summary)
+        .then(() => {
+          this.showSuccessMessage('Analytics summary copied to clipboard!');
+        })
+        .catch(() => {
+          this.showTextInModal(summary);
+        });
+    } else {
+      this.showTextInModal(summary);
+    }
+  }
+
+  private showTextInModal(text: string) {
+    // Simple alert fallback
+    alert('Copy this text to share:\n\n' + text);
+    this.showInfoMessage('Text displayed in popup for manual copying.');
+  }
+
+  // View detailed book information
+  viewBookDetails(book: any) {
+    const details = `
+📖 Book Details:
+
+Title: ${book.title}
+Author: ${book.author}
+Genre: ${book.genre}
+Pages: ${book.pages}
+Rating: ${book.rating}/5 stars
+Cost: $${book.spent}
+Date Read: ${new Date(book.date).toLocaleDateString()}
+Status: ${book.completed ? 'Completed' : 'In Progress'}
+Estimated Reading Time: ${Math.round((book.pages / 40) * 10) / 10} hours
+    `;
+
+    alert(details);
+    this.showInfoMessage(`Viewed details for "${book.title}"`);
+  }
+
+  // Advanced filtering methods
+  filterByRating(minRating: number) {
+    // This could be enhanced to add rating filter to the UI
+    const highRatedBooks = this.books.filter(
+      (book) => book.rating >= minRating
+    );
+    console.log(`Books with ${minRating}+ stars:`, highRatedBooks);
+    this.showInfoMessage(
+      `Found ${highRatedBooks.length} books with ${minRating}+ star rating`
+    );
+  }
+
+  filterByDateRange(startDate: string, endDate: string) {
+    // This could be enhanced to add date range filter to the UI
+    const filteredBooks = this.books.filter(
+      (book) => book.date >= startDate && book.date <= endDate
+    );
+    console.log(
+      `Books read between ${startDate} and ${endDate}:`,
+      filteredBooks
+    );
+    this.showInfoMessage(
+      `Found ${filteredBooks.length} books in selected date range`
+    );
+  }
+
+  // Quick stats methods
+  getQuickInsights() {
+    const books = this.getFilteredBooks();
+    const insights = {
+      fastestRead: books.reduce((prev, curr) =>
+        prev.pages < curr.pages ? prev : curr
+      ),
+      longestBook: books.reduce((prev, curr) =>
+        prev.pages > curr.pages ? prev : curr
+      ),
+      highestRated: books.filter(
+        (book) => book.rating === Math.max(...books.map((b) => b.rating))
+      ),
+      mostExpensive: books.reduce((prev, curr) =>
+        prev.spent > curr.spent ? prev : curr
+      ),
+      recentRead: books.reduce((prev, curr) =>
+        new Date(prev.date) > new Date(curr.date) ? prev : curr
+      ),
+    };
+
+    console.log('Quick Insights:', insights);
+    this.showInfoMessage(
+      'Quick insights calculated - check console for details'
+    );
+    return insights;
   }
 }

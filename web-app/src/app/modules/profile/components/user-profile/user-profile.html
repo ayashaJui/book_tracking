@@ -7,7 +7,9 @@
         <!-- Avatar Section -->
         <div class="relative group">
           <div
-            class="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-500 shadow-2xl"
+            class="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-500 shadow-2xl cursor-pointer"
+            (click)="fileInput.click()"
+            title="Click to change avatar"
           >
             <img
               [src]="user.avatarUrl || 'assets/images/product-not-found.png'"
@@ -18,6 +20,7 @@
           <button
             (click)="fileInput.click()"
             class="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+            title="Change Avatar"
           >
             <i class="pi pi-camera"></i>
           </button>
@@ -33,15 +36,35 @@
         <!-- Profile Info -->
         <div class="flex-1 text-center lg:text-left">
           <div class="mb-4">
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1
+              class="text-4xl font-bold text-gray-900 dark:text-white mb-2"
+              [class.cursor-pointer]="isEditMode"
+              [class.hover:text-blue-600]="isEditMode"
+              (click)="isEditMode ? updateUserName() : null"
+              [title]="isEditMode ? 'Click to edit name' : ''"
+            >
               {{ user.name }}
+              <i
+                *ngIf="isEditMode"
+                class="pi pi-pencil text-lg ml-2 text-blue-500"
+              ></i>
             </h1>
             <div
               class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-gray-600 dark:text-gray-400"
             >
-              <span class="flex items-center gap-2">
+              <span
+                class="flex items-center gap-2"
+                [class.cursor-pointer]="isEditMode"
+                [class.hover:text-blue-600]="isEditMode"
+                (click)="isEditMode ? updateUserLocation() : null"
+                [title]="isEditMode ? 'Click to edit location' : ''"
+              >
                 <i class="pi pi-map-marker text-blue-500"></i>
                 {{ user.location }}
+                <i
+                  *ngIf="isEditMode"
+                  class="pi pi-pencil text-sm text-blue-500"
+                ></i>
               </span>
               <span class="flex items-center gap-2">
                 <i class="pi pi-calendar text-blue-500"></i>
@@ -51,7 +74,14 @@
           </div>
 
           <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
-            <button icon="pi pi-pencil" pButton>Edit Profile</button>
+            <button
+              icon="pi pi-pencil"
+              pButton
+              (click)="editProfile()"
+              [severity]="isEditMode ? 'success' : 'primary'"
+            >
+              {{ isEditMode ? "Save Profile" : "Edit Profile" }}
+            </button>
             <button
               pButton
               icon="pi pi-share-alt"
@@ -69,7 +99,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Books Read -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        (click)="onStatsCardClick('booksRead')"
+        title="View read books"
       >
         <div class="flex items-center justify-between mb-4">
           <div
@@ -86,7 +118,9 @@
 
       <!-- Total Owned -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        (click)="onStatsCardClick('totalOwned')"
+        title="View owned books"
       >
         <div class="flex items-center justify-between mb-4">
           <div
@@ -105,7 +139,9 @@
 
       <!-- Quotes -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        (click)="onStatsCardClick('quotes')"
+        title="View saved quotes"
       >
         <div class="flex items-center justify-between mb-4">
           <div
@@ -124,7 +160,9 @@
 
       <!-- Average Rating -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        (click)="onStatsCardClick('avgRating')"
+        title="View reviews"
       >
         <div class="flex items-center justify-between mb-4">
           <div
@@ -158,7 +196,9 @@
               Annual Goal
             </h3>
             <div
-              class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2"
+              class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2 cursor-pointer hover:text-blue-700 dark:hover:text-blue-300"
+              (click)="updateAnnualGoal()"
+              title="Click to update goal"
             >
               {{ user.stats.booksRead }} / {{ user.goals.annual }}
             </div>
@@ -249,12 +289,18 @@
           <img
             [src]="featured.coverUrl || 'assets/images/product-not-found.png'"
             alt="Featured book cover"
-            class="w-40 h-56 object-cover rounded-xl shadow-lg"
+            class="w-40 h-56 object-cover rounded-xl shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
+            (click)="onFeaturedBookClick()"
+            title="Click to view book details"
           />
         </div>
 
         <div class="flex-1 text-center lg:text-left">
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3
+            class="text-2xl font-bold text-gray-900 dark:text-white mb-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            (click)="onFeaturedBookClick()"
+            title="Click to view book details"
+          >
             {{ featured.title }}
           </h3>
           <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
@@ -270,11 +316,13 @@
           <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
             <button
               class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+              (click)="viewFeaturedBookDetails()"
             >
               View Details
             </button>
             <button
               class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              (click)="addNoteToFeaturedBook()"
             >
               Add Note
             </button>
@@ -365,28 +413,99 @@
           *ngIf="user.social.goodreads"
           [href]="user.social.goodreads"
           target="_blank"
-          class="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center text-white transition-colors"
+          (click)="
+            !isEditMode
+              ? openSocialLink('goodreads')
+              : updateSocialLink('goodreads');
+            $event.preventDefault()
+          "
+          class="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center text-white transition-colors relative"
+          [title]="
+            isEditMode
+              ? 'Click to edit Goodreads URL'
+              : 'View Goodreads Profile'
+          "
         >
           <i class="pi pi-book"></i>
+          <i
+            *ngIf="isEditMode"
+            class="pi pi-pencil absolute -top-1 -right-1 text-xs bg-blue-500 rounded-full p-1"
+          ></i>
         </a>
 
         <a
           *ngIf="user.social.instagram"
           [href]="user.social.instagram"
           target="_blank"
-          class="w-10 h-10 bg-pink-500 hover:bg-pink-600 rounded-full flex items-center justify-center text-white transition-colors"
+          (click)="
+            !isEditMode
+              ? openSocialLink('instagram')
+              : updateSocialLink('instagram');
+            $event.preventDefault()
+          "
+          class="w-10 h-10 bg-pink-500 hover:bg-pink-600 rounded-full flex items-center justify-center text-white transition-colors relative"
+          [title]="
+            isEditMode
+              ? 'Click to edit Instagram URL'
+              : 'View Instagram Profile'
+          "
         >
           <i class="pi pi-instagram"></i>
+          <i
+            *ngIf="isEditMode"
+            class="pi pi-pencil absolute -top-1 -right-1 text-xs bg-blue-500 rounded-full p-1"
+          ></i>
         </a>
 
         <a
           *ngIf="user.social.linkedin"
           [href]="user.social.linkedin"
           target="_blank"
-          class="w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors"
+          (click)="
+            !isEditMode
+              ? openSocialLink('linkedin')
+              : updateSocialLink('linkedin');
+            $event.preventDefault()
+          "
+          class="w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors relative"
+          [title]="
+            isEditMode ? 'Click to edit LinkedIn URL' : 'View LinkedIn Profile'
+          "
         >
           <i class="pi pi-linkedin"></i>
+          <i
+            *ngIf="isEditMode"
+            class="pi pi-pencil absolute -top-1 -right-1 text-xs bg-blue-500 rounded-full p-1"
+          ></i>
         </a>
+
+        <!-- Add social link buttons when in edit mode -->
+        <button
+          *ngIf="isEditMode && !user.social.goodreads"
+          (click)="updateSocialLink('goodreads')"
+          class="w-10 h-10 bg-gray-300 hover:bg-emerald-500 rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-colors"
+          title="Add Goodreads URL"
+        >
+          <i class="pi pi-plus"></i>
+        </button>
+
+        <button
+          *ngIf="isEditMode && !user.social.instagram"
+          (click)="updateSocialLink('instagram')"
+          class="w-10 h-10 bg-gray-300 hover:bg-pink-500 rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-colors"
+          title="Add Instagram URL"
+        >
+          <i class="pi pi-plus"></i>
+        </button>
+
+        <button
+          *ngIf="isEditMode && !user.social.linkedin"
+          (click)="updateSocialLink('linkedin')"
+          class="w-10 h-10 bg-gray-300 hover:bg-blue-600 rounded-full flex items-center justify-center text-gray-600 hover:text-white transition-colors"
+          title="Add LinkedIn URL"
+        >
+          <i class="pi pi-plus"></i>
+        </button>
       </div>
     </div>
   </div>
