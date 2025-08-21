@@ -1,7 +1,7 @@
-<div class="min-h-screen">
+<div class="min-h-screen ">
   <!-- Modern Header Section -->
   <div
-    class="analytics-header relative overflow-hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+    class="analytics-header max-w-7xl mx-auto rounded-xl shadow-lg relative overflow-hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
   >
     <!-- Background Pattern -->
     <div
@@ -122,46 +122,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Quick Actions Panel -->
-        <div
-          class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div
-              class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              <i class="pi pi-bolt text-blue-500"></i>
-              <span>Quick Actions:</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <p-button
-                label="High Rated (4+ ⭐)"
-                size="small"
-                severity="success"
-                (onClick)="filterByRating(4)"
-                [outlined]="true"
-                icon="pi pi-star"
-              ></p-button>
-              <p-button
-                label="Current Year"
-                size="small"
-                severity="info"
-                (onClick)="filterByDateRange('2025-01-01', '2025-12-31')"
-                [outlined]="true"
-                icon="pi pi-calendar"
-              ></p-button>
-              <p-button
-                label="Insights"
-                size="small"
-                severity="help"
-                (onClick)="getQuickInsights()"
-                [outlined]="true"
-                icon="pi pi-lightbulb"
-              ></p-button>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   </div>
@@ -169,7 +130,7 @@
   <!-- Quick Stats Section -->
   <div class="quick-stats">
     <div class="max-w-7xl mx-auto py-6 lg:py-8">
-      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 lg:gap-6">
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mx-2 lg:gap-6">
         <div
           class="bg-white dark:bg-gray-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
         >
@@ -249,7 +210,7 @@
   <div class="lg:px-6 py-6 lg:py-8">
     <div class="max-w-7xl mx-auto">
       <!-- Trend Insights Section -->
-      <div class="trend-insights mb-8">
+      <div class="trend-insights mb-8 mx-2">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Reading Trend Insight -->
           <div
@@ -261,7 +222,7 @@
                   class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
                 >
                   <i
-                    class="pi pi-trending-up text-blue-600 dark:text-blue-400 text-sm"
+                    class="fa fa-level-up text-blue-600 dark:text-blue-400 text-sm"
                   ></i>
                 </div>
                 <span
@@ -380,7 +341,7 @@
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         <!-- Reading Trend Chart -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -428,7 +389,7 @@
         </p-card>
 
         <!-- Genre Distribution Chart -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -450,11 +411,7 @@
                   </p>
                 </div>
               </div>
-              <p-tag
-                value="Click to filter"
-                severity="info"
-                icon="pi pi-info-circle"
-              ></p-tag>
+              
             </div>
           </ng-template>
           <ng-template pTemplate="content">
@@ -475,7 +432,7 @@
         </p-card>
 
         <!-- Monthly Spending Chart -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -522,7 +479,7 @@
         </p-card>
 
         <!-- Rating Distribution Chart -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -565,7 +522,7 @@
         </p-card>
 
         <!-- Author Leaderboard Chart -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -607,7 +564,7 @@
         </p-card>
 
         <!-- Completion Rate Card -->
-        <p-card class="chart-card">
+        <p-card class="chart-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -655,8 +612,8 @@
       </div>
 
       <!-- Full Width Reading Streak Section -->
-      <div class="w-full mt-8">
-        <p-card class="reading-streak-card">
+      <div class="w-full mt-8 ">
+        <p-card class="reading-streak-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700"
@@ -683,8 +640,8 @@
       </div>
 
       <!-- Data Table Section -->
-      <div class="w-full mt-8">
-        <p-card class="data-table-card">
+      <div class="w-full mt-8 ">
+        <p-card class="data-table-card mx-2">
           <ng-template pTemplate="header">
             <div
               class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
@@ -752,7 +709,6 @@
                   </span>
                   <div class="flex items-center gap-2">
                     <span class="p-input-icon-left">
-                      <i class="pi pi-search"></i>
                       <input
                         pInputText
                         type="text"

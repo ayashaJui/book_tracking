@@ -161,11 +161,12 @@ export class AllBook implements OnInit {
     return `${finishedCount}/${booksInSeries.length} read`;
   }
 
-  // optional: view series details
+  // Navigate to series view page
   viewSeries(seriesId: number) {
     const booksInSeries = this.seriesMap[seriesId];
     console.log('Series Books:', booksInSeries);
-    // open dialog or navigate to series page
+    // Navigate to series view page
+    this.router.navigate([`/series/view/${seriesId}`]);
   }
 
   applyFilters() {

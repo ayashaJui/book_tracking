@@ -18,6 +18,7 @@ import {
 import { LayoutService } from '../../../layout/service/layout.service';
 import { UiService } from '../../shared/services/ui.service.service';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -72,7 +73,8 @@ export class Dashboard {
 
   constructor(
     private layoutService: LayoutService,
-    private uiService: UiService
+    private uiService: UiService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -378,5 +380,21 @@ export class Dashboard {
     this.monthlyReadingChartOptions.xaxis = {
       categories: newCategories,
     };
+  }
+
+  addNewBook() {
+    this.router.navigate(['/books/add-book']);
+  }
+
+  addNewQuote() {
+    this.router.navigate(['/quotes/add']);
+  }
+
+  viewWishlist() {
+    this.router.navigate(['/wishlist']);
+  }
+
+  updateProgress() {
+    this.router.navigate(['/reading-logs']);
   }
 }

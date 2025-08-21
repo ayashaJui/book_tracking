@@ -2,7 +2,7 @@
 <div class="min-h-screen">
   <!-- Dashboard Header -->
   <div
-    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+    class="  relative mx-auto overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
   >
     <!-- Background Pattern -->
     <div
@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto py-8">
+  <div class=" mx-auto py-8 mx-2 px-2">
     <!-- Top Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <div
@@ -502,27 +502,27 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <button
         pButton
-        label="Add New Book"
+        label="Add New Book" (click)="addNewBook()"
         icon="pi pi-book"
         class="px-4 py-3 transition-colors"
       ></button>
       <button
         pButton
-        label="Add a New Quote"
+        label="Add a New Quote" (click)="addNewQuote()"
         severity="info"
         icon="fa-solid fa-quote-left"
         class="px-4 py-3 transition-colors"
       ></button>
       <button
         pButton
-        label="View Wishlist"
+        label="View Wishlist" (click)="viewWishlist()"
         severity="help"
         icon="pi pi-heart"
         class="px-4 py-3 transition-colors"
       ></button>
       <button
         pButton
-        label="Update Progress"
+        label="Update Progress" (click)="updateProgress()"
         severity="contrast"
         icon="pi pi-sync"
         class="px-4 py-3 transition-colors"
