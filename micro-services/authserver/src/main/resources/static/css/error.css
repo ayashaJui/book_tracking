@@ -1,0 +1,102 @@
+:root {
+    --primary-gradient: linear-gradient(180deg, rgba(233, 30, 99, 0.4) 10%, rgba(33, 150, 243, 0) 30%);
+    --card-bg: #ffffff;
+    --card-radius: 53px;
+    --icon-border: #e91e63;
+    --error-btn-bg: #f44336;
+    --error-btn-hover: #d32f2f;
+    --text-color: #111827;
+    --muted-color: #6b7280;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-width: 100vw;
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-card-wrapper {
+    border-radius: 56px;
+    padding: 0.3rem;
+    background: var(--primary-gradient);
+}
+
+.error-card {
+    background: var(--card-bg);
+    border-radius: var(--card-radius);
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.error-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.error-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--icon-border);
+    border-radius: 50%;
+    width: 3.2rem;
+    height: 3rem;
+    font-size: 2rem;
+    color: var(--icon-border);
+}
+
+.error-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0.5rem 0;
+}
+
+.error-subtitle {
+    color: var(--muted-color);
+    font-size: 0.9rem;
+}
+
+.error-image {
+    width: 80%;
+    margin: 2rem 0;
+}
+
+.error-button-container {
+    margin-top: 1.8rem;
+    text-align: center;
+}
+
+.error-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: var(--error-btn-bg);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.error-btn:hover {
+    background-color: var(--error-btn-hover);
+}

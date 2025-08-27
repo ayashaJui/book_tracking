@@ -12,8 +12,5 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, Integer> {
     @Query("SELECT u FROM AuthUser u WHERE u.emailAddress = :emailAddress")
     Optional<AuthUser> findByEmailAddress(@Param("emailAddress") String emailAddress);
 
-    Optional<AuthUser> findByEmailAddressAndEnabledTrue(String email);
 
-    Optional<AuthUser> findByResetPasswordTokenAndEmailAddressAndTokenValidUptoGreaterThanEqualAndEnabledTrue(String token, String emailAddress, LocalDateTime localDateTime);
-    Optional<AuthUser> findByResetPasswordTokenAndTokenValidUptoGreaterThanEqualAndEnabledTrue(String token, LocalDateTime localDateTime);
 }

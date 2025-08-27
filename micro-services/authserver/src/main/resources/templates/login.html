@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login Page</title>
+
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" th:href="@{/css/login.css}" />
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="text-center">
+            <svg viewBox="0 0 54 40" xmlns="http://www.w3.org/2000/svg" width="64" height="48" style="margin-bottom: 1rem;">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
+                      fill="var(--primary-color)" />
+            </svg>
+            <div class="text-title">Welcome to BIBLIOTECA!</div>
+            <div class="text-subtitle">Sign in to continue</div>
+        </div>
+
+        <!-- Error message -->
+        <div th:if="${param.error}" class="error">
+            Invalid username or password.
+        </div>
+
+        <!-- Logout success message -->
+        <div th:if="${param.logout}" class="error" style="color:green;">
+            You have been logged out successfully.
+        </div>
+
+        <!-- Form -->
+        <form th:action="@{/login}" method="post">
+            <label for="username">Email</label>
+            <input id="username" type="text" name="username" placeholder="Email address" class="field-spacing" required/>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Password" class="field-spacing" required/>
+
+            <div class="flex justify-end">
+                <a href="#" class="forgot">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn">Sign In</button>
+
+            <!-- Sign Up -->
+            <div class="signup-text">
+                <span>Don't have an account?</span>
+                <a href="/signup" class="btn-signup">Sign Up</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+</body>
+</html>

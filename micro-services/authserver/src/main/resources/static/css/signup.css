@@ -1,0 +1,133 @@
+:root {
+    --primary-color: #2196f3;
+    --secondary-color: #e91e63;
+    --surface-0: #ffffff;
+    --surface-50: #f9fafb;
+    --surface-900: #111827;
+    --muted-color: #6b7280;
+    --error-color: #f44336;
+}
+
+/* Reset & Body */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--surface-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    border-radius: 56px;
+    padding: 0.3rem;
+    background: linear-gradient(180deg, rgba(33, 150, 243, 0.2) 10%, rgba(33, 150, 243, 0) 30%);
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Card */
+.card {
+    background: var(--surface-0);
+    border-radius: 53px;
+    padding: 3rem 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+/* Centered text */
+.text-center {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.text-title {
+    color: var(--surface-900);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.text-subtitle {
+    color: var(--muted-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Labels and Inputs */
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--surface-900);
+}
+
+input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    transition: border 0.3s;
+}
+
+input[type="email"]:focus, input[type="password"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Submit button */
+.btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background-color: #1976d2;
+}
+
+/* Signup redirect text */
+.signup-text {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--muted-color);
+}
+
+.signup-text a {
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.3rem;
+    transition: color 0.3s;
+}
+
+.signup-text a:hover {
+    color: var(--primary-color);
+}
+
+/* Error message */
+.error {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.error-msg {
+    color: red;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+    display: block;
+}

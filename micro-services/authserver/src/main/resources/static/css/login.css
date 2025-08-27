@@ -1,0 +1,170 @@
+:root {
+    --primary-color: #2196f3;
+    --surface-0: #ffffff;
+    --surface-50: #f9fafb;
+    --surface-900: #111827;
+    --muted-color: #6b7280;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--surface-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem; /* for mobile spacing */
+    box-sizing: border-box;
+}
+
+.container {
+    border-radius: 56px;
+    padding: 0.3rem;
+    background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);
+    width: 100%;
+    max-width: 480px; /* ensures card doesn't overflow */
+    box-sizing: border-box;
+}
+
+.card {
+    background: var(--surface-0);
+    border-radius: 53px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.text-title {
+    color: var(--surface-900);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.text-subtitle {
+    color: var(--muted-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--surface-900);
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 1rem; /* reduce spacing for error below */
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.error-msg {
+    color: red;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.field-spacing {
+    margin-bottom: 1.5rem;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.forgot {
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.forgot:hover {
+    text-decoration: underline;
+}
+
+.btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-bottom: 1rem;
+}
+
+.btn:hover {
+    background-color: #1976d2;
+}
+
+.signup-text {
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+/* Sign Up Button / Link */
+.btn-signup {
+    display: inline-block;
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 8px;
+    color: #2196f3;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.btn-signup:hover {
+    color: #1976d2;
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .container {
+        padding: 0.2rem;
+    }
+
+    .card {
+        padding: 2rem 1.5rem;
+    }
+
+    .text-title {
+        font-size: 1.6rem;
+    }
+
+    .text-subtitle {
+        font-size: 0.95rem;
+    }
+}

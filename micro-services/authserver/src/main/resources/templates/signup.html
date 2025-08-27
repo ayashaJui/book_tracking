@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign Up</title>
+
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" th:href="@{/css/signup.css}" />
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="text-center">
+            <svg viewBox="0 0 54 40" xmlns="http://www.w3.org/2000/svg" width="64" height="48" style="margin-bottom: 1rem;">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
+                      fill="var(--primary-color)" />
+            </svg>
+            <div class="text-title">Join BIBLIOTECA!</div>
+            <div class="text-subtitle">Create your account</div>
+        </div>
+
+        <!-- Error message -->
+        <div th:if="${param.error}" class="error">
+            Something went wrong. Please try again.
+        </div>
+
+        <form th:action="@{/signup}" method="post" id="signupForm">
+
+            <label for="emailAddress">Email</label>
+            <input id="emailAddress" type="email" name="emailAddress" placeholder="Email address"/>
+            <span class="error-msg" id="emailError"></span>
+
+            <label for="password_hash">Password</label>
+            <input id="password_hash" type="password" name="password_hash" placeholder="Password"/>
+            <span class="error-msg" id="passwordError"></span>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm Password"/>
+            <span class="error-msg" id="confirmPasswordError"></span>
+
+            <button type="submit" class="btn">Sign Up</button>
+
+            <div class="signup-text">
+                <span>Already have an account?</span>
+                <a href="/login" class="btn-signup">Sign In</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const emailInput = document.getElementById("emailAddress");
+        const passwordInput = document.getElementById("password_hash");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const confirmPasswordError = document.getElementById("confirmPasswordError");
+
+        // Helper regex patterns
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+        // Email validation on input
+        emailInput.addEventListener("input", function () {
+            const value = emailInput.value.trim();
+            if (!value) {
+                emailError.textContent = "Email is required.";
+            } else if (!emailPattern.test(value)) {
+                emailError.textContent = "Please enter a valid email address.";
+            } else {
+                emailError.textContent = "";
+            }
+        });
+
+        // Password validation on input
+        passwordInput.addEventListener("input", function () {
+            const value = passwordInput.value.trim();
+            if (!value) {
+                passwordError.textContent = "Password is required.";
+            } else if (!passwordPattern.test(value)) {
+                passwordError.textContent = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.";
+            } else {
+                passwordError.textContent = "";
+            }
+
+            // Also check confirm password live
+            if (confirmPasswordInput.value && confirmPasswordInput.value !== value) {
+                confirmPasswordError.textContent = "Passwords do not match.";
+            } else {
+                confirmPasswordError.textContent = "";
+            }
+        });
+
+        // Confirm password validation on input
+        confirmPasswordInput.addEventListener("input", function () {
+            if (!confirmPasswordInput.value) {
+                confirmPasswordError.textContent = "Confirm Password is required.";
+            } else if (confirmPasswordInput.value !== passwordInput.value) {
+                confirmPasswordError.textContent = "Passwords do not match.";
+            } else {
+                confirmPasswordError.textContent = "";
+            }
+        });
+
+        // Final check on form submit
+        const form = document.getElementById("signupForm");
+        form.addEventListener("submit", function (e) {
+            if (emailError.textContent || passwordError.textContent || confirmPasswordError.textContent) {
+                e.preventDefault(); // prevent submission if errors exist
+            }
+        });
+    });
+</script>
+
+
+
+
+</body>
+
+</html>
