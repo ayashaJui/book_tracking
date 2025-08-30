@@ -1,6 +1,6 @@
 CREATE TABLE user_preferences (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    auth_user_id INT REFERENCES auth_users(id) ON DELETE CASCADE,
     theme VARCHAR(50) DEFAULT 'light',
     language VARCHAR(10) DEFAULT 'en',
     timezone VARCHAR(100) DEFAULT 'UTC',

@@ -1,6 +1,6 @@
 CREATE TABLE user_profile_settings (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    auth_user_id INT REFERENCES auth_users(id) ON DELETE CASCADE,
     profile_visibility VARCHAR(20) DEFAULT 'private', -- public, friends, private
     show_reading_progress BOOLEAN DEFAULT true,
     show_reading_goals BOOLEAN DEFAULT true,
