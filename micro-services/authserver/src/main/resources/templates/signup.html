@@ -22,25 +22,25 @@
         </div>
 
         <!-- Error message -->
-        <div th:if="${param.error}" class="error">
-            Something went wrong. Please try again.
+        <div th:if="${error}" class="error">
+            <span th:text="${error}" class="error-message display-block"></span>
         </div>
 
-        <form th:action="@{/signup}" method="post" id="signupForm">
+        <form th:action="@{/signup}" th:object="${userRegistrationDTO}" method="post" id="signupForm">
 
             <label for="emailAddress">Email</label>
             <input id="emailAddress" type="email" name="emailAddress" placeholder="Email address"/>
             <span class="error-msg" id="emailError"></span>
 
-            <label for="password_hash">Password</label>
-            <input id="password_hash" type="password" name="password_hash" placeholder="Password"/>
+            <label for="passwordHash">Password</label>
+            <input id="passwordHash" type="password" name="passwordHash" placeholder="Password"/>
             <span class="error-msg" id="passwordError"></span>
 
             <label for="confirmPassword">Confirm Password</label>
             <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm Password"/>
             <span class="error-msg" id="confirmPasswordError"></span>
 
-            <button type="submit" class="btn">Sign Up</button>
+            <button type="submit" class="btn"  id="sendOtpButtonText"  onsubmit="onSubmit()">Sign Up</button>
 
             <div class="signup-text">
                 <span>Already have an account?</span>
@@ -52,74 +52,86 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    // Patterns
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    // Validation functions
+    function validateEmail(emailInput, errorElement) {
+        const value = emailInput.value.trim();
+        if (!value) {
+            errorElement.textContent = "Email is required.";
+        } else if (!emailPattern.test(value)) {
+            errorElement.textContent = "Please enter a valid email address.";
+        } else {
+            errorElement.textContent = "";
+        }
+    }
+
+    function validatePassword(passwordInput, confirmPasswordInput, passwordError, confirmPasswordError) {
+        const value = passwordInput.value.trim();
+
+        if (!value) {
+            passwordError.textContent = "Password is required.";
+        } else if (!passwordPattern.test(value)) {
+            passwordError.textContent = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.";
+        } else {
+            passwordError.textContent = "";
+        }
+
+        if (confirmPasswordInput.value && confirmPasswordInput.value !== value) {
+            confirmPasswordError.textContent = "Passwords do not match.";
+        } else {
+            confirmPasswordError.textContent = "";
+        }
+    }
+
+    function validateConfirmPassword(confirmPasswordInput, passwordInput, errorElement) {
+        if (!confirmPasswordInput.value) {
+            errorElement.textContent = "Confirm Password is required.";
+        } else if (confirmPasswordInput.value !== passwordInput.value) {
+            errorElement.textContent = "Passwords do not match.";
+        } else {
+            errorElement.textContent = "";
+        }
+    }
+
+    // Form validation setup
+    function setupValidation() {
         const emailInput = document.getElementById("emailAddress");
-        const passwordInput = document.getElementById("password_hash");
+        const passwordInput = document.getElementById("passwordHash");
         const confirmPasswordInput = document.getElementById("confirmPassword");
 
         const emailError = document.getElementById("emailError");
         const passwordError = document.getElementById("passwordError");
         const confirmPasswordError = document.getElementById("confirmPasswordError");
 
-        // Helper regex patterns
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        emailInput.addEventListener("input", () => validateEmail(emailInput, emailError));
+        passwordInput.addEventListener("input", () => validatePassword(passwordInput, confirmPasswordInput, passwordError, confirmPasswordError));
+        confirmPasswordInput.addEventListener("input", () => validateConfirmPassword(confirmPasswordInput, passwordInput, confirmPasswordError));
 
-        // Email validation on input
-        emailInput.addEventListener("input", function () {
-            const value = emailInput.value.trim();
-            if (!value) {
-                emailError.textContent = "Email is required.";
-            } else if (!emailPattern.test(value)) {
-                emailError.textContent = "Please enter a valid email address.";
-            } else {
-                emailError.textContent = "";
-            }
-        });
-
-        // Password validation on input
-        passwordInput.addEventListener("input", function () {
-            const value = passwordInput.value.trim();
-            if (!value) {
-                passwordError.textContent = "Password is required.";
-            } else if (!passwordPattern.test(value)) {
-                passwordError.textContent = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.";
-            } else {
-                passwordError.textContent = "";
-            }
-
-            // Also check confirm password live
-            if (confirmPasswordInput.value && confirmPasswordInput.value !== value) {
-                confirmPasswordError.textContent = "Passwords do not match.";
-            } else {
-                confirmPasswordError.textContent = "";
-            }
-        });
-
-        // Confirm password validation on input
-        confirmPasswordInput.addEventListener("input", function () {
-            if (!confirmPasswordInput.value) {
-                confirmPasswordError.textContent = "Confirm Password is required.";
-            } else if (confirmPasswordInput.value !== passwordInput.value) {
-                confirmPasswordError.textContent = "Passwords do not match.";
-            } else {
-                confirmPasswordError.textContent = "";
-            }
-        });
-
-        // Final check on form submit
         const form = document.getElementById("signupForm");
         form.addEventListener("submit", function (e) {
+            validateEmail(emailInput, emailError);
+            validatePassword(passwordInput, confirmPasswordInput, passwordError, confirmPasswordError);
+            validateConfirmPassword(confirmPasswordInput, passwordInput, confirmPasswordError);
+
             if (emailError.textContent || passwordError.textContent || confirmPasswordError.textContent) {
-                e.preventDefault(); // prevent submission if errors exist
+                e.preventDefault();
             }
         });
-    });
+    }
+
+    // Button loader
+    function onSubmit(){
+        const btn = document.getElementById("sendOtpButtonText");
+        btn.innerText='';
+        btn.innerHTML='<div class="spinner-border" role="status"></div>';
+    }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", setupValidation);
 </script>
 
-
-
-
 </body>
-
 </html>

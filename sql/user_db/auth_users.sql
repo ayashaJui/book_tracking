@@ -15,7 +15,8 @@ CREATE TABLE auth_users (
     otp_date TIMESTAMP,
     email_verified BOOLEAN,
     reset_password_token VARCHAR(255),
-    token_valid_upto TIMESTAMP
+    token_valid_upto TIMESTAMP,
+    otp VARCHAR(100)
 );
 
 CREATE TABLE user_authorities (
