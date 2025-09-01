@@ -2,6 +2,7 @@ package com.biblioteca.userservice.controller;
 
 import com.biblioteca.userservice.dto.authUser.AuthUserDTO;
 import com.biblioteca.userservice.dto.authentication.AuthUserRegistrationRequestDTO;
+import com.biblioteca.userservice.dto.authentication.VerifyOTPDTO;
 import com.biblioteca.userservice.dto.response.ResponseDTO;
 import com.biblioteca.userservice.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,4 +39,11 @@ public class AuthenticationController {
 
         return new ResponseEntity<>(new ResponseDTO<>(authUserDTO, "success", HttpStatus.OK.value()),HttpStatus.OK);
     }
+
+    @PostMapping("/verify_otp")
+    @Operation(summary = "API ID: Authentication003")
+    private ResponseEntity<ResponseDTO<AuthUserDTO>> verifyOtp(@RequestBody @Valid VerifyOTPDTO verifyOTP){
+        log.info(("AuthenticationController verifyOtp is called with data: {}"), verifyOTP.toString());
+        AuthUserDTO dto = authenticationService.verifyOTP(verifyOTP);
+        return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()),HttpStatus.OK);}
 }

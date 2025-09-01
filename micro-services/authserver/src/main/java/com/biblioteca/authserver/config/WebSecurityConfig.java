@@ -19,6 +19,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->{
                     authorizeRequests
                             .requestMatchers("/login**").permitAll()
+                            .requestMatchers("otp-page**").permitAll()
                             .requestMatchers("/error").permitAll()
                             .requestMatchers("/signup**").permitAll()
                             .requestMatchers("/css/**").permitAll()
