@@ -51,6 +51,9 @@ public class SignupController {
                 if(user != null && user.get("id") != null){
                     authUserId = user.get("id").toString();
                 }
+
+                Integer.parseInt(authUserId);
+
                 redirectAttributes.addAttribute("id", authUserId);
                 return "redirect:/otp-page";
             }else{

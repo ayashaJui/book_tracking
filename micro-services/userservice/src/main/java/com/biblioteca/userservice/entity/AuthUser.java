@@ -1,12 +1,15 @@
 package com.biblioteca.userservice.entity;
 
+import com.biblioteca.userservice.config.SimpleGrantedAuthorityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -72,10 +75,17 @@ public class AuthUser {
     @Column(name = "otp")
     private String otp;
 
+    // Roles in separate table
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "authority", nullable = false)
-    private Set<SimpleGrantedAuthority> authorities;
+    @Column(name = "authority")
+    private Set<String> authorities = new HashSet<>();
 
+    @Transient
+    public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet());
+    }
 
 }

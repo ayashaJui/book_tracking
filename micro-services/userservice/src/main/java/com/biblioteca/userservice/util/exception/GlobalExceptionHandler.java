@@ -3,6 +3,8 @@ package com.biblioteca.userservice.util.exception;
 import com.biblioteca.userservice.dto.response.ResponseDTO;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -54,6 +56,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ResponseDTO<String>> handleCustomException(CustomException exception) {
         log.error("Exception: {}", exception.getLocalizedMessage());
-        return new ResponseEntity<>(new ResponseDTO<>("error", exception.getMessage(), BAD_REQUEST.value()), BAD_REQUEST);
+
+        // data is a string, for example, "error" or the HTTP reason phrase
+        String data = HttpStatus.valueOf(exception.getCode()).getReasonPhrase();
+
+        ResponseDTO<String> response = new ResponseDTO<>();
+        response.setData(data);
+        response.setMessage(exception.getMessage());
+        response.setCode(exception.getCode());
+
+        // Use HttpStatus.valueOf to set the HTTP status correctly
+        return new ResponseEntity<>(response, HttpStatus.valueOf(exception.getCode()));
     }
 }

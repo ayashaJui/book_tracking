@@ -24,3 +24,12 @@ CREATE TABLE user_authorities (
     authority VARCHAR(100) NOT NULL,
     PRIMARY KEY (id, authority)
 );
+
+CREATE TABLE user_authorities (
+    id BIGINT NOT NULL,
+    authority VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_authorities_auth_users
+        FOREIGN KEY (id) REFERENCES auth_users(id)
+        ON DELETE CASCADE
+);
+

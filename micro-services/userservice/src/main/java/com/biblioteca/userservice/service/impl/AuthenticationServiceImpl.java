@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -44,21 +44,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException("Password and Confirm Password do not match", HttpStatus.BAD_REQUEST.value());
         }
 
-        Optional<AuthUser> existingUser = authUserRepository.findByEmailAddress(registrationRequestDTO.getEmailAddress());
-
-        if(existingUser.isPresent()){
-            log.error("User already exists with email: {}", registrationRequestDTO.getEmailAddress());
+        if (authUserRepository.findByEmailAddress(registrationRequestDTO.getEmailAddress()).isPresent()) {
             throw new CustomException("User already exists with this email", HttpStatus.CONFLICT.value());
         }
 
         try{
             AuthUser authUser = new AuthUser();
+
             authUser.setEmailAddress(registrationRequestDTO.getEmailAddress());
             authUser.setPasswordHash(passwordEncoder.encode(registrationRequestDTO.getPasswordHash()));
 
-            ArrayList<String> authorities = new ArrayList<>();
-            authorities.add(Authorities.USER.name());
-            authUser.setAuthorities(authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet()));
+            // Assign USER role
+            Set<String> roles = new HashSet<>();
+            roles.add(Authorities.USER.name());
+            authUser.setAuthorities(roles);
 
             authUser.setOtp(generateOTP());
             authUser.setOtpDate(LocalDateTime.now());
@@ -70,7 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             authUserRepository.save(authUser);
             log.info("User registered successfully with emailAddress: {}", registrationRequestDTO.getEmailAddress());
 
-            return genericMapper.toDTO(authUser, AuthUserMapper::toRegisterUserDTO);
+            return AuthUserMapper.toRegisterUserDTO(authUser);
 
         }catch(Exception e){
             log.error("Error occurred while registering user with emailAddress: {}. Error: {}", registrationRequestDTO.getEmailAddress(), e.getMessage());
@@ -100,5 +99,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return RANDOM.ints(6, 0, Constants.CHARACTERS.length())
                 .mapToObj(i -> String.valueOf(Constants.CHARACTERS.charAt(i)))
                 .collect(Collectors.joining());
+    }
+
+    public AuthUserDTO convertToDto(AuthUser authUser) {
+        return AuthUserMapper.toDto(authUser);
     }
 }
