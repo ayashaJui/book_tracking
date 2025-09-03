@@ -27,11 +27,11 @@
             <div class="text-subtitle">Enter the 6-digit code sent to your email</div>
         </div>
 
-        <div th:if="${errormessage}">
-            <span th:text="${errormessage}" class="alert alert-danger error-message display-block"></span>
+        <div th:if="${error}">
+            <span th:text="${error}"  class="alert alert-danger error-message display-block"></span>
         </div>
 
-        <form  th:action="@{/verify_otp}" th:object="${verifyEmailOtp}" method="post">
+        <form  th:action="@{/otp-page}" th:object="${emailOtpDTO}" method="post">
             <div class="otp-inputs ">
                 <input type="text" class="otp-field" id="digit1" maxlength="1" oninput="moveToNext(this, 'digit2')" onkeypress="return isDigit(event)" onpaste="handlePaste(event)">
                 <input type="text" class="otp-field" id="digit2" maxlength="1" oninput="moveToNext(this, 'digit3')" onkeypress="return isDigit(event)" disabled>
@@ -42,15 +42,16 @@
             </div>
 
             <div class="submit-form text-center">
-                <button type="submit" disabled class="btn" id="otp-verify"><i class="bi bi-patch-check"></i>&nbsp;Verify</button>
+                <button type="submit" disabled class="btn" id="otp-verify" onclick=""><i class="bi bi-patch-check"></i>&nbsp;Verify</button>
             </div>
 
             <div class="signup-text">
                 <span>Didn’t receive the code?</span>
-                <a class="btn-signup" style="pointer-events:none; opacity:0.5; display:none;" th:if="*{otpRetryCount>0}" id="btnOtpResend">Resend OTP</a>
-                <div id="timerText" style="margin-top:0.5rem; font-size:0.9rem; color:var(--muted-color);">
-                    Resend available in <span id="timer">120</span>s
-                </div>
+                <a class="btn-signup" style="pointer-events:none; opacity:0.5; display:none;" th:if="*{otpRetryCount>0}" id="btnOtpResend" onclick="resendOTP()">Resend OTP</a>
+<!--                <div id="timerText" style="margin-top:0.5rem; font-size:0.9rem; color:var(&#45;&#45;muted-color);">-->
+<!--                    Resend available in <span id="timer">120</span>s-->
+<!--                </div>-->
+                <p th:if="*{otpRetryCount>=0}" class="otp-timer" id="resendOtpTimerInfo"></p>
                 <p th:if="*{otpRetryCount>0}" id="remainingAttempts">
                     <span id="attemptCount" th:text="*{otpRetryCount}"></span>&nbsp;attempts remaining
                 </p>
@@ -59,7 +60,7 @@
 
             <input type="hidden" th:field="*{authUserId}" id="uid">
             <input type="hidden" th:field="*{emailAddress}" id="verifySubject">
-            <input type="hidden" th:field="*{otp}" id="otp">
+            <input type="hidden" th:field="*{otp}" id="finalOTP">
             <input type="hidden" th:field="*{resendOtpRemainingTime}" id="remainingTime">
             <input type="hidden" th:field="*{otpRetryCount}" id="retryCounter">
         </form>
@@ -67,122 +68,132 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- OTP Input Logic ---
-        const otpInputs = document.querySelectorAll('.otp-inputs input');
-        otpInputs.forEach((input, idx) => {
-            input.addEventListener('input', function(e) {
-                // Only allow digits
-                let val = input.value.replace(/[^0-9]/g, '');
-                input.value = val;
-                if (val.length === 1 && idx < otpInputs.length - 1) {
-                    otpInputs[idx + 1].disabled = false;
-                    otpInputs[idx + 1].focus();
-                }
-                enableSubmit();
-            });
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace') {
-                    if (input.value === '' && idx > 0) {
-                        otpInputs[idx - 1].disabled = false;
-                        otpInputs[idx - 1].focus();
-                        otpInputs[idx - 1].select();
-                    }
-                }
-            });
-            input.addEventListener('paste', function(e) {
-                e.preventDefault();
-                const pasteData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
-                for (let i = 0; i < otpInputs.length; i++) {
-                    otpInputs[i].value = pasteData[i] || '';
-                    otpInputs[i].disabled = false;
-                }
-                let lastFilled = 0;
-                for (let i = 0; i < otpInputs.length; i++) {
-                    if (otpInputs[i].value) lastFilled = i;
-                }
-                otpInputs[lastFilled].focus();
-                enableSubmit();
-            });
-        });
-        // --- End OTP Input Logic ---
+    let retryTimerInterval;
 
-        // --- Timer and Resend Logic ---
-        let retryTimerInterval;
-        document.getElementById('otp').value='';
-        let remaining_time = parseInt(document.getElementById("remainingTime")?.value) || 120;
-        let retry_count = parseInt(document.getElementById("retryCounter")?.value) || 0;
-        if(document.getElementById("timer")) {
-            document.getElementById("timer").innerText = remaining_time;
-        }
-        retryTimerInterval = setInterval(function (){
-            if(document.getElementById("remainingTime")){
-                if(remaining_time>0 && retry_count>=0){
-                    remaining_time-=1;
-                    document.getElementById("remainingTime").value = remaining_time;
-                    if(document.getElementById("timer")) {
-                        document.getElementById("timer").innerText = remaining_time;
-                    }
-                    if(document.getElementById("btnOtpResend")) {
-                        document.getElementById("btnOtpResend").style.display='none';
-                    }
-                    if(document.getElementById("timerText")) {
-                        document.getElementById("timerText").style.display='block';
-                    }
-                }
-                else {
-                    if(document.getElementById("btnOtpResend")) {
-                        document.getElementById("btnOtpResend").style.display='inline-block';
-                        document.getElementById("btnOtpResend").style.pointerEvents='auto';
-                        document.getElementById("btnOtpResend").style.opacity='1';
-                    }
-                    if(document.getElementById("timerText")) {
-                        document.getElementById("timerText").style.display='none';
-                    }
-                    clearInterval(retryTimerInterval);
-                }
-            }
-        }, 1000);
+    document.getElementById('finalOTP').value='';
 
-        function resendOTP(){
-            let uid = document.getElementById("uid").value;
+    retryTimerInterval = setInterval(function (){
+        if(document.getElementById("remainingTime")){
+            let remaining_time = parseInt(document.getElementById("remainingTime").value);
+            let retry_count = parseInt(document.getElementById("retryCounter").value);
 
-            fetch('/resend_email_otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ "authUserId": uid})
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                window.location.href = '/verify-email?id=' + uid;
-            })
-                .catch(error => {
-                    console.error('There was a problem with your fetch operation:', error);
-                });
-        }
+            if(remaining_time > 0 && retry_count >= 0){
+                remaining_time -= 1;
+                document.getElementById("remainingTime").value = remaining_time;
 
-        function enableSubmit() {
-            const inputs = document.querySelectorAll('.otp-inputs input');
-            let filled = true;
-            let otp = '';
-            inputs.forEach(input => {
-                if (input.value === '') {
-                    filled = false;
-                } else {
-                    otp += input.value;
+                // Show timer text
+                const timerInfo = document.getElementById("resendOtpTimerInfo");
+                timerInfo.style.display = 'block';
+                timerInfo.innerText = 'Resend OTP in ' + remaining_time + 's';
+
+                if(document.getElementById("btnOtpResend")) {
+                    document.getElementById("btnOtpResend").style.display = 'none';
                 }
-            });
-            document.getElementById('otp').value = otp;
-            if(filled && otp.length === inputs.length){
-                document.getElementById('otp-verify').removeAttribute('disabled');
             } else {
-                document.getElementById('otp-verify').setAttribute('disabled', 'disabled');
+                if(document.getElementById("btnOtpResend")) {
+                    let btn = document.getElementById("btnOtpResend");
+                    btn.style.display = 'inline-block';
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.opacity = '1';
+                }
+                document.getElementById("resendOtpTimerInfo").style.display = 'none';
+                clearInterval(retryTimerInterval);
             }
         }
+    }, 1000);
+
+    function resendOTP(){
+        let uid = document.getElementById("uid").value;
+
+        fetch('/resend_email_otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "authUserId": uid})
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            window.location.href = '/otp-page?id=' + uid;
+        })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+            });
+    }
+
+    function moveToNext(current, nextFieldId) {
+        if (current.value.length === 1) {
+            const nextField = document.getElementById(nextFieldId);
+            nextField.disabled = false;
+            nextField.focus();
+            current.disabled = true;
+        }
+        enableSubmit();
+    }
+
+    document.querySelectorAll('.otp-inputs input').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace') {
+                const prevInput = input.previousElementSibling;
+                if (prevInput) {
+                    input.value = '';
+                    input.disabled = true;
+                    prevInput.disabled = false;
+                    prevInput.focus();
+                    prevInput.select();
+
+                    enableSubmit();
+                }
+            }
+        });
     });
+
+    function enableSubmit() {
+        const inputs = document.querySelectorAll('.otp-inputs input');
+        let filled = true;
+        let otp = '';
+        inputs.forEach(input => {
+            if (input.value === '') {
+                filled = false;
+            } else {
+                otp += input.value;
+            }
+        });
+
+        if(filled){
+            document.getElementById('finalOTP').value=otp;
+            document.getElementById('otp-verify').removeAttribute('disabled');
+        } else {
+            document.getElementById('finalOTP').value='';
+            document.getElementById('otp-verify').setAttribute('disabled', 'disabled');
+        }
+    }
+
+    function handlePaste(event) {
+        event.preventDefault();
+        const pasteData = event.clipboardData.getData('text').split('');
+        const inputs = document.querySelectorAll('.otp-inputs input');
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].value = pasteData[i] || '';
+            if (i < inputs.length - 1) {
+                inputs[i].disabled = true;
+                inputs[i + 1].disabled = false;
+                inputs[i + 1].focus();
+            }
+        }
+        enableSubmit();
+    }
+
+    function isDigit(event) {
+        const charCode = event.charCode ? event.charCode : event.keyCode;
+        if (charCode < 48 || charCode > 57) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+
 </script>
 </body>
 </html>

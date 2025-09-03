@@ -15,6 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +28,14 @@ import java.util.Optional;
 public class SignupController {
     private final UserRegistrationService userRegistrationService;
     private final Environment environment;
+
+    private static final DateTimeFormatter FLEXIBLE_FORMATTER =
+            new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                    .optionalStart()
+                    .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, false)
+                    .optionalEnd()
+                    .toFormatter();
 
     @GetMapping("/signup")
     public String signup(Model model) {
@@ -83,6 +94,8 @@ public class SignupController {
         try{
             UserRegistrationResponseDTO responseDTO = userRegistrationService.getRegisteredUserInfo(id).block();
 
+
+
             if(responseDTO == null ){
                 model.addAttribute("emailOtpDTO", new EmailOtpDTO());
                 model.addAttribute("error", "Failed to fetch user details. Please register again.");
@@ -91,6 +104,7 @@ public class SignupController {
 
             if(responseDTO.getCode() == 200){
                 HashMap<String, Object> user = (HashMap<String, Object>) responseDTO.getData();
+                log.info("Response from getRegisteredUserInfo: {}", user);
                 String emailAddress = "";
                 if(user != null && user.get("emailAddress") != null){
                     emailAddress = user.get("emailAddress").toString();
@@ -100,8 +114,10 @@ public class SignupController {
 
                 int retryLimit = Integer.parseInt(Objects.requireNonNull(environment.getProperty("otp.retry.limit")));
                 otpRetryCount = retryLimit - otpRetryCount;
+
                 long remainingTime = getDuration(otpDate);
-                model.addAttribute("verifyEmailOtp", new EmailOtpDTO(id, emailAddress, "", Long.toString(remainingTime), otpRetryCount));
+
+                model.addAttribute("emailOtpDTO", new EmailOtpDTO(id, emailAddress, "", Long.toString(remainingTime), otpRetryCount));
             }else{
                 model.addAttribute("emailOtpDTO", new EmailOtpDTO());
                 model.addAttribute("error", responseDTO.getMessage());
@@ -115,9 +131,9 @@ public class SignupController {
         }
     }
 
-    @PostMapping("/verify_otp")
-    public String verifyOtp(@ModelAttribute @Valid VerifyEmailOTPDTO verifyEmailOTPDTO, Model model, RedirectAttributes redirectAttributes) {
-        log.info("SignupController verifyOtp is called with: {}", verifyEmailOTPDTO.toString());
+    @PostMapping("/otp-page")
+    public String verifyOtp(@ModelAttribute @Valid EmailOtpDTO verifyEmailOTPDTO, Model model, RedirectAttributes redirectAttributes) {
+        log.info("SignupController verifyOtp is called with: {}", verifyEmailOTPDTO.getAuthUserId());
 
         try{
             UserRegistrationResponseDTO responseDTO = userRegistrationService.verifyEmailOtp(verifyEmailOTPDTO).block();
@@ -129,19 +145,19 @@ public class SignupController {
                     redirectAttributes.addAttribute("id", authUserId);
                     return "redirect:/status";
                 }else {
-                    model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+                    model.addAttribute("emailOtpDTO", verifyEmailOTPDTO);
                     model.addAttribute("error", responseDTO.getMessage());
                     return "otp-page";
                 }
             }else{
-                model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+                model.addAttribute("emailOtpDTO", verifyEmailOTPDTO);
                 model.addAttribute("error", "OTP verification failed. Please try again.");
                 return "otp-page";
             }
 
         }catch(Exception e){
             log.error("Error during OTP verification: {}", e.getMessage());
-            model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+            model.addAttribute("emailOtpDTO", verifyEmailOTPDTO);
             model.addAttribute("error", "OTP verification failed. Please try again.");
             return "otp-page";
         }
@@ -176,9 +192,27 @@ public class SignupController {
     }
 
     private long getDuration(String otpDate) {
-        Duration duration = Duration.between(LocalDateTime.parse(otpDate), LocalDateTime.now());
-        long seconds = duration.toSeconds();
-        seconds = seconds < 0 ? 0 : seconds;
-        return (60 - seconds) > 0 ? (60 - seconds) : 0;
+//        Duration duration = Duration.between(LocalDateTime.parse(otpDate), LocalDateTime.now());
+//        log.info("Duration: {}", duration);
+//        long seconds = duration.toSeconds();
+//        log.info("Seconds: {}", seconds);
+//        seconds = seconds < 0 ? 0 : seconds;
+//        log.info("Seconds: {}", seconds);
+//        return (60 - seconds) > 0 ? (60 - seconds) : 0;
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true) // allow 0–9 fraction digits
+                .toFormatter();
+
+        LocalDateTime createdAt = LocalDateTime.parse(otpDate, formatter);
+
+        Duration duration = Duration.between(createdAt, LocalDateTime.now());
+        long elapsedSeconds = duration.toSeconds();
+
+        long validityPeriod = 120; // 2 minutes
+        long remaining = validityPeriod - elapsedSeconds;
+
+        return remaining > 0 ? remaining : 0;
+
     }
 }

@@ -1,37 +1,40 @@
 :root {
     --primary-color: #2196f3;
-    --surface-0: #ffffff;
-    --surface-50: #f9fafb;
-    --surface-900: #111827;
-    --muted-color: #6b7280;
+    --background-dark: #121212;
+    --surface-dark: #1e1e1e;
+    --surface-light-dark: #2c2c2c;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --muted-color: #9ca3af;
+    --error-color: #f87171;
 }
 
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: var(--surface-50);
+    background-color: var(--background-dark);
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 1rem; /* for mobile spacing */
+    padding: 1rem;
     box-sizing: border-box;
 }
 
 .container {
     border-radius: 56px;
     padding: 0.3rem;
-    background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);
+    background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0.2) 30%);
     width: 100%;
-    max-width: 480px; /* ensures card doesn't overflow */
+    max-width: 480px;
     box-sizing: border-box;
 }
 
 .card {
-    background: var(--surface-0);
+    background: var(--surface-dark);
     border-radius: 53px;
     padding: 2.5rem 2rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
     width: 100%;
     box-sizing: border-box;
 }
@@ -42,14 +45,14 @@ body {
 }
 
 .text-title {
-    color: var(--surface-900);
+    color: var(--text-primary);
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 .text-subtitle {
-    color: var(--muted-color);
+    color: var(--text-secondary);
     font-size: 1rem;
     font-weight: 500;
 }
@@ -59,21 +62,27 @@ label {
     margin-bottom: 0.5rem;
     font-weight: 500;
     font-size: 1rem;
-    color: var(--surface-900);
+    color: var(--text-primary);
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid #444;
+    background-color: var(--surface-light-dark);
     border-radius: 8px;
-    margin-bottom: 1rem; /* reduce spacing for error below */
+    margin-bottom: 1rem;
     font-size: 1rem;
+    color: var(--text-primary);
     box-sizing: border-box;
 }
 
+input::placeholder {
+    color: var(--muted-color);
+}
+
 .error-msg {
-    color: red;
+    color: var(--error-color);
     font-size: 0.85rem;
     margin-bottom: 1rem;
     display: block;
@@ -126,16 +135,16 @@ input[type="text"], input[type="email"], input[type="password"] {
 .signup-text {
     text-align: center;
     font-size: 0.95rem;
+    color: var(--text-secondary);
 }
 
-/* Sign Up Button / Link */
 .btn-signup {
     display: inline-block;
     width: 100%;
     padding: 0.85rem;
     border: none;
     border-radius: 8px;
-    color: #2196f3;
+    color: var(--primary-color);
     text-decoration: none;
     font-size: 1rem;
     font-weight: 600;

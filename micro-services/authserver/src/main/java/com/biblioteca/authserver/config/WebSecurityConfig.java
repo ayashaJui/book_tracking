@@ -19,7 +19,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->{
                     authorizeRequests
                             .requestMatchers("/login**").permitAll()
-                            .requestMatchers("otp-page**").permitAll()
+                            .requestMatchers("/otp-page**", "/verify_otp", "/resend_email_otp").permitAll()
                             .requestMatchers("/error").permitAll()
                             .requestMatchers("/signup**").permitAll()
                             .requestMatchers("/status**").permitAll()

@@ -67,7 +67,7 @@ public class UserRegistrationService {
                 });
     }
 
-    public Mono<UserRegistrationResponseDTO> verifyEmailOtp(VerifyEmailOTPDTO verifyEmailOTPDTO) {
+    public Mono<UserRegistrationResponseDTO> verifyEmailOtp(EmailOtpDTO verifyEmailOTPDTO) {
         log.info("verifyEmailOtp is called with: {}", verifyEmailOTPDTO.toString());
         return webClient.post()
                 .uri(UserRegistrationAPIEnums.VERIFY_EMAIL_OTP_API.value)

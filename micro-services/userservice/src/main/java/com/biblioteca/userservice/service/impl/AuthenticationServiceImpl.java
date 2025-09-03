@@ -116,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         checkIfUserAlreadyVerified(authUser);
 
-        if(compareOTP(authUser.getOtp(), authUser)){
+        if(compareOTP(verifyOTP.getOtp(), authUser)){
             authUser.setEmailVerified(true);
             authUser.setOtp(null);
             authUser.setOtpDate(null);
@@ -190,7 +190,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private boolean compareOTP(String otp, AuthUser authUser) {
-        log.info("Compare OTP is called");
+        log.info("Compare OTP is called: {}, {}", otp, authUser.getOtp());
 
         if(authUser.getOtp().equals(otp)){
             Duration duration = Duration.between(authUser.getOtpDate(), LocalDateTime.now());

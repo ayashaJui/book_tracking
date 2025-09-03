@@ -67,6 +67,19 @@ body {
     border-color: var(--primary-color);
     background-color: #333;
 }
+ #otp-verify {
+     padding: 0.75rem 2.5rem;
+     font-size: 1.25rem;
+     min-width: 180px;
+ }
+
+.error-message {
+    color: red;
+    text-align: center;
+    display: block;
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
 
 /* Button */
 .btn {
