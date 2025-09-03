@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OTP Verified</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" th:href="@{/css/otp.css}"/>
+
+    <style>
+        /* Override card styles for better shadow and centering */
+        .card {
+            /*box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);*/
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Improved text-btn style with proper centering */
+        .text-btn {
+            display: block;
+            margin: 1.5rem auto 0;
+            width: fit-content;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .text-btn:hover {
+            color: var(--secondary-color);
+            background-color: rgba(var(--primary-color-rgb, 59, 130, 246), 0.1);
+            text-decoration: underline;
+        }
+
+        /* Ensure text center alignment for the entire card */
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card text-center">
+        <!-- Success Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+             fill="var(--primary-color)" viewBox="0 0 24 24" style="margin-bottom: 1rem;">
+            <path d="M20.285 6.709l-11.025 11.025-5.546-5.547 1.414-1.414
+                     4.132 4.132 9.611-9.611z"/>
+        </svg>
+
+        <div class="text-title">OTP Verified</div>
+        <div class="text-subtitle">
+            Your email has been verified successfully.<br/>
+            Redirecting you to the login page in <span id="redirectTimer">10</span> seconds...
+        </div>
+
+        <!-- Manual Login Text Button -->
+        <a th:href="@{/login}" class="text-btn">Go to Login</a>
+    </div>
+</div>
+
+<script>
+    let seconds = 10;
+    const timerEl = document.getElementById("redirectTimer");
+
+    const countdown = setInterval(() => {
+        seconds -= 1;
+        if (seconds >= 0) {
+            timerEl.textContent = seconds;
+        }
+        if (seconds === 0) {
+            clearInterval(countdown);
+            window.location.href = "/login"; // redirect
+        }
+    }, 1000);
+</script>
+</body>
+</html>

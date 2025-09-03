@@ -2,6 +2,7 @@ package com.biblioteca.userservice.controller;
 
 import com.biblioteca.userservice.dto.authUser.AuthUserDTO;
 import com.biblioteca.userservice.dto.authentication.AuthUserRegistrationRequestDTO;
+import com.biblioteca.userservice.dto.authentication.ResendOTPRequestDTO;
 import com.biblioteca.userservice.dto.authentication.VerifyOTPDTO;
 import com.biblioteca.userservice.dto.response.ResponseDTO;
 import com.biblioteca.userservice.service.AuthenticationService;
@@ -40,10 +41,18 @@ public class AuthenticationController {
         return new ResponseEntity<>(new ResponseDTO<>(authUserDTO, "success", HttpStatus.OK.value()),HttpStatus.OK);
     }
 
-    @PostMapping("/verify_otp")
+    @PostMapping("/verify_email_otp")
     @Operation(summary = "API ID: Authentication003")
     private ResponseEntity<ResponseDTO<AuthUserDTO>> verifyOtp(@RequestBody @Valid VerifyOTPDTO verifyOTP){
         log.info(("AuthenticationController verifyOtp is called with data: {}"), verifyOTP.toString());
         AuthUserDTO dto = authenticationService.verifyOTP(verifyOTP);
+        return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()),HttpStatus.OK);}
+
+
+    @PostMapping("/resend_email_otp")
+    @Operation(summary = "API ID: Authentication004")
+    private ResponseEntity<ResponseDTO<AuthUserDTO>> resendOtp(@RequestBody @Valid ResendOTPRequestDTO resendOTPRequestDTO){
+        log.info(("AuthenticationController resendOtp is called with data: {}"), resendOTPRequestDTO.toString());
+        AuthUserDTO dto = authenticationService.resendOTP(resendOTPRequestDTO);
         return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()),HttpStatus.OK);}
 }

@@ -4,16 +4,21 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>OTP Verification</title>
-
-    <!-- External CSS -->
     <link rel="stylesheet" th:href="@{/css/otp.css}"/>
+
+    <style>
+        #otp-verify {
+            padding: 0.75rem 2.5rem;
+            font-size: 1.25rem;
+            min-width: 180px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
         <div class="text-center">
-            <svg viewBox="0 0 54 40" xmlns="http://www.w3.org/2000/svg" width="64" height="48"
-                 style="margin-bottom: 1rem;">
+            <svg viewBox="0 0 54 40" xmlns="http://www.w3.org/2000/svg" width="64" height="48" style="margin-bottom: 1rem;">
                 <path fill-rule="evenodd" clip-rule="evenodd"
                       d="M17.1637 19.2467C17.1566 19.4033 17.1529 19.561 17.1529 19.7194C17.1529 25.3503 21.7203 29.915 27.3546 29.915C32.9887 29.915 37.5561 25.3503 37.5561 19.7194C37.5561 19.5572 37.5524 19.3959 37.5449 19.2355C38.5617 19.0801 39.5759 18.9013 40.5867 18.6994L40.6926 18.6782C40.7191 19.0218 40.7326 19.369 40.7326 19.7194C40.7326 27.1036 34.743 33.0896 27.3546 33.0896C19.966 33.0896 13.9765 27.1036 13.9765 19.7194C13.9765 19.374 13.9896 19.0316 14.0154 18.6927L14.0486 18.6994C15.0837 18.9062 16.1223 19.0886 17.1637 19.2467Z"
                       fill="var(--primary-color)"/>
@@ -22,137 +27,161 @@
             <div class="text-subtitle">Enter the 6-digit code sent to your email</div>
         </div>
 
-        <!-- Error -->
-        <div th:if="${param.error}" class="error">
-            Invalid OTP. Please try again.
+        <div th:if="${errormessage}">
+            <span th:text="${errormessage}" class="alert alert-danger error-message display-block"></span>
         </div>
 
-        <!-- Form -->
-        <form th:action="@{/verify-otp}" method="post" id="otpForm">
-
-            <div class="otp-inputs">
-                <input type="text" maxlength="1" class="otp-field"/>
-                <input type="text" maxlength="1" class="otp-field"/>
-                <input type="text" maxlength="1" class="otp-field"/>
-                <input type="text" maxlength="1" class="otp-field"/>
-                <input type="text" maxlength="1" class="otp-field"/>
-                <input type="text" maxlength="1" class="otp-field"/>
+        <form  th:action="@{/verify_otp}" th:object="${verifyEmailOtp}" method="post">
+            <div class="otp-inputs ">
+                <input type="text" class="otp-field" id="digit1" maxlength="1" oninput="moveToNext(this, 'digit2')" onkeypress="return isDigit(event)" onpaste="handlePaste(event)">
+                <input type="text" class="otp-field" id="digit2" maxlength="1" oninput="moveToNext(this, 'digit3')" onkeypress="return isDigit(event)" disabled>
+                <input type="text" class="otp-field" id="digit3" maxlength="1" oninput="moveToNext(this, 'digit4')" onkeypress="return isDigit(event)" disabled>
+                <input type="text" class="otp-field" id="digit4" maxlength="1" oninput="moveToNext(this, 'digit5')" onkeypress="return isDigit(event)" disabled>
+                <input type="text" class="otp-field" id="digit5" maxlength="1" oninput="moveToNext(this, 'digit6')" onkeypress="return isDigit(event)" disabled>
+                <input type="text" class="otp-field" id="digit6" maxlength="1" oninput="enableSubmit()" onkeypress="return isDigit(event)" disabled>
             </div>
 
-            <span class="error-msg" id="otpError"></span>
-
-            <button type="submit" class="btn" id="verifyOtpBtn" onsubmit="onSubmit()">Verify OTP</button>
+            <div class="submit-form text-center">
+                <button type="submit" disabled class="btn" id="otp-verify"><i class="bi bi-patch-check"></i>&nbsp;Verify</button>
+            </div>
 
             <div class="signup-text">
                 <span>Didn’t receive the code?</span>
-                <a href="/resend-otp" id="resendLink" class="btn-signup"
-                   style="pointer-events:none; opacity:0.5;">Resend OTP</a>
+                <a class="btn-signup" style="pointer-events:none; opacity:0.5; display:none;" th:if="*{otpRetryCount>0}" id="btnOtpResend">Resend OTP</a>
                 <div id="timerText" style="margin-top:0.5rem; font-size:0.9rem; color:var(--muted-color);">
-                    Resend available in <span id="timer">30</span>s
+                    Resend available in <span id="timer">120</span>s
                 </div>
+                <p th:if="*{otpRetryCount>0}" id="remainingAttempts">
+                    <span id="attemptCount" th:text="*{otpRetryCount}"></span>&nbsp;attempts remaining
+                </p>
+                <p th:if="*{otpRetryCount==0}">Resend limit finished!</p>
             </div>
+
+            <input type="hidden" th:field="*{authUserId}" id="uid">
+            <input type="hidden" th:field="*{emailAddress}" id="verifySubject">
+            <input type="hidden" th:field="*{otp}" id="otp">
+            <input type="hidden" th:field="*{resendOtpRemainingTime}" id="remainingTime">
+            <input type="hidden" th:field="*{otpRetryCount}" id="retryCounter">
         </form>
     </div>
 </div>
 
 <script>
-    // Collect OTP
-    function getOtpValue() {
-        return Array.from(document.querySelectorAll(".otp-field"))
-            .map(input => input.value.trim())
-            .join("");
-    }
-
-    // Auto-focus OTP fields
-    function setupOtpInputs() {
-        const inputs = document.querySelectorAll(".otp-field");
-        inputs.forEach((input, index) => {
-            input.addEventListener("input", () => {
-                if (input.value && index < inputs.length - 1) {
-                    inputs[index + 1].focus();
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- OTP Input Logic ---
+        const otpInputs = document.querySelectorAll('.otp-inputs input');
+        otpInputs.forEach((input, idx) => {
+            input.addEventListener('input', function(e) {
+                // Only allow digits
+                let val = input.value.replace(/[^0-9]/g, '');
+                input.value = val;
+                if (val.length === 1 && idx < otpInputs.length - 1) {
+                    otpInputs[idx + 1].disabled = false;
+                    otpInputs[idx + 1].focus();
+                }
+                enableSubmit();
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace') {
+                    if (input.value === '' && idx > 0) {
+                        otpInputs[idx - 1].disabled = false;
+                        otpInputs[idx - 1].focus();
+                        otpInputs[idx - 1].select();
+                    }
                 }
             });
-            input.addEventListener("keydown", (e) => {
-                if (e.key === "Backspace" && !input.value && index > 0) {
-                    inputs[index - 1].focus();
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
+                for (let i = 0; i < otpInputs.length; i++) {
+                    otpInputs[i].value = pasteData[i] || '';
+                    otpInputs[i].disabled = false;
                 }
+                let lastFilled = 0;
+                for (let i = 0; i < otpInputs.length; i++) {
+                    if (otpInputs[i].value) lastFilled = i;
+                }
+                otpInputs[lastFilled].focus();
+                enableSubmit();
             });
         });
-    }
+        // --- End OTP Input Logic ---
 
-    // Validate OTP
-    function validateOtp() {
-        const otp = getOtpValue();
-        const otpError = document.getElementById("otpError");
-        if (otp.length !== 6 || isNaN(otp)) {
-            otpError.textContent = "Please enter a valid 6-digit OTP.";
-            return false;
+        // --- Timer and Resend Logic ---
+        let retryTimerInterval;
+        document.getElementById('otp').value='';
+        let remaining_time = parseInt(document.getElementById("remainingTime")?.value) || 120;
+        let retry_count = parseInt(document.getElementById("retryCounter")?.value) || 0;
+        if(document.getElementById("timer")) {
+            document.getElementById("timer").innerText = remaining_time;
         }
-        otpError.textContent = "";
-        return true;
-    }
-
-    // Button Loader
-    function onSubmit() {
-        const btn = document.getElementById("verifyOtpBtn");
-        btn.innerText = '';
-        btn.innerHTML = '<div class="spinner-border" role="status"></div>';
-    }
-
-    // Global timer reference
-    let countdown;
-
-    function startTimer(seconds = 120) {  // 2 minutes = 120 seconds
-        clearInterval(countdown);
-
-        const resendLink = document.getElementById("resendLink");
-        const timerText  = document.getElementById("timerText");
-
-        // Reset UI
-        timerText.style.display = "block";
-        timerText.innerHTML = `Resend available in <span id="timer">${seconds}</span>s`;
-        const timerDisplay = document.getElementById("timer");
-
-        // Disable the link
-        resendLink.style.pointerEvents = "none";
-        resendLink.style.opacity = "0.5";
-
-        countdown = setInterval(() => {
-            seconds -= 1;
-
-            if (seconds >= 0) {
-                timerDisplay.textContent = String(seconds);
-            } else {
-                clearInterval(countdown);
-                timerText.style.display = "none"; // hide timer text
-                resendLink.style.pointerEvents = "auto"; // enable resend
-                resendLink.style.opacity = "1";
+        retryTimerInterval = setInterval(function (){
+            if(document.getElementById("remainingTime")){
+                if(remaining_time>0 && retry_count>=0){
+                    remaining_time-=1;
+                    document.getElementById("remainingTime").value = remaining_time;
+                    if(document.getElementById("timer")) {
+                        document.getElementById("timer").innerText = remaining_time;
+                    }
+                    if(document.getElementById("btnOtpResend")) {
+                        document.getElementById("btnOtpResend").style.display='none';
+                    }
+                    if(document.getElementById("timerText")) {
+                        document.getElementById("timerText").style.display='block';
+                    }
+                }
+                else {
+                    if(document.getElementById("btnOtpResend")) {
+                        document.getElementById("btnOtpResend").style.display='inline-block';
+                        document.getElementById("btnOtpResend").style.pointerEvents='auto';
+                        document.getElementById("btnOtpResend").style.opacity='1';
+                    }
+                    if(document.getElementById("timerText")) {
+                        document.getElementById("timerText").style.display='none';
+                    }
+                    clearInterval(retryTimerInterval);
+                }
             }
         }, 1000);
-    }
 
+        function resendOTP(){
+            let uid = document.getElementById("uid").value;
 
-    function setupForm() {
-        const form = document.getElementById("otpForm");
-        form.addEventListener("submit", function (e) {
-            if (!validateOtp()) {
-                e.preventDefault();
+            fetch('/resend_email_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "authUserId": uid})
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = '/verify-email?id=' + uid;
+            })
+                .catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+        }
+
+        function enableSubmit() {
+            const inputs = document.querySelectorAll('.otp-inputs input');
+            let filled = true;
+            let otp = '';
+            inputs.forEach(input => {
+                if (input.value === '') {
+                    filled = false;
+                } else {
+                    otp += input.value;
+                }
+            });
+            document.getElementById('otp').value = otp;
+            if(filled && otp.length === inputs.length){
+                document.getElementById('otp-verify').removeAttribute('disabled');
+            } else {
+                document.getElementById('otp-verify').setAttribute('disabled', 'disabled');
             }
-        });
-    }
-
-    function setupResend() {
-        const resendLink = document.getElementById("resendLink");
-        resendLink.addEventListener("click", function () {
-            startTimer(120); // restart timer with 2 minutes
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        setupOtpInputs();
-        setupForm();
-        setupResend();
-        startTimer(120); // initial countdown
+        }
     });
 </script>
 </body>

@@ -22,6 +22,7 @@ public class WebSecurityConfig {
                             .requestMatchers("otp-page**").permitAll()
                             .requestMatchers("/error").permitAll()
                             .requestMatchers("/signup**").permitAll()
+                            .requestMatchers("/status**").permitAll()
                             .requestMatchers("/css/**").permitAll()
                             .anyRequest().authenticated();
                 })

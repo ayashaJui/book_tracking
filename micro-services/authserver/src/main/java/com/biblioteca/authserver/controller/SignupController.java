@@ -1,23 +1,23 @@
 package com.biblioteca.authserver.controller;
 
-import com.biblioteca.authserver.dto.EmailOtpDTO;
-import com.biblioteca.authserver.dto.UserRegistrationDTO;
-import com.biblioteca.authserver.dto.UserRegistrationResponseDTO;
+import com.biblioteca.authserver.dto.*;
 import com.biblioteca.authserver.service.UserRegistrationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -113,6 +113,66 @@ public class SignupController {
             model.addAttribute("errorMessage", "Something went wrong. Please try again.");
             return "otp-page";
         }
+    }
+
+    @PostMapping("/verify_otp")
+    public String verifyOtp(@ModelAttribute @Valid VerifyEmailOTPDTO verifyEmailOTPDTO, Model model, RedirectAttributes redirectAttributes) {
+        log.info("SignupController verifyOtp is called with: {}", verifyEmailOTPDTO.toString());
+
+        try{
+            UserRegistrationResponseDTO responseDTO = userRegistrationService.verifyEmailOtp(verifyEmailOTPDTO).block();
+
+            if(responseDTO != null){
+                if(responseDTO.getCode() == 200){
+                    HashMap<String, Object> user = (HashMap<String, Object>) responseDTO.getData();
+                    int authUserId = (Integer) user.get("id");
+                    redirectAttributes.addAttribute("id", authUserId);
+                    return "redirect:/status";
+                }else {
+                    model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+                    model.addAttribute("error", responseDTO.getMessage());
+                    return "otp-page";
+                }
+            }else{
+                model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+                model.addAttribute("error", "OTP verification failed. Please try again.");
+                return "otp-page";
+            }
+
+        }catch(Exception e){
+            log.error("Error during OTP verification: {}", e.getMessage());
+            model.addAttribute("verifyEmailOtp", verifyEmailOTPDTO);
+            model.addAttribute("error", "OTP verification failed. Please try again.");
+            return "otp-page";
+        }
+    }
+
+    @PostMapping("/resend_email_otp")
+    public ResponseEntity<ResponseDTO<String>> resendOtp(@RequestBody @Valid ResendOTPRequestDTO resendOTPRequestDTO) {
+        log.info("SignupController resendOtp is called with: {}", resendOTPRequestDTO.toString());
+
+        try{
+            UserRegistrationResponseDTO responseDTO = userRegistrationService.resendEmailOtp(resendOTPRequestDTO).block();
+
+            if(Optional.ofNullable(responseDTO).isEmpty()){
+                log.error("Empty Response for email resend otp request");
+                return new ResponseEntity<>(new ResponseDTO<>(null, "Failed", HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }else{
+                return new ResponseEntity<>(new ResponseDTO<>("OTP resent", "Success", HttpStatus.OK.value()), HttpStatus.OK);
+            }
+
+        }catch(Exception e){
+            log.error("Error during resending OTP: {}", e.getMessage());
+            return new ResponseEntity<>(new ResponseDTO<>("error", "Failed", HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/status")
+    public String status(@ModelAttribute("message") String message, @ModelAttribute("action")  String action, Model model){
+        model.addAttribute("status", message);
+        model.addAttribute("action", action);
+        return "status";
     }
 
     private long getDuration(String otpDate) {
