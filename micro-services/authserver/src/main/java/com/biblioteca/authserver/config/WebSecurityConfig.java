@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                     httpSecurityFormLoginConfigurer
                             .loginPage("/login")
                             .loginProcessingUrl("/login")
-                            .defaultSuccessUrl("http://127.0.0.1:4200", true)
+                            .defaultSuccessUrl("http://localhost:4200", true)
                             .permitAll();
                 });
 

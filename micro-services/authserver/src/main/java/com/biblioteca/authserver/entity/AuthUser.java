@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -71,5 +72,6 @@ public class AuthUser {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "id"))
     @Column(name = "authority", nullable = false)
-    private Collection<SimpleGrantedAuthority> authorities;
+//    private Collection<SimpleGrantedAuthority> authorities;
+    private Set<String> authorities;
 }

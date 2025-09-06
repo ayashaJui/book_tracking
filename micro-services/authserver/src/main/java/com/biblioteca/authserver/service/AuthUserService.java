@@ -2,8 +2,8 @@ package com.biblioteca.authserver.service;
 
 import com.biblioteca.authserver.entity.AuthUser;
 import com.biblioteca.authserver.exception.AuthServerException;
+import com.biblioteca.authserver.mapper.AuthUserMapper;
 import com.biblioteca.authserver.repository.AuthUserRepository;
-import com.biblioteca.authserver.util.mapper.AuthUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
