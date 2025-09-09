@@ -23,7 +23,8 @@ export class InitialAuthService {
       this.oauthService.configure(this.authConfig);
 
       // continue initializing app (provoking a token_received event) or redirect to login-page
-      this.oauthService.loadDiscoveryDocumentAndLogin().then((isLoggedIn) => {
+      this.oauthService
+        .loadDiscoveryDocumentAndLogin().then((isLoggedIn) => {
         if (isLoggedIn) {
           const userInfo = this.oauthService.getIdentityClaims();
           const decodeToken: CustomJwtPayload = jwtDecode(

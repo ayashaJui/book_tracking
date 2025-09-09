@@ -48,6 +48,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
@@ -134,4 +137,30 @@ public class AuthServerConfig {
         return authenticationProvider;
     }
    
+    // Add OAuth2 authorization server configuration
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        
+        http
+                .apply(authorizationServerConfigurer)
+                .and()
+                .exceptionHandling(exceptions -> exceptions
+                    .defaultAuthenticationEntryPointFor(
+                        (request, response, authException) -> response.sendRedirect("/login"),
+                        authorizationServerConfigurer.getEndpointsMatcher()
+                    )
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource));
+        
+        http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher());
+        
+        authorizationServerConfigurer
+                .oidc(Customizer.withDefaults());
+                
+        return http.formLogin(withDefaults()).build();
+    }
 }
