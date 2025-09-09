@@ -14,7 +14,12 @@ import Aura from '@primeuix/themes/aura';
 import { SharedModule } from './modules/shared/shared.module';
 import { AppLayout } from './layout/component/app.layout';
 import { CommonModule } from '@angular/common';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { StoreModule } from '@ngrx/store';
 import {
   AuthConfig,
   OAuthModule,
@@ -34,7 +39,7 @@ import { httpInterceptorProviders } from './configurations';
     SharedModule,
     AppLayout,
     OAuthModule.forRoot(),
-    // StoreModule.forRoot(),
+    StoreModule.forRoot(),
   ],
   providers: [
     OAuthService,
@@ -42,13 +47,16 @@ import { httpInterceptorProviders } from './configurations';
     { provide: AuthConfig, useValue: authCodeFlowConfig },
     {
       provide: APP_INITIALIZER,
-      useFactory: (initialAuthService: InitialAuthService) => {
+      useFactory: (initialAuthService: InitialAuthService) => () => {
         initialAuthService.initAuth();
       },
-      deps: [OAuthService],
+      deps: [InitialAuthService],
       multi: true,
     },
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
     httpInterceptorProviders,
+    provideHttpClient(withFetch()),
+
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),
     providePrimeNG({
@@ -57,7 +65,6 @@ import { httpInterceptorProviders } from './configurations';
         options: { darkModeSelector: '.app-dark' },
       },
     }),
-    provideHttpClient(withFetch()),
   ],
   bootstrap: [App],
 })

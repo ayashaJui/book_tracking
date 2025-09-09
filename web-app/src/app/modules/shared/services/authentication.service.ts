@@ -39,6 +39,15 @@ export class AuthenticationService implements OnDestroy {
     return isAuthorized;
   }
 
+  loadUserProfile() {
+    let _decodedAccessToken = this.jwtHelperService.decodeToken(
+      this.oauthService.getAccessToken()
+    );
+    this.oauthService.loadUserProfile().then((resp: any) => {
+      console.log('User Profile: ', resp);
+    });
+  }
+
   ngOnDestroy(): void {
     // Clean up any subscriptions or resources
     this.subscriptions.forEach((sub) => sub.unsubscribe());

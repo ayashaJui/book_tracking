@@ -18,6 +18,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->{
                     authorizeRequests
+                            .requestMatchers("/client/register").permitAll()
                             .requestMatchers("/login**").permitAll()
                             .requestMatchers("/otp-page**", "/verify_otp", "/resend_email_otp").permitAll()
                             .requestMatchers("/error").permitAll()
@@ -34,7 +35,7 @@ public class WebSecurityConfig {
                     httpSecurityFormLoginConfigurer
                             .loginPage("/login")
                             .loginProcessingUrl("/login")
-                            .defaultSuccessUrl("http://localhost:4200", true)
+                            .defaultSuccessUrl("http://localhost:4200")
                             .permitAll();
                 });
 

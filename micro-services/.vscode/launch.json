@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-AuthserverApplication<authserver>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.biblioteca.authserver.AuthserverApplication",
+      "projectName": "authserver",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
