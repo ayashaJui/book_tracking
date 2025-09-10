@@ -6,6 +6,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { ColorScheme, LayoutService } from '../service/layout.service';
 import { UiService } from '../../modules/shared/services/ui.service.service';
+import { AuthenticationService } from '../../modules/shared/services/authentication.service';
 
 @Component({
   selector: 'app-topbar',
@@ -17,7 +18,7 @@ export class AppTopbar {
   items!: MenuItem[];
 
   constructor(
-    public layoutService: LayoutService,
+    public layoutService: LayoutService, private authenticationService: AuthenticationService,
     private uiService: UiService
   ) {}
 
@@ -36,5 +37,9 @@ export class AppTopbar {
         darkTheme: newDarkTheme,
       };
     });
+  }
+
+  logout(){
+    this.authenticationService.logout()
   }
 }

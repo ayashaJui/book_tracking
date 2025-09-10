@@ -42,38 +42,38 @@ CREATE TABLE oauth2_authorization (
     authorization_grant_type varchar(100) NOT NULL,
     authorized_scopes varchar(1000),
 
-    attributes bytea,
+    attributes text,
     state varchar(500),
 
-    authorization_code_value bytea,
+    authorization_code_value text,
     authorization_code_issued_at timestamp,
     authorization_code_expires_at timestamp,
-    authorization_code_metadata bytea,
+    authorization_code_metadata text,
 
-    access_token_value bytea,
+    access_token_value text,
     access_token_issued_at timestamp,
     access_token_expires_at timestamp,
-    access_token_metadata bytea,
+    access_token_metadata text,
     access_token_type varchar(100),
     access_token_scopes varchar(1000),
 
-    oidc_id_token_value bytea,
+    oidc_id_token_value text,
     oidc_id_token_issued_at timestamp,
     oidc_id_token_expires_at timestamp,
-    oidc_id_token_metadata bytea,
+    oidc_id_token_metadata text,
 
-    refresh_token_value bytea,
+    refresh_token_value text,
     refresh_token_issued_at timestamp,
     refresh_token_expires_at timestamp,
-    refresh_token_metadata bytea,
+    refresh_token_metadata text,
 
-    user_code_value bytea,
+    user_code_value text,
     user_code_issued_at timestamp,
     user_code_expires_at timestamp,
-    user_code_metadata bytea,
+    user_code_metadata text,
 
-    device_code_value bytea,
+    device_code_value text,
     device_code_issued_at timestamp,
     device_code_expires_at timestamp,
-    device_code_metadata bytea
+    device_code_metadata text
 );

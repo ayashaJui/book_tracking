@@ -32,4 +32,8 @@ public class AuthUserService implements UserDetailsService {
 
         return authUserMapper.fromAuthUser(authUser, username);
     }
+
+    public AuthUser findByEmail(String email) {
+        return authUserRepository.findByEmailAddress(email).orElseThrow(() -> new AuthServerException("No User Found"));
+    }
 }

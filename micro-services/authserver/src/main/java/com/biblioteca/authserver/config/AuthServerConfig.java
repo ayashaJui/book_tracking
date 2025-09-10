@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
@@ -70,6 +71,15 @@ public class AuthServerConfig {
     @Bean
     JdbcOAuth2AuthorizationConsentService consentService(DataSource dataSource, RegisteredClientRepository clientRepository) {
         return new JdbcOAuth2AuthorizationConsentService(new JdbcTemplate(dataSource), clientRepository);
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                // Optional: customize endpoints
+                // .authorizationEndpoint("/oauth2/authorize")
+                // .tokenEndpoint("/oauth2/token")
+                .build();
     }
 
     @Bean
@@ -138,29 +148,20 @@ public class AuthServerConfig {
     }
    
     // Add OAuth2 authorization server configuration
-    @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Bean
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-        
-        http
-                .apply(authorizationServerConfigurer)
-                .and()
-                .exceptionHandling(exceptions -> exceptions
-                    .defaultAuthenticationEntryPointFor(
-                        (request, response, authException) -> response.sendRedirect("/login"),
-                        authorizationServerConfigurer.getEndpointsMatcher()
-                    )
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
-                .cors(cors -> cors.configurationSource(corsConfigurationSource));
-        
-        http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher());
-        
-        authorizationServerConfigurer
-                .oidc(Customizer.withDefaults());
-                
-        return http.formLogin(withDefaults()).build();
+
+        http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .csrf(csrf -> csrf.ignoringRequestMatchers(authorizationServerConfigurer.getEndpointsMatcher()))
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .with(authorizationServerConfigurer, authServer -> authServer.oidc(Customizer.withDefaults()))
+                .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .formLogin(Customizer.withDefaults());
+
+        return http.build();
     }
 }
