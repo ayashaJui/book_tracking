@@ -84,116 +84,122 @@ CREATE INDEX idx_user_activities_user_type ON user_activities(user_id, activity_
 Catalog service database: catalog_db → postgresql
 -- Authors table
 CREATE TABLE authors (
-    id UUID PRIMARY KEY ,
-    name VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
     bio TEXT,
     birth_date DATE,
     death_date DATE,
     nationality VARCHAR(100),
     website VARCHAR(500),
-    image_id VARCHAR(500), 
+    image_id VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
 -- Genres table
 CREATE TABLE genres (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) UNIQUE NOT NULL,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    parent_genre_id UUID REFERENCES genres(id),
+    parent_genre_id INT REFERENCES genres(id),
     is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Publishers table
 CREATE TABLE publishers (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
     location VARCHAR(255),
     website VARCHAR(500),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Series table
-CREATE TABLE series (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    total_books INTEGER DEFAULT 0,
-    is_completed BOOLEAN DEFAULT false,
-    primary_author_id UUID REFERENCES authors(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Books table
+-- Series table
+CREATE TABLE series (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    total_books INTEGER DEFAULT 0,
+    is_completed BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Series Author table
+CREATE TABLE series_authors (
+    series_id INT REFERENCES series(id) ON DELETE CASCADE,
+    author_id INT REFERENCES authors(id) ON DELETE CASCADE,
+    role VARCHAR(50) DEFAULT 'author',
+    PRIMARY KEY (series_id, author_id, role)
+);
+
+-- Books table (represents the WORK, not an edition)
 CREATE TABLE books (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id SERIAL PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
     subtitle VARCHAR(500),
-    isbn_10 VARCHAR(20),
-    isbn_13 VARCHAR(20) UNIQUE,
-    publication_date DATE,
-    page_count INTEGER,
-    language VARCHAR(10) DEFAULT 'en',
-    publisher_id UUID REFERENCES publishers(id),
     description TEXT,
-    cover_image_id UUID, -- References files.id in File Storage service
+    publication_date DATE,  
+    page_count INTEGER,     
+    language VARCHAR(10) DEFAULT 'en',
     average_rating DECIMAL(3,2) DEFAULT 0,
     total_ratings INTEGER DEFAULT 0,
     goodreads_id VARCHAR(50),
     google_books_id VARCHAR(50),
-    series_id UUID REFERENCES series(id),
-    series_position INTEGER,
-    format VARCHAR(50) DEFAULT 'paperback', -- hardcover, paperback, ebook, audiobook
-    edition VARCHAR(100),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Book-Author relationships
+-- Book-Author relationships (many-to-many)
 CREATE TABLE book_authors (
-    book_id UUID REFERENCES books(id) ON DELETE CASCADE,
-    author_id UUID REFERENCES authors(id) ON DELETE CASCADE,
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    author_id INT REFERENCES authors(id) ON DELETE CASCADE,
     role VARCHAR(50) DEFAULT 'author',
     PRIMARY KEY (book_id, author_id, role)
 );
 
--- Book-Genre relationships
+-- Book-Genre relationships (many-to-many)
 CREATE TABLE book_genres (
-    book_id UUID REFERENCES books(id) ON DELETE CASCADE,
-    genre_id UUID REFERENCES genres(id) ON DELETE CASCADE,
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    genre_id INT REFERENCES genres(id) ON DELETE CASCADE,
     PRIMARY KEY (book_id, genre_id)
 );
 
--- Book editions/formats
+-- Book-Series relationships (many-to-many)
+CREATE TABLE book_series (
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    series_id INT REFERENCES series(id) ON DELETE CASCADE,
+    position INTEGER,
+    PRIMARY KEY (book_id, series_id)
+);
+
+-- Book editions (different formats/ISBNs for same book)
 CREATE TABLE book_editions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    book_id UUID REFERENCES books(id) ON DELETE CASCADE,
-    format VARCHAR(50) NOT NULL, -- hardcover, paperback, ebook, audiobook
-    isbn_10 VARCHAR(20),
-    isbn_13 VARCHAR(20),
-    publisher_id UUID REFERENCES publishers(id),
+    id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    format VARCHAR(50) NOT NULL,
+    isbn VARCHAR(20),
+    publisher_id INT REFERENCES publishers(id),
     publication_date DATE,
     page_count INTEGER,
     price DECIMAL(10,2),
     currency VARCHAR(10) DEFAULT 'USD',
-    cover_image_id UUID, -- References files.id in File Storage service
+    cover_image_id INT,
     availability_status VARCHAR(50) DEFAULT 'available',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes
-CREATE INDEX idx_books_title ON books USING gin(to_tsvector('english', title));
-CREATE INDEX idx_books_series ON books(series_id);
-CREATE INDEX idx_books_isbn13 ON books(isbn_13);
-CREATE INDEX idx_authors_name ON authors USING gin(to_tsvector('english', name));
-CREATE INDEX idx_book_authors_book ON book_authors(book_id);
-CREATE INDEX idx_book_genres_book ON book_genres(book_id);
+-- Partial unique index on ISBN if not null
+CREATE UNIQUE INDEX uq_book_editions_isbn
+ON book_editions(isbn)
+WHERE isbn IS NOT NULL;
+
+
 
 
 User library service: user_library_db → postgresql
