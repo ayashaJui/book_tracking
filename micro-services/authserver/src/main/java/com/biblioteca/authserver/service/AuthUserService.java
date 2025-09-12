@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,5 +37,46 @@ public class AuthUserService implements UserDetailsService {
 
     public AuthUser findByEmail(String email) {
         return authUserRepository.findByEmailAddress(email).orElseThrow(() -> new AuthServerException("No User Found"));
+    }
+
+    public void blockUser(AuthUser authUser) {
+        LocalDateTime blockTo = LocalDateTime.now().plusHours(userBlockHours);
+
+        authUser.setBlockedTo(blockTo);
+        authUser.setBlockedAt(LocalDateTime.now());
+        authUser.setAccountNonLocked(false);
+
+        try {
+            authUserRepository.save(authUser);
+        } catch (Exception e) {
+            log.error("Exception in user save method: {}", e.getLocalizedMessage());
+        }
+    }
+
+    public void increaseLoginAttempt(AuthUser authUser) {
+
+        authUser.setLoginAttempt(authUser.getLoginAttempt() + 1);
+
+        try {
+            authUserRepository.save(authUser);
+        } catch (Exception e) {
+            log.error("Exception in user save method: {}", e.getLocalizedMessage());
+        }
+    }
+
+    public AuthUser resetLoginAttempt(AuthUser authUser) {
+        authUser.setLoginAttempt(0);
+        authUser.setBlockedAt(null);
+        authUser.setBlockedTo(null);
+        authUser.setAccountNonLocked(true);
+
+        try {
+            authUserRepository.save(authUser);
+        } catch (Exception e) {
+            log.error("Exception in user save method: {}", e.getLocalizedMessage());
+
+        }
+
+        return authUser;
     }
 }

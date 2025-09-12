@@ -29,6 +29,14 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         AuthUser authUser = authUserService.findByEmail(user.getUsername());
 
+        if(authUser.isAccountNonLocked()){
+            authUserService.resetLoginAttempt(authUser);
+            log.info("Login attempt reset for : {}", authUser.getEmailAddress());
+        }else{
+            log.error("Account locked till : {}", authUser.getBlockedTo());
+            throw new RuntimeException("Account locked for too many attempts till : " + authUser.getBlockedTo());
+        }
+
         super.setDefaultTargetUrl(frontendUrl+"/dashboard");
 
         super.onAuthenticationSuccess(request, response, authentication);
