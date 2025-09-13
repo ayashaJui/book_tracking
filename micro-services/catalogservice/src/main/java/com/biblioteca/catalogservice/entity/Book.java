@@ -3,6 +3,7 @@ package com.biblioteca.catalogservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,7 +29,7 @@ public class Book {
     private String description;
 
     @Column(name = "publication_date")
-    private LocalDateTime publicationDate;
+    private LocalDate publicationDate;
 
     @Column(name = "page_count", columnDefinition = "INT")
     private Integer pageCount;

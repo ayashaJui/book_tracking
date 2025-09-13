@@ -3,6 +3,7 @@ package com.biblioteca.catalogservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,10 +26,10 @@ public class Author {
     private  String bio;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "death_date")
-    private LocalDateTime deathDate;
+    private LocalDate deathDate;
 
     @Column(name = "nationality", columnDefinition = "VARCHAR(100)")
     private String nationality;

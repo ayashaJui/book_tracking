@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.entity;
 
+import com.biblioteca.catalogservice.util.enums.AuthorRoleEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,8 +18,8 @@ public class SeriesAuthor {
     @EmbeddedId
     private SeriesAuthorId id;
 
-    @Column(name = "role", columnDefinition = "VARCHAR(50)")
-    private String role = "AUTHOR";
+//    @Column(name = "role", columnDefinition = "VARCHAR(50)")
+//    private String role = AuthorRoleEnums.AUTHOR.name();
 
     // Many-to-one relationship to Series
     @MapsId("seriesId") // Maps seriesId from embedded key

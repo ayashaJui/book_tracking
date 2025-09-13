@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Builder
 @ToString
 @Table(name = "book_genres")
-public class BookGenres {
+public class BookGenre {
     @EmbeddedId
     private BookGenreId id;
 

@@ -17,9 +17,6 @@ public class BookAuthor {
     @EmbeddedId
     private BookAuthorId id;
 
-    @Column(name = "role", columnDefinition = "VARCHAR(50)")
-    private String role = "AUTHOR";
-
     // Many-to-one relationship to Book
     @MapsId("bookId") // Maps bookId from embedded key
     @ManyToOne(fetch = FetchType.LAZY)
