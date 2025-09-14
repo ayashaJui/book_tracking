@@ -9,31 +9,22 @@ import com.biblioteca.catalogservice.util.enums.AuthorRoleEnums;
 public class BookAuthorMapper {
     public static BookAuthorDTO toDTO(BookAuthor bookAuthor) {
         return BookAuthorDTO.builder()
+                .id(bookAuthor.getId())
                 .bookId(bookAuthor.getBook().getId())
                 .authorId(bookAuthor.getAuthor().getId())
-                .authorRole(bookAuthor.getId().getRole() != null ? AuthorRoleEnums.valueOf(bookAuthor.getId().getRole()) : null)
+                .authorRole(bookAuthor.getRole() != null ? AuthorRoleEnums.valueOf(bookAuthor.getRole()) : null)
                 .build();
     }
 
     public static BookAuthor fromCreateDTO(BookAuthorCreateDTO bookAuthorCreateDTO) {
         return BookAuthor.builder()
-                .id(BookAuthor.BookAuthorId.builder()
-                        .authorId(bookAuthorCreateDTO.getAuthorId())
-                        .bookId(bookAuthorCreateDTO.getBookId())
-                        .role(bookAuthorCreateDTO.getAuthorRole().name())
-                        .build())
+                .role(bookAuthorCreateDTO.getAuthorRole().name())
                 .build();
     }
 
     public static  BookAuthor fromUpdateDTO(BookAuthorUpdateDTO bookAuthorUpdateDTO, BookAuthor bookAuthor) {
 
-        bookAuthor.setId(
-                BookAuthor.BookAuthorId.builder()
-                        .bookId(bookAuthorUpdateDTO.getBookId())
-                        .authorId(bookAuthorUpdateDTO.getAuthorId())
-                        .role(bookAuthorUpdateDTO.getAuthorRole().name())
-                        .build()
-        );
+        bookAuthor.setRole(bookAuthorUpdateDTO.getAuthorRole().name());
 
         return bookAuthor;
     }

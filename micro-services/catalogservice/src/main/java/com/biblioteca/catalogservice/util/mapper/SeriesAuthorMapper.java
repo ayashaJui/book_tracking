@@ -9,31 +9,22 @@ import com.biblioteca.catalogservice.util.enums.AuthorRoleEnums;
 public class SeriesAuthorMapper {
     public static SeriesAuthorDTO toDTO(SeriesAuthor seriesAuthor) {
         return SeriesAuthorDTO.builder()
+                .id(seriesAuthor.getId())
                 .seriesId(seriesAuthor.getSeries().getId())
                 .authorId(seriesAuthor.getAuthor().getId())
-                .authorRole(seriesAuthor.getId().getRole() != null ? AuthorRoleEnums.valueOf(seriesAuthor.getId().getRole()) : null)
+                .authorRole(seriesAuthor.getRole() != null ? AuthorRoleEnums.valueOf(seriesAuthor.getRole()) : null)
                 .build();
     }
 
     public static SeriesAuthor fromCreateDTO(SeriesAuthorCreateDTO seriesAuthorCreateDTO) {
         return SeriesAuthor.builder()
-                .id(SeriesAuthor.SeriesAuthorId.builder()
-                        .seriesId(seriesAuthorCreateDTO.getSeriesId())
-                        .authorId(seriesAuthorCreateDTO.getAuthorId())
-                        .role(seriesAuthorCreateDTO.getAuthorRole().name())
-                        .build())
+                .role(seriesAuthorCreateDTO.getAuthorRole().name())
                 .build();
     }
 
     public static SeriesAuthor fromUpdateDTO(SeriesAuthorUpdateDTO seriesAuthorUpdateDTO, SeriesAuthor seriesAuthor) {
 
-        seriesAuthor.setId(
-                SeriesAuthor.SeriesAuthorId.builder()
-                        .seriesId(seriesAuthorUpdateDTO.getSeriesId())
-                        .authorId(seriesAuthorUpdateDTO.getAuthorId())
-                        .role(seriesAuthorUpdateDTO.getAuthorRole().name())
-                        .build()
-        );
+        seriesAuthor.setRole(seriesAuthorUpdateDTO.getAuthorRole() != null ? seriesAuthorUpdateDTO.getAuthorRole().name() : seriesAuthor.getRole());
 
         return seriesAuthor;
     }

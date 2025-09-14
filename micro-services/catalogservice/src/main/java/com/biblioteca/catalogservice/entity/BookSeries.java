@@ -14,35 +14,18 @@ import java.io.Serializable;
 @ToString
 @Table(name = "book_series")
 public class BookSeries {
-    @EmbeddedId
-    private BookSeriesId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "series_id", nullable = false)
+    private Series series;
 
     @Column(name = "position")
     private Integer position;
-
-    // Many-to-one relationship to Book
-    @MapsId("bookId") // Maps bookId from embedded key
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private Book book;
-
-    // Many-to-one relationship to Series
-    @MapsId("seriesId") // Maps seriesId from embedded key
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "series_id")
-    private Series series;
-
-    // ===== Composite Key Class =====
-    @Embeddable
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class BookSeriesId implements Serializable {
-        @Column(name = "book_id")
-        private Integer bookId;
-
-        @Column(name = "series_id")
-        private Integer seriesId;
-    }
 }

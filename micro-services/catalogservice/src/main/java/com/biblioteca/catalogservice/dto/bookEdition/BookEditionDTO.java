@@ -24,7 +24,7 @@ public class BookEditionDTO {
 
     private Integer publisherId;
 
-    private LocalDate publishedDate;
+    private LocalDate publicationDate;
 
     private Integer pageCount;
 
@@ -32,7 +32,7 @@ public class BookEditionDTO {
 
     private String currency;
 
-    private Integer coverImage;
+    private Integer coverImageId;
 
     private String availabilityStatus;
 

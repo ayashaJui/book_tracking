@@ -25,8 +25,8 @@ public class BookEdition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "formate", columnDefinition = "VARCHAR(50)")
-    private String formate;
+    @Column(name = "format", columnDefinition = "VARCHAR(50)")
+    private String format;
 
     @Column(name = "isbn", columnDefinition = "VARCHAR(50)")
     private String isbn;

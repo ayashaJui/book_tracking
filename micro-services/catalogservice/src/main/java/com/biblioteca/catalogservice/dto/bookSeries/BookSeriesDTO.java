@@ -9,6 +9,8 @@ import lombok.*;
 @Builder
 @ToString
 public class BookSeriesDTO {
+    private Integer id;
+
     private Integer bookId;
 
     private Integer seriesId;
