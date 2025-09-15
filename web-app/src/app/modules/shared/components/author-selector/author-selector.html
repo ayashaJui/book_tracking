@@ -1,0 +1,204 @@
+<div class="author-selector-container" [class.disabled]="disabled">
+  <!-- Single Selection Display -->
+  <div 
+    *ngIf="!multiple" 
+    class="author-selector-input"
+    [class.has-value]="selectedAuthors"
+    [class.disabled]="disabled"
+    (click)="toggleDropdown()"
+  >
+    <div class="selected-value">
+      <ng-container *ngIf="getSingleAuthor(); else placeholderTemplate; let author">
+        <img 
+          *ngIf="author.photoUrl" 
+          [src]="author.photoUrl" 
+          [alt]="author.name"
+          class="author-avatar"
+        >
+        <span class="author-name">{{ author.name }}</span>
+        <button 
+          *ngIf="showClear && !disabled" 
+          type="button"
+          class="clear-button"
+          (click)="onClear(); $event.stopPropagation()"
+          aria-label="Clear selection"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </ng-container>
+      
+      <ng-template #placeholderTemplate>
+        <span class="placeholder">{{ placeholder }}</span>
+      </ng-template>
+    </div>
+    
+    <i class="pi pi-chevron-down dropdown-icon" [class.rotated]="showDropdown"></i>
+  </div>
+
+  <!-- Multiple Selection Display -->
+  <div 
+    *ngIf="multiple" 
+    class="author-selector-input multiple"
+    [class.has-value]="getSelectedAuthorsArray().length > 0"
+    [class.disabled]="disabled"
+    (click)="toggleDropdown()"
+  >
+    <div class="selected-chips" *ngIf="getSelectedAuthorsArray().length > 0; else multiplePlaceholder">
+      <span 
+        *ngFor="let author of getSelectedAuthorsArray().slice(0, maxSelectedLabels)" 
+        class="author-chip"
+      >
+        <img 
+          *ngIf="author.photoUrl" 
+          [src]="author.photoUrl" 
+          [alt]="author.name"
+          class="chip-avatar"
+        >
+        {{ author.name }}
+        <button 
+          *ngIf="!disabled"
+          type="button" 
+          class="chip-remove"
+          (click)="onAuthorRemove(author); $event.stopPropagation()"
+          aria-label="Remove author"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </span>
+      
+      <span 
+        *ngIf="getSelectedAuthorsArray().length > maxSelectedLabels" 
+        class="more-indicator"
+      >
+        +{{ getSelectedAuthorsArray().length - maxSelectedLabels }} more
+      </span>
+    </div>
+    
+    <ng-template #multiplePlaceholder>
+      <span class="placeholder">{{ placeholder }}</span>
+    </ng-template>
+    
+    <div class="dropdown-controls">
+      <button 
+        *ngIf="showClear && getSelectedAuthorsArray().length > 0 && !disabled" 
+        type="button"
+        class="clear-button"
+        (click)="onClear(); $event.stopPropagation()"
+        aria-label="Clear all selections"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+      <i class="pi pi-chevron-down dropdown-icon" [class.rotated]="showDropdown"></i>
+    </div>
+  </div>
+
+  <!-- Dropdown Panel -->
+  <div class="dropdown-panel" [class.show]="showDropdown" *ngIf="showDropdown">
+    <!-- Search Input -->
+    <div class="search-container" *ngIf="filter">
+      <input 
+        type="text"
+        class="search-input"
+        placeholder="Search authors..."
+        [value]="searchTerm"
+        (input)="onSearch($event)"
+        #searchInput
+      >
+      <i class="pi pi-search search-icon"></i>
+    </div>
+
+    <!-- Add New Author Button -->
+    <div class="add-author-container" *ngIf="showAddButton">
+      <button 
+        type="button" 
+        class="add-author-button"
+        (click)="onAddNewAuthor()"
+      >
+        <i class="pi pi-plus"></i>
+        Add New Author
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+      <i class="pi pi-spinner pi-spin"></i>
+      Loading authors...
+    </div>
+
+    <!-- Authors List -->
+    <div class="authors-list" *ngIf="!loading">
+      <div 
+        *ngFor="let author of filteredAuthors; trackBy: trackByAuthorId"
+        class="author-item"
+        [class.selected]="isAuthorSelected(author)"
+        (click)="onAuthorSelect(author)"
+      >
+        <div class="author-info">
+          <img 
+            *ngIf="author.photoUrl" 
+            [src]="author.photoUrl" 
+            [alt]="author.name"
+            class="author-avatar"
+          >
+          <div class="author-placeholder-avatar" *ngIf="!author.photoUrl">
+            {{ author.name.charAt(0).toUpperCase() }}
+          </div>
+          
+          <div class="author-details">
+            <div class="author-name">{{ author.name }}</div>
+            <div class="author-meta" *ngIf="author.nationality || author.genres?.length">
+              <span *ngIf="author.nationality" class="nationality">{{ author.nationality }}</span>
+              <span *ngIf="author.genres?.length" class="genres">
+                {{ author.genres!.slice(0, 2).join(', ') }}
+                <span *ngIf="author.genres!.length > 2">...</span>
+              </span>
+            </div>
+            <div class="author-stats" *ngIf="author.totalBooks">
+              {{ author.totalBooks }} book{{ author.totalBooks === 1 ? '' : 's' }}
+              <span *ngIf="author.averageRating"> • ★ {{ author.averageRating.toFixed(1) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="author-actions">
+          <button 
+            type="button"
+            class="view-author-button"
+            (click)="onViewAuthor(author, $event)"
+            title="View author details"
+          >
+            <i class="pi pi-eye"></i>
+          </button>
+          
+          <i 
+            *ngIf="isAuthorSelected(author)" 
+            class="pi pi-check selected-indicator"
+            title="Selected"
+          ></i>
+        </div>
+      </div>
+
+      <!-- No Results -->
+      <div class="no-results" *ngIf="filteredAuthors.length === 0">
+        <i class="pi pi-search"></i>
+        <span>No authors found</span>
+        <button 
+          *ngIf="searchTerm && showAddButton" 
+          type="button"
+          class="add-author-button small"
+          (click)="onAddNewAuthor()"
+        >
+          <i class="pi pi-plus"></i>
+          Add "{{ searchTerm }}"
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay for closing dropdown -->
+  <div 
+    class="dropdown-overlay" 
+    *ngIf="showDropdown"
+    (click)="showDropdown = false"
+  ></div>
+</div>

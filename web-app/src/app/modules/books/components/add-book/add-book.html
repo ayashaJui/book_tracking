@@ -1,7 +1,7 @@
-<div class="min-h-screen">
+<div class="min-h-screen ">
   <!-- Modern Header Section -->
   <div
-    class="relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+    class="max-w-7xl mx-auto relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
   >
     <!-- Background Pattern -->
     <div
@@ -76,7 +76,7 @@
   </div>
 
   <!-- Main Content Container -->
-  <div class="lg:px-6 py-6 lg:py-8">
+  <div class=" py-6 lg:py-8 max-w-7xl mx-auto">
     <div class=" mx-auto">
       <!-- Enhanced Form -->
       <div
@@ -119,17 +119,18 @@
                   class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
                 >
                   <i class="pi pi-user text-indigo-500 mr-2"></i>
-                  Author *
+                  Author(s) *
                 </label>
-                <input
-                  type="text"
-                  pInputText
-                  required
-                  [(ngModel)]="newBook.author"
-                  name="author"
-                  placeholder="Enter author name"
-                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-                />
+                <app-author-selector
+                  [multiple]="true"
+                  [showAddButton]="true"
+                  [(ngModel)]="selectedAuthors"
+                  (ngModelChange)="onAuthorsChange($event)"
+                  name="authors"
+                  placeholder="Select or search for authors..."
+                  class="w-full"
+                >
+                </app-author-selector>
               </div>
             </div>
           </div>

@@ -63,7 +63,8 @@ export class AllBook implements OnInit {
       {
         id: 1,
         title: 'The Hobbit',
-        author: 'J.R.R. Tolkien',
+        authorIds: [1], // J.R.R. Tolkien
+        authorNames: ['J.R.R. Tolkien'],
         genres: ['Fantasy', 'Adventure'],
         pages: 310,
         rating: 4.8,
@@ -78,7 +79,8 @@ export class AllBook implements OnInit {
       {
         id: 2,
         title: 'The Fellowship of the Ring',
-        author: 'J.R.R. Tolkien',
+        authorIds: [1], // J.R.R. Tolkien
+        authorNames: ['J.R.R. Tolkien'],
         genres: ['Fantasy', 'Epic'],
         pages: 423,
         rating: 4.9,
@@ -93,7 +95,8 @@ export class AllBook implements OnInit {
       {
         id: 3,
         title: 'Dune',
-        author: 'Frank Herbert',
+        authorIds: [2], // Frank Herbert
+        authorNames: ['Frank Herbert'],
         genres: ['Science Fiction', 'Space Opera'],
         pages: 688,
         rating: 4.7,
@@ -106,7 +109,8 @@ export class AllBook implements OnInit {
       {
         id: 4,
         title: 'The Name of the Wind',
-        author: 'Patrick Rothfuss',
+        authorIds: [3], // Patrick Rothfuss
+        authorNames: ['Patrick Rothfuss'],
         genres: ['Fantasy', 'Adventure'],
         pages: 662,
         rating: 4.6,
@@ -125,7 +129,7 @@ export class AllBook implements OnInit {
     const authors = new Set<string>();
     this.books.forEach((b) => {
       b.genres.forEach((g) => genres.add(g));
-      authors.add(b.author);
+      b.authorNames?.forEach((a) => authors.add(a));
     });
 
     this.genreOptions = Array.from(genres).map((g) => ({ label: g, value: g }));
@@ -183,13 +187,13 @@ export class AllBook implements OnInit {
       }
 
       // author
-      if (this.selectedAuthor && b.author !== this.selectedAuthor) return false;
+      if (this.selectedAuthor && !b.authorNames?.includes(this.selectedAuthor)) return false;
 
       // global search on title or author
       if (q) {
         const match =
           b.title.toLowerCase().includes(q) ||
-          b.author.toLowerCase().includes(q);
+          b.authorNames?.some(author => author.toLowerCase().includes(q));
         if (!match) return false;
       }
 

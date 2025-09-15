@@ -1,9 +1,9 @@
 <div class="min-h-screen ">
   <!-- Header -->
   <div
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-b border-gray-200 dark:border-gray-700"
+    class="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border-b border-gray-200 dark:border-gray-700"
   >
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class=" px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col lg:flex-row items-start gap-8">
         <!-- Book Cover -->
         <div class="flex-shrink-0 mx-auto lg:mx-0">
@@ -81,7 +81,7 @@
           </div>
 
           <p class="text-xl text-gray-600 dark:text-gray-300 mb-4">
-            by {{ book.author || "Unknown Author" }}
+            by {{ book.authorNames?.join(', ') || "Unknown Author" }}
           </p>
 
           <div
@@ -180,7 +180,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto py-8">
     <!-- Tab Navigation -->
     <div class="mb-6">
       <div class="flex flex-wrap border-b border-gray-200 dark:border-gray-700">

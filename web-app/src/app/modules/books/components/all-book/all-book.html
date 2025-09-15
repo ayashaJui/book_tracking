@@ -1,4 +1,4 @@
-<div class="min-h-screen">
+<div class="min-h-screen ">
   <!-- Loading State -->
   <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
     <div class="text-center">
@@ -124,7 +124,7 @@
     </div>
 
     <!-- Main Content Container -->
-    <div class="lg:px-6 py-6 lg:py-8">
+    <div class=" py-6 lg:py-8">
       <!-- Action Buttons -->
       <div class="mb-8">
         <div
@@ -472,7 +472,7 @@
               </td>
 
               <td class="px-6 py-4">
-                <div class="font-medium">{{ book.author }}</div>
+                <div class="font-medium">{{ book.authorNames?.join(', ') || 'Unknown Author' }}</div>
               </td>
               <td class="px-6 py-4 text-center">
                 <div class="flex flex-wrap gap-1 justify-center">
@@ -675,7 +675,7 @@
                   {{ book.title }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                  by {{ book.author }}
+                  by {{ book.authorNames?.join(', ') || 'Unknown Author' }}
                 </p>
               </div>
 

@@ -48,7 +48,8 @@ interface Book {
   seriesBooks?: SeriesBook[];
   id?: number;
   title?: string;
-  author?: string;
+  authorIds?: number[];
+  authorNames?: string[];
   genre?: string;
   genres?: string[];
   purchaseDate?: Date;
@@ -93,7 +94,8 @@ export class BookDetails implements OnInit {
     this.book = {
       id: 1,
       title: 'The Name of the Wind',
-      author: 'Patrick Rothfuss',
+      authorIds: [3], // Patrick Rothfuss
+      authorNames: ['Patrick Rothfuss'],
       genre: 'Fantasy',
       genres: ['Fantasy', 'Adventure', 'Magic'],
       purchaseDate: new Date('2023-11-15'),

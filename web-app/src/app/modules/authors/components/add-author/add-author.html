@@ -1,0 +1,376 @@
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="max-w-7xl mx-auto relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(99, 102, 241, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
+
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center  gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-plus text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Add New Author
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Add a new author to your personal library collection
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spacer for large gap -->
+          <div class="hidden lg:block lg:flex-grow lg:max-w-xs"></div>
+
+          <!-- Right Side - Quick Actions -->
+          <div class="flex-shrink-0 w-full lg:w-auto">
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                pButton
+                label="Back to Authors"
+                icon="pi pi-arrow-left"
+                class="p-button-outlined"
+                routerLink="/authors"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class=" py-6 lg:py-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Enhanced Form -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <form [formGroup]="authorForm" (ngSubmit)="onSubmit()" class="p-8 space-y-8">
+          <!-- Basic Information Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-indigo-100 rounded-lg">
+                <i class="pi pi-info-circle text-indigo-600"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Basic Information
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Name -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-user text-indigo-500 mr-2"></i>
+                  Author Name *
+                </label>
+                <input
+                  pInputText
+                  formControlName="name"
+                  placeholder="Enter author's full name"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                  [class.ng-invalid]="isFieldInvalid('name')"
+                />
+                <small *ngIf="isFieldInvalid('name')" class="text-red-500 block">
+                  {{ getFieldError('name') }}
+                </small>
+              </div>
+
+              <!-- Nationality -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-globe text-indigo-500 mr-2"></i>
+                  Nationality
+                </label>
+                <p-select
+                  formControlName="nationality"
+                  [options]="nationalitySelectOptions"
+                  placeholder="Select nationality"
+                  [filter]="true"
+                  [showClear]="true"
+                  class="w-full">
+                </p-select>
+                <small *ngIf="isFieldInvalid('nationality')" class="text-red-500 block">
+                  {{ getFieldError('nationality') }}
+                </small>
+              </div>
+
+              <!-- Biography -->
+              <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-align-left text-indigo-500 mr-2"></i>
+                  Biography
+                </label>
+                <textarea
+                  pInputTextarea
+                  formControlName="biography"
+                  placeholder="Enter author's biography"
+                  class="w-full rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                  rows="4"
+                  [class.ng-invalid]="isFieldInvalid('biography')"
+                ></textarea>
+                <small *ngIf="isFieldInvalid('biography')" class="text-red-500 block">
+                  {{ getFieldError('biography') }}
+                </small>
+              </div>
+
+              <!-- Birth Date -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-calendar text-indigo-500 mr-2"></i>
+                  Birth Date
+                </label>
+                <p-datePicker
+                  formControlName="birthDate"
+                  placeholder="Select birth date"
+                  class="w-full"
+                  [showIcon]="true"
+                  iconDisplay="input"
+                  inputId="birthDate"
+                  dateFormat="mm/dd/yy"
+                  [maxDate]="today">
+                </p-datePicker>
+                <small *ngIf="isFieldInvalid('birthDate')" class="text-red-500 block">
+                  {{ getFieldError('birthDate') }}
+                </small>
+              </div>
+
+              <!-- Death Date -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-calendar text-indigo-500 mr-2"></i>
+                  Death Date
+                </label>
+                <p-datePicker
+                  formControlName="deathDate"
+                  placeholder="Select death date (if applicable)"
+                  class="w-full"
+                  [showIcon]="true"
+                  iconDisplay="input"
+                  inputId="deathDate"
+                  dateFormat="mm/dd/yy"
+                  [maxDate]="today"
+                  [minDate]="authorForm.get('birthDate')?.value">
+                </p-datePicker>
+                <small class="text-gray-600 dark:text-gray-400 block">
+                  Leave empty if author is still alive
+                </small>
+              </div>
+
+              <!-- Genres -->
+              <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-tags text-indigo-500 mr-2"></i>
+                  Genres
+                </label>
+                <p-multiSelect
+                  formControlName="genres"
+                  [options]="genreSelectOptions"
+                  placeholder="Select genres this author writes in"
+                  [filter]="true"
+                  [showToggleAll]="true"
+                  class="w-full">
+                </p-multiSelect>
+                <small class="text-gray-600 dark:text-gray-400 block">
+                  Select the main genres this author is known for writing in
+                </small>
+              </div>
+
+              <!-- Notes -->
+              <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-book text-indigo-500 mr-2"></i>
+                  Notes
+                </label>
+                <p-textarea
+                  formControlName="notes"
+                  placeholder="Any additional notes about this author"
+                  class="w-full border-0 bg-gray-50"
+                  rows="3"
+                  [class.ng-invalid]="isFieldInvalid('notes')">
+                </p-textarea>
+                <small *ngIf="isFieldInvalid('notes')" class="text-red-500 block">
+                  {{ getFieldError('notes') }}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Online Presence Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="pi pi-globe text-blue-600"></i>
+              </div>
+              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Online Presence
+              </h2>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Website -->
+              <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-link text-blue-500 mr-2"></i>
+                  Official Website
+                </label>
+                <input
+                  pInputText
+                  formControlName="website"
+                  placeholder="https://authorwebsite.com"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                  [class.ng-invalid]="isFieldInvalid('website')"
+                />
+                <small *ngIf="isFieldInvalid('website')" class="text-red-500 block">
+                  {{ getFieldError('website') }}
+                </small>
+              </div>
+
+              <!-- Social Links -->
+              <div formGroupName="socialLinks" class="space-y-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                  <i class="pi pi-share-alt text-blue-500 mr-2"></i>
+                  Social Media Links
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <!-- Twitter -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      <i class="pi pi-twitter text-blue-400 mr-1"></i>
+                      Twitter
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="twitter"
+                      placeholder="@username"
+                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
+                    />
+                  </div>
+
+                  <!-- Instagram -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      <i class="pi pi-instagram text-pink-500 mr-1"></i>
+                      Instagram
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="instagram"
+                      placeholder="@username"
+                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
+                    />
+                  </div>
+
+                  <!-- Facebook -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      <i class="pi pi-facebook text-blue-600 mr-1"></i>
+                      Facebook
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="facebook"
+                      placeholder="@username or full URL"
+                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
+                    />
+                  </div>
+
+                  <!-- LinkedIn -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      <i class="pi pi-linkedin text-blue-700 mr-1"></i>
+                      LinkedIn
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="linkedin"
+                      placeholder="@username or full URL"
+                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
+                    />
+                  </div>
+
+                  <!-- Goodreads -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                      <i class="pi pi-book text-yellow-600 mr-1"></i>
+                      Goodreads
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="goodreads"
+                      placeholder="Profile URL"
+                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              pButton
+              label="Clear Form"
+              icon="pi pi-refresh"
+              class="p-button-outlined w-full sm:w-auto"
+              (click)="clearForm()"
+            ></button>
+            <button
+              type="button"
+              pButton
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-outlined w-full sm:w-auto"
+              routerLink="/authors"
+            ></button>
+            <button
+              type="submit"
+              pButton
+              label="Save Author"
+              icon="pi pi-check"
+              class="p-button-success w-full sm:w-auto"
+              [disabled]="authorForm.invalid"
+              [loading]="loading"
+              loadingIcon="pi pi-spinner pi-spin"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+// All Authors Component Styles
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Card hover effects
+.group:hover {
+  .author-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.author-actions {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease-in-out;
+}
+
+// Status indicators
+.status-active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-inactive {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+// Dark mode adjustments
+:host-context(.dark) {
+  .status-active {
+    background-color: #064e3b;
+    color: #bbf7d0;
+  }
+  
+  .status-inactive {
+    background-color: #111827;
+    color: #d1d5db;
+  }
+}
+
+// Grid layout adjustments
+.authors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .authors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Loading state
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Empty state
+.empty-state {
+  min-height: 400px;
+}
+
+// Filter section
+.filters-section {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+:host-context(.dark) .filters-section {
+  background: rgba(31, 41, 55, 0.95);
+}
+
+// Avatar fallback styling
+.author-avatar-fallback {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

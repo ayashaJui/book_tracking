@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Book } from '../../models/book.model';
+import { Book, BookCreateRequest } from '../../models/book.model';
+import { BookService } from '../../services/book.service';
 import { Series } from '../../../series/models/series.model';
 import { SeriesService } from '../../../series/services/series.service';
 import { GenreService } from '../../../shared/services/genre.service';
+import { AuthorService } from '../../../authors/services/author.service';
+import { Author } from '../../../authors/models/author.model';
 
 @Component({
   selector: 'app-add-book',
@@ -15,7 +18,7 @@ import { GenreService } from '../../../shared/services/genre.service';
 export class AddBook implements OnInit {
   newBook: Book = {
     title: '',
-    author: '',
+    authorIds: [],
     genres: [],
     status: undefined,
     pages: undefined,
@@ -25,6 +28,9 @@ export class AddBook implements OnInit {
     seriesId: undefined,
     seriesOrder: undefined,
   };
+
+  // Selected authors for the book
+  selectedAuthors: Author[] = [];
 
   // Series related properties
   seriesOptions: { label: string; value: number }[] = [];
@@ -52,7 +58,9 @@ export class AddBook implements OnInit {
     private location: Location,
     private router: Router,
     private seriesService: SeriesService,
-    private genreService: GenreService
+    private genreService: GenreService,
+    private bookService: BookService,
+    private authorService: AuthorService
   ) {}
 
   ngOnInit() {
@@ -62,6 +70,11 @@ export class AddBook implements OnInit {
 
   loadGenreOptions() {
     this.genreOptions = this.genreService.getGenreOptions();
+  }
+
+  onAuthorsChange(authors: Author[]) {
+    this.selectedAuthors = authors;
+    this.newBook.authorIds = authors.map(a => a.id!).filter(id => id !== undefined);
   }
 
   onGenreCreated(genreName: string) {
@@ -101,9 +114,17 @@ export class AddBook implements OnInit {
         // Generate available positions in the series
         this.updateAvailableSeriesOrders(series);
 
-        // Auto-fill author if it's the same as series author
-        if (!this.newBook.author || this.newBook.author === '') {
-          this.newBook.author = series.author;
+        // Auto-fill author if no authors selected and series has author
+        if (this.selectedAuthors.length === 0 && series.author) {
+          // Try to find matching author in our author system
+          const authors = this.authorService.getAuthors();
+          const matchingAuthor = authors.find(author => 
+            author.name.toLowerCase() === series.author.toLowerCase()
+          );
+          if (matchingAuthor) {
+            this.selectedAuthors = [matchingAuthor];
+            this.newBook.authorIds = [matchingAuthor.id!];
+          }
         }
       }
     } else {
@@ -132,8 +153,10 @@ export class AddBook implements OnInit {
   toggleCreateNewSeries() {
     this.showCreateNewSeries = !this.showCreateNewSeries;
     if (this.showCreateNewSeries) {
-      // Pre-fill with current book's author
-      this.newSeriesData.author = this.newBook.author;
+      // Pre-fill with current book's first author
+      if (this.selectedAuthors.length > 0) {
+        this.newSeriesData.author = this.selectedAuthors[0].name;
+      }
     }
   }
 

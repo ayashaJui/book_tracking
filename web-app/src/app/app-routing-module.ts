@@ -18,6 +18,12 @@ const routes: Routes = [
   },
 
   {
+    path: 'authors',
+    loadChildren: () =>
+      import('./modules/authors/authors-module').then((m) => m.AuthorsModule),
+  },
+
+  {
     path: 'reading-logs',
     loadChildren: () =>
       import('./modules/reading-logs/reading-logs-module').then(

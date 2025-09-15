@@ -1,0 +1,294 @@
+// Author Details Component Styles
+
+// Profile header
+.author-profile-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.author-avatar {
+  position: relative;
+  z-index: 10;
+}
+
+.author-avatar img {
+  transition: transform 0.3s ease;
+}
+
+.author-avatar:hover img {
+  transform: scale(1.05);
+}
+
+// Status indicator
+.status-indicator {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Social links
+.social-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.social-link {
+  transition: all 0.2s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+// Tab navigation
+.tab-navigation {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+:host-context(.dark) .tab-navigation {
+  border-bottom-color: #374151;
+}
+
+.tab-button {
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  padding: 1rem 0.25rem;
+  margin: 0 2rem 0 0;
+}
+
+.tab-button.active {
+  border-bottom-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.tab-button:hover:not(.active) {
+  color: #6b7280;
+  border-bottom-color: #d1d5db;
+}
+
+:host-context(.dark) .tab-button:hover:not(.active) {
+  color: #9ca3af;
+}
+
+// Tab content
+.tab-content {
+  min-height: 400px;
+}
+
+// Book cards
+.book-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover {
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Statistics
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-text) 100%);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+// Chart container
+.chart-container {
+  position: relative;
+  height: 16rem;
+}
+
+// Genre tags
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-tag {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+:host-context(.dark) .genre-tag {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+// Personal notes
+.personal-notes {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+:host-context(.dark) .personal-notes {
+  background: rgba(14, 165, 233, 0.1);
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+// Empty states
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+// Loading state
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  font-size: 3rem;
+  color: #3b82f6;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .author-profile-header {
+    text-align: center;
+  }
+  
+  .author-info {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .tab-navigation {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .tab-button {
+    display: inline-block;
+    margin-right: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Dark mode adjustments
+:host-context(.dark) {
+  .book-card {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .book-card:hover {
+    background: #4b5563;
+  }
+  
+  .personal-notes {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+  }
+}
+
+// Animations
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Print styles
+@media print {
+  .social-links,
+  .tab-navigation,
+  .edit-button {
+    display: none;
+  }
+  
+  .tab-content {
+    display: block !important;
+  }
+}

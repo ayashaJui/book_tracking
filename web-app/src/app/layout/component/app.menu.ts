@@ -34,6 +34,11 @@ export class AppMenu {
             routerLink: ['/books'],
           },
           {
+            label: 'Authors',
+            icon: 'pi pi-fw pi-users',
+            routerLink: ['/authors'],
+          },
+          {
             label: 'Reading Logs',
             icon: 'fa fa-solid fa-book-open-reader',
             routerLink: ['/reading-logs'],
