@@ -9,15 +9,15 @@
         <div class="flex-shrink-0 mx-auto lg:mx-0">
           <div class="relative group">
             <img
-              [src]="book.coverImage || 'assets/images/product-not-found.png'"
+              [src]="book.cover || 'assets/images/product-not-found.png'"
               [alt]="book.title"
               class="w-48 h-72 object-cover rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-transform group-hover:scale-105"
             />
             <span
-              *ngIf="book.seriesInfo"
+              *ngIf="mockSeriesInfo"
               class="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-bl rounded-tr"
             >
-              Series #{{ book.seriesInfo.orderInSeries }}
+              Series #{{ mockSeriesInfo.orderInSeries }}
             </span>
           </div>
 
@@ -68,14 +68,14 @@
             <button
               class="flex items-center justify-center px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm text-sm font-medium"
               [ngClass]="{
-                'text-red-500': book.wishlist,
-                'text-gray-400': !book.wishlist
+                'text-red-500': isWishlisted,
+                'text-gray-400': !isWishlisted
               }"
               (click)="toggleWishlist()"
             >
               <i class="pi pi-heart mr-2"></i>
               <span>{{
-                book.wishlist ? "In Wishlist" : "Add to Wishlist"
+                isWishlisted ? "In Wishlist" : "Add to Wishlist"
               }}</span>
             </button>
           </div>
@@ -85,28 +85,28 @@
           </p>
 
           <div
-            *ngIf="book.seriesInfo"
+            *ngIf="mockSeriesInfo"
             class="mb-3 text-blue-600 dark:text-blue-400"
           >
             <a
               href="javascript:void(0)"
-              (click)="navigateToSeries(book.seriesInfo.id)"
+              (click)="navigateToSeries(mockSeriesInfo.id)"
               class="hover:underline flex items-center"
             >
               <i class="pi pi-book mr-1"></i> Part of
-              {{ book.seriesInfo.title }} series
+              {{ mockSeriesInfo.title }} series
             </a>
           </div>
 
           <div class="flex flex-wrap items-center gap-3 mb-4">
             <span
-              *ngFor="let genre of book.genres || [book.genre]"
+              *ngFor="let genre of book.genres"
               class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
             >
               {{ genre }}
             </span>
             <span
-              *ngFor="let tag of book.tags"
+              *ngFor="let tag of []"
               class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium"
             >
               {{ tag }}
@@ -127,7 +127,7 @@
               class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-700 shadow-sm"
             >
               <div class="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                {{ book.actualTime || "0" }}h
+                {{ bookDetails.actualTime || "0" }}h
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">
                 Reading Time
@@ -137,7 +137,7 @@
               class="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-700 shadow-sm"
             >
               <div class="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                {{ book.relatedQuotes?.length || 0 }}
+                {{ mockQuotes.length || 0 }}
               </div>
               <div class="text-xs text-gray-500 dark:text-gray-400">Quotes</div>
             </div>
@@ -155,6 +155,7 @@
           <div class="flex flex-wrap gap-3 justify-center lg:justify-start">
             <button
               class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-sm"
+              (click)="openEditBookDialog()"
             >
               <i class="pi pi-pencil mr-2"></i> Edit Book
             </button>
@@ -217,7 +218,7 @@
               Notes
             </h2>
             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-              {{ book.notes || "No notes added yet." }}
+              {{ bookDetails.notes || "No notes added yet." }}
             </p>
           </div>
 
@@ -237,7 +238,7 @@
                   Start Date
                 </div>
                 <div class="font-semibold text-gray-900 dark:text-white">
-                  {{ (book.startDate | date : "MMM dd, yyyy") || "Not set" }}
+                  {{ (bookDetails.startDate | date : "MMM dd, yyyy") || "Not set" }}
                 </div>
               </div>
               <div
@@ -248,7 +249,7 @@
                 </div>
                 <div class="font-semibold text-gray-900 dark:text-white">
                   {{
-                    (book.finishDate | date : "MMM dd, yyyy") || "Not finished"
+                    (bookDetails.finishDate | date : "MMM dd, yyyy") || "Not finished"
                   }}
                 </div>
               </div>
@@ -259,7 +260,7 @@
                   Reading Speed
                 </div>
                 <div class="font-semibold text-gray-900 dark:text-white">
-                  {{ book.readingSpeed || "0" }} pages/hour
+                  {{ bookDetails.readingSpeed || "0" }} pages/hour
                 </div>
               </div>
             </div>
@@ -267,7 +268,7 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="space-y-6">
+        <div class="space-y-4">
           <!-- Book Details -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <h3
@@ -282,7 +283,7 @@
                   >Genre</span
                 >
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.genre || "Unknown" }}
+                  {{ book.genres[0] || "Unknown" }}
                 </span>
               </div>
               <div class="flex justify-between">
@@ -306,7 +307,7 @@
                   >Est. Time</span
                 >
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.estimatedTime || "0" }}h
+                  {{ bookDetails.estimatedTime || "0" }}h
                 </span>
               </div>
               <div class="flex justify-between">
@@ -314,8 +315,151 @@
                   >Actual Time</span
                 >
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.actualTime || "0" }}h
+                  {{ bookDetails.actualTime || "0" }}h
                 </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Publisher Info -->
+          <div 
+            *ngIf="getSelectedPublisher()" 
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center"
+            >
+              <i class="pi pi-building text-purple-500 mr-2"></i>
+              Publisher
+            </h3>
+            <div class="space-y-3">
+              <!-- Publisher Name -->
+              <div class="flex items-center justify-between">
+                <div class="flex-1 cursor-pointer" (click)="togglePublisherDetails()">
+                  <div class="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                    {{ getSelectedPublisher()?.name }}
+                  </div>
+                  <div *ngIf="getSelectedPublisher()?.location" class="text-sm text-gray-600 dark:text-gray-400 flex items-center mt-1">
+                    <i class="pi pi-map-marker mr-1"></i>
+                    {{ getSelectedPublisher()?.location }}
+                  </div>
+                </div>
+                <button
+                  pButton
+                  [icon]="showPublisherDetails ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  class="p-button-rounded p-button-outlined p-button-sm"
+                  [pTooltip]="showPublisherDetails ? 'Hide Details' : 'Show Details'"
+                  (click)="togglePublisherDetails()"
+                ></button>
+              </div>
+
+              <!-- Publisher Stats -->
+              <div class="grid grid-cols-2 gap-2">
+                <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div class="text-base font-bold text-purple-600 dark:text-purple-400">
+                    {{ getPublisherBookCount() }}
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Total Books
+                  </div>
+                </div>
+                <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div class="text-base font-bold text-green-600 dark:text-green-400">
+                    {{ getPublisherOwnedCount() }}
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Owned
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expandable Publisher Details -->
+              <div *ngIf="showPublisherDetails" class="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 space-y-3">
+                <!-- Publisher Description -->
+                <div *ngIf="getSelectedPublisher()?.description">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                    <i class="pi pi-info-circle mr-2 text-purple-600"></i>
+                    About Publisher
+                  </h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {{ getSelectedPublisher()?.description }}
+                  </p>
+                </div>
+
+                <!-- Publisher Books in Library -->
+                <div>
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                    <i class="pi pi-book mr-2 text-purple-600"></i>
+                    Books in Your Library ({{ getPublisherBookCount() }})
+                  </h4>
+                  <div class="space-y-2 max-h-40 overflow-y-auto">
+                    <div 
+                      *ngFor="let publisherBook of getPublisherBooks()" 
+                      class="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      [title]="'Book: ' + publisherBook.title"
+                    >
+                      <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {{ publisherBook.title }}
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ publisherBook.author }}
+                        </div>
+                      </div>
+                      <div class="ml-2 flex-shrink-0">
+                        <span 
+                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': publisherBook.status === 'Completed',
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': publisherBook.status === 'Reading',
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': publisherBook.status === 'Want to Read',
+                            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300': !publisherBook.status
+                          }"
+                        >
+                          {{ publisherBook.status || 'Unknown' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div *ngIf="getPublisherBookCount() === 0" class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                      No other books from this publisher in your library
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Publisher Genres -->
+                <div *ngIf="getSelectedPublisher()?.specializedGenres?.length">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                    <i class="pi pi-tags mr-2 text-purple-600"></i>
+                    Specialized Genres
+                  </h4>
+                  <div class="flex flex-wrap gap-1">
+                    <span 
+                      *ngFor="let genre of getSelectedPublisher()?.specializedGenres" 
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
+                    >
+                      {{ genre }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Publisher Website -->
+              <div *ngIf="getSelectedPublisher()?.website" class="pt-2 border-t border-gray-200 dark:border-gray-600">
+                <a
+                  [href]="getSelectedPublisher()?.website"
+                  target="_blank"
+                  class="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm flex items-center gap-1"
+                >
+                  <i class="pi pi-external-link"></i>
+                  Visit Website
+                </a>
+              </div>
+
+              <!-- Publisher Description (only first 2 lines) -->
+              <div *ngIf="getSelectedPublisher()?.description" class="pt-2 border-t border-gray-200 dark:border-gray-600">
+                <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+                  {{ getSelectedPublisher()?.description }}
+                </p>
               </div>
             </div>
           </div>
@@ -342,7 +486,7 @@
                   >Purchase Date</span
                 >
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ (book.purchaseDate | date : "MMM dd, yyyy") || "Unknown" }}
+                  {{ (bookDetails.purchaseDate | date : "MMM dd, yyyy") || "Unknown" }}
                 </span>
               </div>
               <div class="flex justify-between">
@@ -377,9 +521,9 @@
           </button>
         </div>
 
-        <div *ngIf="book.relatedQuotes?.length">
+        <div *ngIf="mockQuotes?.length">
           <div
-            *ngFor="let quote of book.relatedQuotes"
+            *ngFor="let quote of mockQuotes"
             class="mb-5 bg-purple-50 dark:bg-purple-900/10 rounded-lg p-5 border-l-4 border-purple-500"
           >
             <blockquote
@@ -414,7 +558,7 @@
           </div>
         </div>
 
-        <div *ngIf="!book.relatedQuotes?.length" class="text-center py-8">
+        <div *ngIf="!mockQuotes?.length" class="text-center py-8">
           <div class="text-gray-400 dark:text-gray-500 mb-3">
             <i class="pi pi-quote-left text-6xl"></i>
           </div>
@@ -446,9 +590,9 @@
           </button>
         </div>
 
-        <div *ngIf="book.reviews?.length">
+        <div *ngIf="mockReviews?.length">
           <div
-            *ngFor="let review of book.reviews"
+            *ngFor="let review of mockReviews"
             class="mb-5 bg-white dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600 shadow-sm"
           >
             <div class="flex items-center mb-3">
@@ -510,7 +654,7 @@
           </div>
         </div>
 
-        <div *ngIf="!book.reviews?.length" class="text-center py-8">
+        <div *ngIf="!mockReviews?.length" class="text-center py-8">
           <div class="text-gray-400 dark:text-gray-500 mb-3">
             <i class="pi pi-star text-6xl"></i>
           </div>
@@ -542,7 +686,7 @@
           </button>
         </div>
 
-        <div *ngIf="book.readingLogs?.length">
+        <div *ngIf="mockReadingLogs?.length">
           <div
             class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
           >
@@ -580,7 +724,7 @@
               <tbody
                 class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
               >
-                <tr *ngFor="let log of book.readingLogs">
+                <tr *ngFor="let log of mockReadingLogs">
                   <td
                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300"
                   >
@@ -634,7 +778,7 @@
           </div>
         </div>
 
-        <div *ngIf="!book.readingLogs?.length" class="text-center py-8">
+        <div *ngIf="!mockReadingLogs?.length" class="text-center py-8">
           <div class="text-gray-400 dark:text-gray-500 mb-3">
             <i class="pi pi-clock text-6xl"></i>
           </div>
@@ -652,25 +796,25 @@
         *ngSwitchCase="'series'"
         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
       >
-        <div *ngIf="book.seriesInfo">
+        <div *ngIf="mockSeriesInfo">
           <h2
             class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
           >
             <i class="pi pi-list text-blue-500 mr-3"></i>
-            Series: {{ book.seriesInfo.title }}
+            Series: {{ mockSeriesInfo.title }}
           </h2>
 
           <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
             <div class="flex flex-wrap justify-between items-center">
               <div>
                 <p class="text-gray-700 dark:text-gray-300">
-                  This book is #{{ book.seriesInfo.orderInSeries }} in a series
-                  of {{ book.seriesInfo.totalBooks }} books
+                  This book is #{{ mockSeriesInfo.orderInSeries }} in a series
+                  of {{ mockSeriesInfo.totalBooks }} books
                 </p>
               </div>
               <button
                 class="mt-2 sm:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-                (click)="navigateToSeries(book.seriesInfo.id)"
+                (click)="navigateToSeries(mockSeriesInfo.id)"
               >
                 View Full Series
               </button>
@@ -688,7 +832,7 @@
               <div
                 class="bg-blue-600 h-2.5 rounded-full"
                 [style.width.%]="
-                  (book.seriesInfo.orderInSeries / book.seriesInfo.totalBooks) *
+                  (mockSeriesInfo.orderInSeries / mockSeriesInfo.totalBooks) *
                   100
                 "
               ></div>
@@ -696,10 +840,10 @@
             <div
               class="flex justify-between text-xs text-gray-500 dark:text-gray-400"
             >
-              <span>Book {{ book.seriesInfo.orderInSeries }}</span>
+              <span>Book {{ mockSeriesInfo.orderInSeries }}</span>
               <span
-                >{{ book.seriesInfo.orderInSeries }} of
-                {{ book.seriesInfo.totalBooks }}</span
+                >{{ mockSeriesInfo.orderInSeries }} of
+                {{ mockSeriesInfo.totalBooks }}</span
               >
             </div>
           </div>
@@ -711,7 +855,7 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ng-container *ngFor="let seriesBook of book.seriesBooks">
+              <ng-container *ngFor="let seriesBook of mockSeriesBooks">
                 <!-- Book card -->
                 <div
                   [ngClass]="{
@@ -801,7 +945,7 @@
             <div class="mt-6 text-center">
               <button
                 class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm flex items-center mx-auto shadow-md transition-all hover:shadow-lg"
-                (click)="navigateToSeries(book.seriesInfo.id)"
+                (click)="navigateToSeries(mockSeriesInfo.id)"
               >
                 <i class="pi pi-list mr-2"></i> View Complete Series Details
               </button>
@@ -812,7 +956,7 @@
           </div>
         </div>
 
-        <div *ngIf="!book.seriesInfo" class="text-center py-8">
+        <div *ngIf="!mockSeriesInfo" class="text-center py-8">
           <div class="text-gray-400 dark:text-gray-500 mb-3">
             <i class="pi pi-book text-6xl"></i>
           </div>
@@ -837,6 +981,183 @@
           </div>
         </div>
       </div>
+      
+      <!-- Book Editions Section -->
+      <div class="mt-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <app-book-editions 
+            [bookId]="book.id!" 
+            [bookTitle]="book.title!">
+          </app-book-editions>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Edit Book Dialog -->
+<p-dialog
+  [(visible)]="showEditBookDialog"
+  [modal]="true"
+  [closable]="true"
+  [resizable]="false"
+  [draggable]="false"
+  header="Edit Book"
+  styleClass="w-full max-w-2xl mx-4"
+>
+  <div class="space-y-6">
+    <!-- Title -->
+    <div>
+      <label for="editTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Book Title *
+      </label>
+      <input
+        id="editTitle"
+        type="text"
+        [(ngModel)]="editingBook.title"
+        placeholder="Enter book title"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        required
+      />
+    </div>
+
+    <!-- Authors -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Authors *
+      </label>
+      <p-multiSelect
+        [options]="authorOptions"
+        [(ngModel)]="selectedAuthors"
+        optionLabel="name"
+        placeholder="Select authors"
+        [showClear]="true"
+        styleClass="w-full"
+      ></p-multiSelect>
+    </div>
+
+    <!-- Genres -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Genres
+      </label>
+      <p-multiSelect
+        [options]="genreOptions"
+        [(ngModel)]="editingBook.genres"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select genres"
+        [showClear]="true"
+        styleClass="w-full"
+      ></p-multiSelect>
+    </div>
+
+    <!-- Publisher -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Publisher
+      </label>
+      <p-select
+        [options]="publisherOptions"
+        [(ngModel)]="selectedPublisherId"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select a publisher"
+        [showClear]="true"
+        styleClass="w-full"
+      ></p-select>
+      <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Can't find your publisher? You can manage publishers in 
+        <a routerLink="/settings" class="text-blue-600 dark:text-blue-400 hover:underline">Settings → Publisher Management</a>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div>
+      <label for="editPages" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Pages
+      </label>
+      <input
+        id="editPages"
+        type="number"
+        [(ngModel)]="editingBook.pages"
+        placeholder="Number of pages"
+        min="1"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      />
+    </div>
+
+    <!-- Status -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Reading Status
+      </label>
+      <p-select
+        [options]="statuses"
+        [(ngModel)]="editingBook.status"
+        placeholder="Select status"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Price and Source -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="editPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Price
+        </label>
+        <input
+          id="editPrice"
+          type="number"
+          [(ngModel)]="editingBook.price"
+          placeholder="0.00"
+          step="0.01"
+          min="0"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        />
+      </div>
+      <div>
+        <label for="editSource" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Source
+        </label>
+        <input
+          id="editSource"
+          type="text"
+          [(ngModel)]="editingBook.source"
+          placeholder="Where did you get this book?"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+        />
+      </div>
+    </div>
+
+    <!-- Rating -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Rating
+      </label>
+      <p-rating
+        [(ngModel)]="editingBook.rating"
+        [stars]="5"
+      ></p-rating>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        (click)="cancelEditBook()"
+        class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors duration-200"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="saveBookChanges()"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
+      >
+        Save Changes
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

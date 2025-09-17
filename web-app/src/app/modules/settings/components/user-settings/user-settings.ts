@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { PublisherService } from '../../../publishers/services/publisher.service';
+import { Publisher } from '../../../publishers/models/publisher.model';
 
 @Component({
   selector: 'app-user-settings',
@@ -59,11 +61,27 @@ export class UserSettings {
   editingTagIndex = -1;
   editingTagName = '';
 
+  // Publisher management properties
+  showPublisherManagement = false;
+  publishers: Publisher[] = [];
+  showAddPublisherDialog = false;
+  showEditPublisherDialog = false;
+  editingPublisher: Publisher | null = null;
+  newPublisherData = {
+    name: '',
+    location: '',
+    website: '',
+    description: ''
+  };
+
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) {}
+    private confirmationService: ConfirmationService,
+    private publisherService: PublisherService
+  ) {
+    this.loadPublishers();
+  }
 
   // === Settings Management ===
   saveAllSettings() {
@@ -872,8 +890,89 @@ export class UserSettings {
     }, 2000);
   }
 
+  // === Publisher Management ===
+  loadPublishers() {
+    this.publishers = this.publisherService.getPublishers();
+  }
+
+  openAddPublisherDialog() {
+    this.newPublisherData = {
+      name: '',
+      location: '',
+      website: '',
+      description: ''
+    };
+    this.showAddPublisherDialog = true;
+  }
+
+  createPublisher() {
+    if (this.newPublisherData.name.trim()) {
+      const newPublisher = this.publisherService.createPublisher(this.newPublisherData);
+      if (newPublisher) {
+        this.loadPublishers();
+        this.showAddPublisherDialog = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Publisher Added',
+          detail: `${newPublisher.name} has been added successfully.`,
+          life: 3000,
+        });
+      }
+    }
+  }
+
+  editPublisher(publisher: Publisher) {
+    this.editingPublisher = { ...publisher };
+    this.showEditPublisherDialog = true;
+  }
+
+  updatePublisher() {
+    if (this.editingPublisher && this.editingPublisher.id) {
+      const updated = this.publisherService.updatePublisher(this.editingPublisher as any);
+      if (updated) {
+        this.loadPublishers();
+        this.showEditPublisherDialog = false;
+        this.editingPublisher = null;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Publisher Updated',
+          detail: `${updated.name} has been updated successfully.`,
+          life: 3000,
+        });
+      }
+    }
+  }
+
+  deletePublisher(publisher: Publisher) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${publisher.name}? This action cannot be undone.`,
+      header: 'Delete Publisher',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.publisherService.deletePublisher(publisher.id!);
+        this.loadPublishers();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Publisher Deleted',
+          detail: `${publisher.name} has been deleted.`,
+          life: 3000,
+        });
+      }
+    });
+  }
+
+  cancelPublisherDialog() {
+    this.showAddPublisherDialog = false;
+    this.showEditPublisherDialog = false;
+    this.editingPublisher = null;
+  }
+
   // === Navigation Helper ===
   navigateTo(page: string) {
     this.router.navigate([`/${page}`]);
+  }
+
+  navigateToPublishers() {
+    this.router.navigate(['/publishers']);
   }
 }

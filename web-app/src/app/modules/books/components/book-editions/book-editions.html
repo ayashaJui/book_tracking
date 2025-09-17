@@ -1,0 +1,444 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+        <i class="pi pi-list text-indigo-600"></i>
+        Editions
+        <span *ngIf="bookTitle" class="text-sm text-gray-500 dark:text-gray-400 font-normal">
+          for "{{ bookTitle }}"
+        </span>
+      </h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Manage different editions of this book
+      </p>
+    </div>
+    <button
+      pButton
+      label="Add Edition"
+      icon="pi pi-plus"
+      class="p-button-success p-button-sm"
+      (click)="openAddDialog()"
+    ></button>
+  </div>
+
+  <!-- Editions List -->
+  <div *ngIf="editions.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      *ngFor="let edition of editions"
+      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+    >
+      <!-- Edition Header -->
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span [class]="getFormatBadgeClass(edition.format)" class="px-2 py-1 text-xs font-medium rounded-full">
+            {{ edition.format }}
+          </span>
+          <span
+            *ngIf="edition.isOwned"
+            class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+          >
+            Owned
+          </span>
+        </div>
+        <div class="flex gap-1">
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-outlined p-button-sm"
+            pTooltip="Edit Edition"
+            (click)="openEditDialog(edition)"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-outlined p-button-danger p-button-sm"
+            pTooltip="Delete Edition"
+            (click)="deleteEdition(edition)"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Edition Details -->
+      <div class="space-y-2 text-sm">
+        <div *ngIf="edition.isbn || edition.isbn13" class="flex items-center gap-2">
+          <i class="pi pi-barcode text-gray-400"></i>
+          <span class="text-gray-600 dark:text-gray-300">
+            {{ edition.isbn13 || edition.isbn }}
+          </span>
+        </div>
+
+        <div *ngIf="edition.publisherName" class="flex items-center gap-2">
+          <i class="pi pi-building text-gray-400"></i>
+          <span class="text-gray-600 dark:text-gray-300">
+            {{ edition.publisherName }}
+          </span>
+        </div>
+
+        <div *ngIf="edition.publicationDate" class="flex items-center gap-2">
+          <i class="pi pi-calendar text-gray-400"></i>
+          <span class="text-gray-600 dark:text-gray-300">
+            {{ edition.publicationDate | date:'mediumDate' }}
+          </span>
+        </div>
+
+        <div *ngIf="edition.pages" class="flex items-center gap-2">
+          <i class="pi pi-file text-gray-400"></i>
+          <span class="text-gray-600 dark:text-gray-300">
+            {{ edition.pages }} pages
+          </span>
+        </div>
+
+        <div *ngIf="edition.price" class="flex items-center gap-2">
+          <i class="pi pi-dollar text-gray-400"></i>
+          <span class="text-gray-600 dark:text-gray-300 font-semibold">
+            {{ edition.price | currency:edition.currency }}
+          </span>
+        </div>
+
+        <div *ngIf="edition.condition && edition.isOwned" class="flex items-center gap-2">
+          <i class="pi pi-info-circle text-gray-400"></i>
+          <span [class]="getConditionBadgeClass(edition.condition)" class="px-2 py-1 text-xs font-medium rounded-full">
+            {{ edition.condition }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Edition Cover -->
+      <div *ngIf="edition.coverImage" class="mt-3">
+        <img
+          [src]="edition.coverImage"
+          [alt]="'Cover for ' + edition.format + ' edition'"
+          class="w-16 h-20 object-cover rounded border border-gray-200 dark:border-gray-600"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="editions.length === 0"
+    class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600"
+  >
+    <i class="pi pi-book text-4xl text-gray-400 mb-4 block"></i>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">No editions added yet</p>
+    <button
+      pButton
+      label="Add First Edition"
+      icon="pi pi-plus"
+      class="p-button-outlined"
+      (click)="openAddDialog()"
+    ></button>
+  </div>
+</div>
+
+<!-- Add Edition Dialog -->
+<p-dialog
+  header="Add New Edition"
+  [(visible)]="showAddDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '800px', maxWidth: '90vw' }"
+>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Left Column -->
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Format *
+        </label>
+        <p-select
+          [options]="formatOptions"
+          [(ngModel)]="newEdition.format"
+          placeholder="Select format"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          ISBN-13
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="newEdition.isbn13"
+          placeholder="978-0-123456-78-9"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          ISBN-10
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="newEdition.isbn"
+          placeholder="0-123456-78-9"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Publisher
+        </label>
+        <p-select
+          [options]="publisherOptions"
+          [(ngModel)]="newEdition.publisherId"
+          placeholder="Select publisher"
+          class="w-full"
+          [showClear]="true"
+        ></p-select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Publication Date
+        </label>
+        <p-calendar
+          [(ngModel)]="newEdition.publicationDate"
+          dateFormat="yy-mm-dd"
+          showIcon="true"
+          class="w-full"
+        ></p-calendar>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+            Price
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            pInputText
+            [(ngModel)]="newEdition.price"
+            placeholder="0.00"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+            Currency
+          </label>
+          <p-select
+            [options]="currencyOptions"
+            [(ngModel)]="newEdition.currency"
+            class="w-full"
+          ></p-select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Pages
+        </label>
+        <input
+          type="number"
+          pInputText
+          [(ngModel)]="newEdition.pages"
+          placeholder="Number of pages"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Language
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="newEdition.language"
+          placeholder="English"
+          class="w-full"
+        />
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [(ngModel)]="newEdition.isOwned"
+          binary="true"
+          inputId="isOwned"
+        ></p-checkbox>
+        <label for="isOwned" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          I own this edition
+        </label>
+      </div>
+
+      <div *ngIf="newEdition.isOwned">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Condition
+        </label>
+        <p-select
+          [options]="conditionOptions"
+          [(ngModel)]="newEdition.condition"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+      Notes
+    </label>
+    <textarea
+      pInputTextarea
+      [(ngModel)]="newEdition.notes"
+      placeholder="Additional notes about this edition..."
+      rows="3"
+      class="w-full"
+    ></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="onDialogCancel()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Add Edition"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="onAddEdition()"
+        [disabled]="!newEdition.format"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Edit Edition Dialog -->
+<p-dialog
+  header="Edit Edition"
+  [(visible)]="showEditDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '800px', maxWidth: '90vw' }"
+>
+  <div *ngIf="selectedEdition" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Similar structure to add dialog but with selectedEdition -->
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Format *
+        </label>
+        <p-select
+          [options]="formatOptions"
+          [(ngModel)]="selectedEdition.format"
+          placeholder="Select format"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          ISBN-13
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="selectedEdition.isbn13"
+          placeholder="978-0-123456-78-9"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Price
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          pInputText
+          [(ngModel)]="selectedEdition.price"
+          placeholder="0.00"
+          class="w-full"
+        />
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox
+          [(ngModel)]="selectedEdition.isOwned"
+          binary="true"
+          inputId="editIsOwned"
+        ></p-checkbox>
+        <label for="editIsOwned" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          I own this edition
+        </label>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Pages
+        </label>
+        <input
+          type="number"
+          pInputText
+          [(ngModel)]="selectedEdition.pages"
+          placeholder="Number of pages"
+          class="w-full"
+        />
+      </div>
+
+      <div *ngIf="selectedEdition.isOwned">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Condition
+        </label>
+        <p-select
+          [options]="conditionOptions"
+          [(ngModel)]="selectedEdition.condition"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="onDialogCancel()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Update Edition"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="onEditEdition()"
+        [disabled]="!selectedEdition?.format"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

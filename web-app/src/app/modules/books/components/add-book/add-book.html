@@ -126,11 +126,50 @@
                   [showAddButton]="true"
                   [(ngModel)]="selectedAuthors"
                   (ngModelChange)="onAuthorsChange($event)"
+                  (addNewAuthor)="onAddNewAuthor()"
+                  (viewAuthor)="onViewAuthor($event)"
                   name="authors"
                   placeholder="Select or search for authors..."
                   class="w-full"
                 >
                 </app-author-selector>
+              </div>
+              
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-building text-indigo-500 mr-2"></i>
+                  Publisher
+                </label>
+                <div class="flex gap-2">
+                  <p-select
+                    [options]="publisherOptions"
+                    [(ngModel)]="selectedPublisherId"
+                    (ngModelChange)="onPublisherChange()"
+                    name="publisher"
+                    placeholder="Select publisher (optional)"
+                    [showClear]="true"
+                    class="flex-1"
+                  ></p-select>
+                  <button
+                    *ngIf="selectedPublisherId"
+                    pButton
+                    icon="pi pi-info-circle"
+                    class="p-button-outlined p-button-sm"
+                    pTooltip="View Publisher Details"
+                    (click)="viewPublisherDetails(selectedPublisherId)"
+                    type="button"
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-plus"
+                    class="p-button-outlined p-button-success p-button-sm"
+                    pTooltip="Add New Publisher"
+                    (click)="openAddPublisherDialog()"
+                    type="button"
+                  ></button>
+                </div>
               </div>
             </div>
           </div>
@@ -512,3 +551,228 @@
     </div>
   </div>
 </div>
+
+<!-- Add Author Dialog -->
+<p-dialog
+  header="Add New Author"
+  [(visible)]="showAddAuthorDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="author-dialog"
+  [style]="{ width: '600px', maxWidth: '90vw' }"
+>
+  <div class="space-y-6">
+    <!-- Author Name -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-user text-indigo-500 mr-2"></i>
+        Author Name *
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newAuthorData.name"
+        placeholder="Enter author name"
+        class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+        required
+      />
+    </div>
+
+    <!-- Biography -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-file-text text-indigo-500 mr-2"></i>
+        Biography
+      </label>
+      <textarea
+        pTextarea
+        [(ngModel)]="newAuthorData.biography"
+        placeholder="Enter author biography (optional)"
+        rows="3"
+        class="w-full rounded-xl border-0 bg-gray-50 transition-all duration-200"
+      ></textarea>
+    </div>
+
+    <!-- Birth Date and Nationality -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <i class="pi pi-calendar text-indigo-500 mr-2"></i>
+          Birth Date
+        </label>
+        <p-datePicker
+          [(ngModel)]="newAuthorData.birthDate"
+          placeholder="Select birth date"
+          class="w-full"
+          [showIcon]="true"
+          iconDisplay="input"
+        ></p-datePicker>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <i class="pi pi-globe text-indigo-500 mr-2"></i>
+          Nationality
+        </label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="newAuthorData.nationality"
+          placeholder="Enter nationality"
+          class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+        />
+      </div>
+    </div>
+
+    <!-- Genres -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-tags text-indigo-500 mr-2"></i>
+        Genres
+      </label>
+      <p-multiSelect
+        [options]="genreOptions"
+        [(ngModel)]="newAuthorData.genres"
+        placeholder="Select author's genres"
+        optionLabel="label"
+        optionValue="value"
+        class="w-full"
+      ></p-multiSelect>
+    </div>
+
+    <!-- Is Alive Toggle -->
+    <div class="flex items-center gap-3">
+      <input
+        type="checkbox"
+        id="isAliveToggle"
+        [(ngModel)]="newAuthorData.isAlive"
+        class="w-5 h-5 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500"
+      />
+      <label for="isAliveToggle" class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-heart text-indigo-500 mr-2"></i>
+        Author is alive
+      </label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="onAddAuthorDialogCancel()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Add Author"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="onAddAuthorDialogSave()"
+        [disabled]="!newAuthorData.name.trim()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Publisher Dialog -->
+<p-dialog
+  header="Add New Publisher"
+  [(visible)]="showAddPublisherDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="publisher-dialog"
+  [style]="{ width: '500px', maxWidth: '90vw' }"
+>
+  <div class="space-y-6">
+    <!-- Publisher Name -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-building text-indigo-500 mr-2"></i>
+        Publisher Name *
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.name"
+        placeholder="Enter publisher name"
+        class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+        required
+      />
+    </div>
+
+    <!-- Location -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-map-marker text-indigo-500 mr-2"></i>
+        Location
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.location"
+        placeholder="Enter publisher location (optional)"
+        class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+      />
+    </div>
+
+    <!-- Website -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-globe text-indigo-500 mr-2"></i>
+        Website
+      </label>
+      <input
+        type="url"
+        pInputText
+        [(ngModel)]="newPublisherData.website"
+        placeholder="Enter publisher website (optional)"
+        class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <i class="pi pi-file-text text-indigo-500 mr-2"></i>
+        Description
+      </label>
+      <textarea
+        pTextarea
+        [(ngModel)]="newPublisherData.description"
+        placeholder="Enter publisher description (optional)"
+        rows="3"
+        class="w-full rounded-xl border-0 bg-gray-50 transition-all duration-200"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="cancelAddPublisher()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Add Publisher"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="createNewPublisher()"
+        [disabled]="!newPublisherData.name.trim()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

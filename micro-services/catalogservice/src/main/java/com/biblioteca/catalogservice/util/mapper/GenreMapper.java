@@ -13,7 +13,7 @@ public class GenreMapper {
                 .id(genre.getId())
                 .name(genre.getName())
                 .description(genre.getDescription())
-                .parentGenreId(genre.getParentGenreId().getId())
+                .parentGenreId(genre.getParentGenreId() != null ? genre.getParentGenreId().getId() : null)
                 .isActive(genre.getIsActive())
                 .createdAt(genre.getCreatedAt())
                 .updatedAt(genre.getUpdatedAt())

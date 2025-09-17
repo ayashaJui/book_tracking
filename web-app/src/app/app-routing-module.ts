@@ -85,6 +85,14 @@ const routes: Routes = [
       ),
   },
 
+  {
+    path: 'publishers',
+    loadChildren: () =>
+      import('./modules/publishers/publishers-module').then(
+        (m) => m.PublishersModule
+      ),
+  },
+
   { path: 'not-found', component: NotFoundComponent },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' },

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Book, BookCreateRequest, BookUpdateRequest, LegacyBook } from '../models/book.model';
 import { AuthorService } from '../../authors/services/author.service';
+import { PublisherService } from '../../publishers/services/publisher.service';
+import { EditionService } from './edition.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,11 @@ export class BookService {
   private readonly STORAGE_KEY = 'book_tracking_books';
   private booksSubject = new BehaviorSubject<Book[]>([]);
 
-  constructor(private authorService: AuthorService) {
+  constructor(
+    private authorService: AuthorService,
+    private publisherService: PublisherService,
+    private editionService: EditionService
+  ) {
     this.loadBooksFromStorage();
   }
 
@@ -21,27 +27,34 @@ export class BookService {
 
   // Get all books with author names populated
   getBooks(): Book[] {
-    return this.booksSubject.value.map(book => this.populateAuthorNames(book));
+    return this.booksSubject.value.map(book => this.populateBookDetails(book));
   }
 
   // Get book by ID with author names populated
   getBookById(id: number): Book | null {
     const book = this.booksSubject.value.find(b => b.id === id);
-    return book ? this.populateAuthorNames(book) : null;
+    return book ? this.populateBookDetails(book) : null;
   }
 
   // Get books by author ID
   getBooksByAuthor(authorId: number): Book[] {
     return this.booksSubject.value
       .filter(book => book.authorIds.includes(authorId))
-      .map(book => this.populateAuthorNames(book));
+      .map(book => this.populateBookDetails(book));
   }
 
   // Get books by status
   getBooksByStatus(status: string): Book[] {
     return this.booksSubject.value
       .filter(book => book.status === status)
-      .map(book => this.populateAuthorNames(book));
+      .map(book => this.populateBookDetails(book));
+  }
+
+  // Get books by publisher ID
+  getBooksByPublisher(publisherId: number): Book[] {
+    return this.booksSubject.value
+      .filter(book => book.publisherId === publisherId)
+      .map(book => this.populateBookDetails(book));
   }
 
   // Create new book
@@ -59,7 +72,7 @@ export class BookService {
     this.saveBooksToStorage(updatedBooks);
     this.booksSubject.next(updatedBooks);
     
-    return this.populateAuthorNames(newBook);
+    return this.populateBookDetails(newBook);
   }
 
   // Update existing book
@@ -82,7 +95,7 @@ export class BookService {
     this.saveBooksToStorage(updatedBooks);
     this.booksSubject.next(updatedBooks);
     
-    return this.populateAuthorNames(updatedBook);
+    return this.populateBookDetails(updatedBook);
   }
 
   // Delete book
@@ -93,6 +106,9 @@ export class BookService {
     if (filteredBooks.length === books.length) {
       return false; // Book not found
     }
+
+    // Also delete all editions for this book
+    this.editionService.deleteEditionsByBook(id);
 
     this.saveBooksToStorage(filteredBooks);
     this.booksSubject.next(filteredBooks);
@@ -109,14 +125,14 @@ export class BookService {
           .some(name => name.toLowerCase().includes(term));
         return titleMatch || authorMatch;
       })
-      .map(book => this.populateAuthorNames(book));
+      .map(book => this.populateBookDetails(book));
   }
 
   // Get books by genre
   getBooksByGenre(genre: string): Book[] {
     return this.booksSubject.value
       .filter(book => book.genres.includes(genre))
-      .map(book => this.populateAuthorNames(book));
+      .map(book => this.populateBookDetails(book));
   }
 
   // Get all unique genres from books
@@ -180,10 +196,18 @@ export class BookService {
   }
 
   // Private helper methods
-  private populateAuthorNames(book: Book): Book {
+  private populateBookDetails(book: Book): Book {
+    const authorNames = this.getAuthorNames(book.authorIds);
+    const publisherName = book.publisherId 
+      ? this.publisherService.getPublisherById(book.publisherId)?.name 
+      : undefined;
+    const editionCount = this.editionService.getEditionsByBook(book.id || 0).length;
+
     return {
       ...book,
-      authorNames: this.getAuthorNames(book.authorIds)
+      authorNames,
+      publisherName,
+      editionCount
     };
   }
 

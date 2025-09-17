@@ -6,9 +6,10 @@ import { AllBook } from './components/all-book/all-book';
 import { SharedModule } from '../shared/shared.module';
 import { AddBook } from './components/add-book/add-book';
 import { BookDetails } from './components/book-details/book-details';
+import { BookEditionsComponent } from './components/book-editions/book-editions';
 
 @NgModule({
-  declarations: [AllBook, AddBook, BookDetails],
+  declarations: [AllBook, AddBook, BookDetails, BookEditionsComponent],
   imports: [CommonModule, SharedModule, BooksRoutingModule],
 })
 export class BooksModule {}

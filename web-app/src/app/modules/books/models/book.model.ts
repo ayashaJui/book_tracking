@@ -14,6 +14,10 @@ export interface Book {
   seriesName?: string;
   seriesOrder?: number; // Position of book in the series (1, 2, 3, etc.)
   rating?: number;
+  publisherId?: number; // Reference to Publisher ID
+  publisherName?: string; // Computed field for display purposes
+  editionCount?: number; // Computed field - number of editions available
+  primaryEditionId?: number; // The main/preferred edition of this book
 }
 
 // For backward compatibility and API requests
@@ -30,6 +34,7 @@ export interface BookCreateRequest {
   seriesName?: string;
   seriesOrder?: number;
   rating?: number;
+  publisherId?: number;
 }
 
 export interface BookUpdateRequest extends Partial<BookCreateRequest> {
@@ -52,4 +57,5 @@ export interface LegacyBook {
   seriesName?: string;
   seriesOrder?: number;
   rating?: number;
+  publisherId?: number;
 }

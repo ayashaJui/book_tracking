@@ -525,212 +525,336 @@
         </div>
 
         <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Goodreads Integration -->
             <div
-              class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
             >
-              <div class="flex items-center space-x-3">
-                <i
-                  class="pi pi-book text-lg text-gray-600 dark:text-gray-400"
-                ></i>
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    Goodreads
-                  </p>
-                  <p class="text-xs text-gray-500">Sync reading progress</p>
+              <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-amber-100 dark:bg-amber-900 rounded-lg">
+                    <i class="pi pi-book text-lg text-amber-600 dark:text-amber-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                      Goodreads
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      Sync reading progress and reviews
+                    </p>
+                    <div class="mt-1">
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{
+                        settings.integrations.goodreads 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                      }}">
+                        {{ settings.integrations.goodreads ? 'Connected' : 'Not Connected' }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="flex space-x-2">
+              
+              <div class="mt-4 flex flex-wrap gap-2">
                 <p-button
-                  [label]="
-                    settings.integrations.goodreads ? 'Disconnect' : 'Connect'
-                  "
-                  [severity]="
-                    settings.integrations.goodreads ? 'danger' : 'secondary'
-                  "
+                  [label]="settings.integrations.goodreads ? 'Disconnect' : 'Connect'"
+                  [severity]="settings.integrations.goodreads ? 'danger' : 'success'"
                   size="small"
                   (onClick)="connectIntegration('Goodreads')"
+                  class="flex-1 min-w-[100px]"
                 >
                 </p-button>
                 <p-button
                   *ngIf="settings.integrations.goodreads"
-                  label="Sync"
+                  label="Sync Now"
                   icon="pi pi-sync"
                   severity="info"
                   size="small"
                   (onClick)="syncIntegrationData('Goodreads')"
+                  class="flex-1 min-w-[100px]"
                 >
                 </p-button>
               </div>
             </div>
 
+            <!-- Google Drive Integration -->
             <div
-              class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
             >
-              <div class="flex items-center space-x-3">
-                <i
-                  class="pi pi-google text-lg text-gray-600 dark:text-gray-400"
-                ></i>
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    Google Drive
-                  </p>
-                  <p class="text-xs text-gray-500">Cloud backup</p>
+              <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <i class="pi pi-google text-lg text-blue-600 dark:text-blue-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                      Google Drive
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      Automatic cloud backup storage
+                    </p>
+                    <div class="mt-1">
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{
+                        settings.integrations.googleDrive 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                      }}">
+                        {{ settings.integrations.googleDrive ? 'Connected' : 'Not Connected' }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="flex space-x-2">
+              
+              <div class="mt-4 flex flex-wrap gap-2">
                 <p-button
-                  [label]="
-                    settings.integrations.googleDrive ? 'Disconnect' : 'Connect'
-                  "
-                  [severity]="
-                    settings.integrations.googleDrive ? 'danger' : 'secondary'
-                  "
+                  [label]="settings.integrations.googleDrive ? 'Disconnect' : 'Connect'"
+                  [severity]="settings.integrations.googleDrive ? 'danger' : 'success'"
                   size="small"
                   (onClick)="connectIntegration('Google Drive')"
+                  class="flex-1 min-w-[100px]"
                 >
                 </p-button>
                 <p-button
                   *ngIf="settings.integrations.googleDrive"
-                  label="Sync"
-                  icon="pi pi-sync"
+                  label="Backup Now"
+                  icon="pi pi-cloud-upload"
                   severity="info"
                   size="small"
                   (onClick)="syncIntegrationData('Google Drive')"
+                  class="flex-1 min-w-[100px]"
                 >
                 </p-button>
               </div>
-            </div>
-
-            <div
-              class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              (click)="navigateTo('tags')"
-            >
-              <div class="flex items-center space-x-3">
-                <i
-                  class="pi pi-tags text-lg text-gray-600 dark:text-gray-400"
-                ></i>
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    Tag Management
-                  </p>
-                  <p class="text-xs text-gray-500">Organize books</p>
-                </div>
-              </div>
-              <i class="pi pi-chevron-right text-gray-400"></i>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Tag Management Section -->
-          <div class="mt-6">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-md font-semibold text-gray-900 dark:text-white">
-                Quick Tag Management
-              </h4>
-              <p-button
-                label="Add Tag"
-                icon="pi pi-plus"
-                severity="success"
-                size="small"
-                (onClick)="showAddTagDialog = true"
-              >
-              </p-button>
+      <!-- Content Management Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center space-x-3">
+            <i class="pi pi-database text-xl text-purple-500"></i>
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                Content Management
+              </h2>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Manage your books, genres, and organizational tools
+              </p>
             </div>
+          </div>
+        </div>
 
-            <!-- Current Tags Display -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Genre Management Card -->
             <div
-              class="flex flex-wrap gap-2 mb-4"
-              *ngIf="settings.tags.length > 0"
+              class="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl border border-purple-200 dark:border-purple-700 cursor-pointer hover:shadow-lg transition-all duration-200 group"
+              (click)="navigateTo('settings/genres')"
             >
-              <div
-                *ngFor="let tag of settings.tags; let i = index"
-                class="flex items-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
-              >
-                <span
-                  class="mr-2 cursor-pointer"
-                  (click)="editTagInline(i, tag)"
-                  [title]="'Click to edit: ' + tag"
-                >
-                  {{ tag }}
-                </span>
-                <button
-                  class="text-blue-600 dark:text-blue-300 hover:text-red-500 ml-1"
-                  (click)="removeTag(tag)"
-                  [title]="'Remove tag: ' + tag"
-                >
-                  <i class="pi pi-times text-xs"></i>
-                </button>
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="p-3 bg-purple-100 dark:bg-purple-800 rounded-xl group-hover:scale-105 transition-transform">
+                    <i class="pi pi-tags text-xl text-purple-600 dark:text-purple-300"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
+                      Genre Management
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Organize and manage book categories
+                    </p>
+                  </div>
+                </div>
+                <i class="pi pi-chevron-right text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all"></i>
+              </div>
+              
+              <div class="space-y-2">
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Create and edit genres
+                </div>
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Organize your book collection
+                </div>
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Search and filter options
+                </div>
               </div>
             </div>
 
-            <!-- Empty State -->
-            <div
-              *ngIf="settings.tags.length === 0"
-              class="text-center py-4 text-gray-500 dark:text-gray-400"
-            >
-              <i class="pi pi-tags text-3xl mb-2 block"></i>
-              <p class="text-sm">No tags created yet. Add your first tag!</p>
-            </div>
-
-            <!-- Add Tag Input (Inline) -->
-            <div class="mt-4" *ngIf="showAddTagDialog">
-              <div class="flex items-center space-x-2">
-                <input
-                  type="text"
-                  pInputText
-                  [(ngModel)]="newTagName"
-                  placeholder="Enter tag name"
-                  class="flex-1"
-                  (keyup.enter)="addNewTag()"
-                  (keyup.escape)="cancelAddTag()"
-                  #tagInput
-                />
+            <!-- Personal Tags Card -->
+            <div class="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-700">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="p-3 bg-blue-100 dark:bg-blue-800 rounded-xl">
+                    <i class="pi pi-bookmark text-xl text-blue-600 dark:text-blue-300"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      Personal Tags
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Custom labels for personal organization
+                    </p>
+                  </div>
+                </div>
                 <p-button
-                  icon="pi pi-check"
+                  icon="pi pi-plus"
                   severity="success"
                   size="small"
-                  (onClick)="addNewTag()"
-                  [disabled]="!newTagName.trim()"
-                >
-                </p-button>
-                <p-button
-                  icon="pi pi-times"
-                  severity="secondary"
-                  size="small"
-                  (onClick)="cancelAddTag()"
+                  class="!p-2"
+                  (onClick)="showAddTagDialog = true"
+                  pTooltip="Add new tag"
                 >
                 </p-button>
               </div>
+
+              <!-- Current Tags Display -->
+              <div class="min-h-[120px]">
+                <div
+                  class="flex flex-wrap gap-2 mb-4"
+                  *ngIf="settings.tags.length > 0; else emptyTags"
+                >
+                  <div
+                    *ngFor="let tag of settings.tags; let i = index"
+                    class="flex items-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <span
+                      class="cursor-pointer hover:text-blue-900 dark:hover:text-blue-100"
+                      (click)="editTagInline(i, tag)"
+                      [title]="'Click to edit: ' + tag"
+                    >
+                      {{ tag }}
+                    </span>
+                    <button
+                      class="ml-2 text-blue-600 dark:text-blue-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                      (click)="removeTag(tag)"
+                      [title]="'Remove tag: ' + tag"
+                    >
+                      <i class="pi pi-times text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Empty State -->
+                <ng-template #emptyTags>
+                  <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <i class="pi pi-bookmark text-3xl mb-3 block opacity-50"></i>
+                    <p class="text-sm font-medium mb-1">No personal tags yet</p>
+                    <p class="text-xs">Add your first tag to get started!</p>
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- Add Tag Input (Inline) -->
+              <div class="mt-4" *ngIf="showAddTagDialog">
+                <div class="flex items-center space-x-2 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newTagName"
+                    placeholder="Enter tag name"
+                    class="flex-1 border-0 shadow-none focus:ring-0 focus:outline-none bg-transparent"
+                    (keyup.enter)="addNewTag()"
+                    (keyup.escape)="cancelAddTag()"
+                    #tagInput
+                  />
+                  <p-button
+                    icon="pi pi-check"
+                    severity="success"
+                    size="small"
+                    (onClick)="addNewTag()"
+                    [disabled]="!newTagName.trim()"
+                    pTooltip="Save tag"
+                  >
+                  </p-button>
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    size="small"
+                    (onClick)="cancelAddTag()"
+                    pTooltip="Cancel"
+                  >
+                  </p-button>
+                </div>
+              </div>
+
+              <!-- Edit Tag Input (Inline) -->
+              <div class="mt-4" *ngIf="editingTagIndex !== -1">
+                <div class="flex items-center space-x-2 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="editingTagName"
+                    placeholder="Edit tag name"
+                    class="flex-1 border-0 shadow-none focus:ring-0 focus:outline-none bg-transparent"
+                    (keyup.enter)="saveEditedTag()"
+                    (keyup.escape)="cancelEditTag()"
+                    #editTagInput
+                  />
+                  <p-button
+                    icon="pi pi-check"
+                    severity="success"
+                    size="small"
+                    (onClick)="saveEditedTag()"
+                    [disabled]="!editingTagName.trim()"
+                    pTooltip="Save changes"
+                  >
+                  </p-button>
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    size="small"
+                    (onClick)="cancelEditTag()"
+                    pTooltip="Cancel edit"
+                  >
+                  </p-button>
+                </div>
+              </div>
             </div>
 
-            <!-- Edit Tag Input (Inline) -->
-            <div class="mt-4" *ngIf="editingTagIndex !== -1">
-              <div class="flex items-center space-x-2">
-                <input
-                  type="text"
-                  pInputText
-                  [(ngModel)]="editingTagName"
-                  placeholder="Edit tag name"
-                  class="flex-1"
-                  (keyup.enter)="saveEditedTag()"
-                  (keyup.escape)="cancelEditTag()"
-                  #editTagInput
-                />
-                <p-button
-                  icon="pi pi-check"
-                  severity="success"
-                  size="small"
-                  (onClick)="saveEditedTag()"
-                  [disabled]="!editingTagName.trim()"
-                >
-                </p-button>
-                <p-button
-                  icon="pi pi-times"
-                  severity="secondary"
-                  size="small"
-                  (onClick)="cancelEditTag()"
-                >
-                </p-button>
+            <!-- Publisher Management Card -->
+            <div
+              class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-700 cursor-pointer hover:shadow-lg transition-all duration-200 group"
+              (click)="navigateToPublishers()"
+            >
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="p-3 bg-green-100 dark:bg-green-800 rounded-xl group-hover:scale-105 transition-transform">
+                    <i class="pi pi-building text-xl text-green-600 dark:text-green-300"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-300 transition-colors">
+                      Publisher Management
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Manage book publishers in your collection
+                    </p>
+                  </div>
+                </div>
+                <i class="pi pi-chevron-right text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all"></i>
+              </div>
+              
+              <div class="space-y-2">
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Add and edit publishers
+                </div>
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Track publisher information
+                </div>
+                <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                  Bulk management tools
+                </div>
               </div>
             </div>
           </div>
@@ -900,3 +1024,250 @@
     </div>
   </div>
 </div>
+
+<!-- Publisher Management Dialog -->
+<p-dialog
+  header="Publisher Management"
+  [(visible)]="showPublisherManagement"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="publisher-management-dialog"
+  [style]="{ width: '800px', maxWidth: '95vw' }"
+>
+  <div class="space-y-6">
+    <!-- Actions Header -->
+    <div class="flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Manage Publishers
+      </h3>
+      <button
+        type="button"
+        pButton
+        label="Add Publisher"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="openAddPublisherDialog()"
+      ></button>
+    </div>
+
+    <!-- Publishers List -->
+    <div class="space-y-3 max-h-96 overflow-y-auto">
+      <div
+        *ngFor="let publisher of publishers"
+        class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+      >
+        <div class="flex-1">
+          <h4 class="font-medium text-gray-900 dark:text-white">
+            {{ publisher.name }}
+          </h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400" *ngIf="publisher.location">
+            📍 {{ publisher.location }}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400" *ngIf="publisher.website">
+            🌐 {{ publisher.website }}
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-outlined p-button-sm"
+            (click)="editPublisher(publisher)"
+          ></button>
+          <button
+            type="button"
+            pButton
+            icon="pi pi-trash"
+            class="p-button-outlined p-button-danger p-button-sm"
+            (click)="deletePublisher(publisher)"
+          ></button>
+        </div>
+      </div>
+
+      <div *ngIf="publishers.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+        <i class="pi pi-building text-3xl mb-3 block opacity-50"></i>
+        <p class="text-sm font-medium">No publishers found</p>
+        <p class="text-xs">Add your first publisher to get started!</p>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Add Publisher Dialog -->
+<p-dialog
+  header="Add New Publisher"
+  [(visible)]="showAddPublisherDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px', maxWidth: '90vw' }"
+>
+  <div class="space-y-4">
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Publisher Name *
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.name"
+        placeholder="Enter publisher name"
+        class="w-full"
+        required
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Location
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.location"
+        placeholder="Enter publisher location (optional)"
+        class="w-full"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Website
+      </label>
+      <input
+        type="url"
+        pInputText
+        [(ngModel)]="newPublisherData.website"
+        placeholder="Enter publisher website (optional)"
+        class="w-full"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Description
+      </label>
+      <textarea
+        pTextarea
+        [(ngModel)]="newPublisherData.description"
+        placeholder="Enter publisher description (optional)"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="cancelPublisherDialog()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Add Publisher"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="createPublisher()"
+        [disabled]="!newPublisherData.name.trim()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Edit Publisher Dialog -->
+<p-dialog
+  header="Edit Publisher"
+  [(visible)]="showEditPublisherDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px', maxWidth: '90vw' }"
+>
+  <div class="space-y-4" *ngIf="editingPublisher">
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Publisher Name *
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="editingPublisher.name"
+        placeholder="Enter publisher name"
+        class="w-full"
+        required
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Location
+      </label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="editingPublisher.location"
+        placeholder="Enter publisher location (optional)"
+        class="w-full"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Website
+      </label>
+      <input
+        type="url"
+        pInputText
+        [(ngModel)]="editingPublisher.website"
+        placeholder="Enter publisher website (optional)"
+        class="w-full"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+        Description
+      </label>
+      <textarea
+        pTextarea
+        [(ngModel)]="editingPublisher.description"
+        placeholder="Enter publisher description (optional)"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-3 justify-end">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-outlined"
+        (click)="cancelPublisherDialog()"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Update Publisher"
+        icon="pi pi-check"
+        class="p-button-success"
+        (click)="updatePublisher()"
+        [disabled]="!editingPublisher?.name?.trim()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

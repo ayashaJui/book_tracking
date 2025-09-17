@@ -8,6 +8,8 @@ import { SeriesService } from '../../../series/services/series.service';
 import { GenreService } from '../../../shared/services/genre.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { Author } from '../../../authors/models/author.model';
+import { PublisherService } from '../../../publishers/services/publisher.service';
+import { Publisher } from '../../../publishers/models/publisher.model';
 
 @Component({
   selector: 'app-add-book',
@@ -32,6 +34,17 @@ export class AddBook implements OnInit {
   // Selected authors for the book
   selectedAuthors: Author[] = [];
 
+  // Publisher related properties
+  publisherOptions: { label: string; value: number | string }[] = [];
+  selectedPublisherId: number | string | null = null;
+  showAddPublisherDialog: boolean = false;
+  newPublisherData = {
+    name: '',
+    location: '',
+    website: '',
+    description: ''
+  };
+
   // Series related properties
   seriesOptions: { label: string; value: number }[] = [];
   selectedSeriesId: number | null = null;
@@ -54,27 +67,110 @@ export class AddBook implements OnInit {
 
   genreOptions: { label: string; value: string }[] = [];
 
+  // Add author dialog properties
+  showAddAuthorDialog: boolean = false;
+  newAuthorData = {
+    name: '',
+    biography: '',
+    birthDate: null as Date | null,
+    nationality: '',
+    genres: [] as string[],
+    isAlive: true
+  };
+
   constructor(
     private location: Location,
     private router: Router,
     private seriesService: SeriesService,
     private genreService: GenreService,
     private bookService: BookService,
-    private authorService: AuthorService
+    private authorService: AuthorService,
+    private publisherService: PublisherService
   ) {}
 
   ngOnInit() {
     this.loadSeriesOptions();
     this.loadGenreOptions();
+    this.loadPublisherOptions();
   }
 
   loadGenreOptions() {
     this.genreOptions = this.genreService.getGenreOptions();
   }
 
+  loadPublisherOptions() {
+    const publishers = this.publisherService.getPublishers();
+    this.publisherOptions = [
+      { label: '+ Add New Publisher', value: 'add_new' },
+      ...publishers.map(publisher => ({
+        label: publisher.name,
+        value: publisher.id!
+      }))
+    ];
+  }
+
   onAuthorsChange(authors: Author[]) {
     this.selectedAuthors = authors;
     this.newBook.authorIds = authors.map(a => a.id!).filter(id => id !== undefined);
+  }
+
+  onAddNewAuthor() {
+    // Open the add author dialog
+    this.showAddAuthorDialog = true;
+  }
+
+  onViewAuthor(author: Author) {
+    // Navigate to author details page
+    if (author.id) {
+      this.router.navigate(['/authors', author.id]);
+    }
+  }
+
+  onAddAuthorDialogSave() {
+    if (this.newAuthorData.name.trim()) {
+      // Create new author object
+      const newAuthor: Author = {
+        name: this.newAuthorData.name.trim(),
+        biography: this.newAuthorData.biography,
+        birthDate: this.newAuthorData.birthDate || undefined,
+        nationality: this.newAuthorData.nationality,
+        genres: this.newAuthorData.genres,
+        isActive: this.newAuthorData.isAlive,
+        totalBooks: 0,
+        averageRating: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Add the author using the service
+      this.authorService.addAuthor(newAuthor);
+
+      // Add the newly created author to the selected authors
+      if (newAuthor.id) {
+        this.selectedAuthors = [...this.selectedAuthors, newAuthor];
+        this.newBook.authorIds = this.selectedAuthors.map(a => a.id!).filter(id => id !== undefined);
+      }
+
+      // Close dialog and reset form
+      this.showAddAuthorDialog = false;
+      this.resetNewAuthorData();
+    }
+  }
+
+  onAddAuthorDialogCancel() {
+    this.showAddAuthorDialog = false;
+    this.resetNewAuthorData();
+  }
+
+  private resetNewAuthorData() {
+    this.newAuthorData = {
+      name: '',
+      biography: '',
+      birthDate: null,
+      nationality: '',
+      genres: [],
+      isAlive: true
+    };
   }
 
   onGenreCreated(genreName: string) {
@@ -192,6 +288,11 @@ export class AddBook implements OnInit {
   addBook() {
     console.log('Book added:', this.newBook);
 
+    // Add publisher ID if selected
+    if (this.selectedPublisherId && typeof this.selectedPublisherId === 'number') {
+      this.newBook.publisherId = this.selectedPublisherId;
+    }
+
     // If book is part of a series, add it to the series
     if (
       this.isPartOfSeries &&
@@ -208,7 +309,15 @@ export class AddBook implements OnInit {
     // Add current date
     this.newBook.dateAdded = new Date().toISOString().split('T')[0];
 
-    // TODO: send newBook to backend API or store locally
+    // Create the book using the service
+    const bookData: BookCreateRequest = {
+      ...this.newBook,
+      authorIds: this.newBook.authorIds,
+      publisherId: (typeof this.selectedPublisherId === 'number') ? this.selectedPublisherId : undefined
+    };
+
+    const createdBook = this.bookService.createBook(bookData);
+    console.log('Book created:', createdBook);
 
     // Show success message and navigate back
     // You can add a toast notification here
@@ -217,6 +326,66 @@ export class AddBook implements OnInit {
 
   goBack() {
     this.location.back();
+  }
+
+  onPublisherChange() {
+    if (this.selectedPublisherId === 'add_new') {
+      this.showAddPublisherDialog = true;
+      this.selectedPublisherId = null;
+    }
+  }
+
+  viewPublisherDetails(publisherId: number | string | null) {
+    if (publisherId && typeof publisherId === 'number') {
+      // Open publisher details in new tab or navigate
+      this.router.navigate(['/publishers/details', publisherId]);
+    }
+  }
+
+  openAddPublisherDialog() {
+    this.showAddPublisherDialog = true;
+  }
+
+  onAddNewPublisher() {
+    this.showAddPublisherDialog = true;
+  }
+
+  createNewPublisher() {
+    if (this.newPublisherData.name.trim()) {
+      const newPublisher = this.publisherService.createPublisher({
+        name: this.newPublisherData.name,
+        location: this.newPublisherData.location,
+        website: this.newPublisherData.website,
+        description: this.newPublisherData.description
+      });
+
+      if (newPublisher) {
+        // Reload publisher options
+        this.loadPublisherOptions();
+        
+        // Select the newly created publisher
+        this.selectedPublisherId = newPublisher.id!;
+        
+        // Reset form and close dialog
+        this.newPublisherData = {
+          name: '',
+          location: '',
+          website: '',
+          description: ''
+        };
+        this.showAddPublisherDialog = false;
+      }
+    }
+  }
+
+  cancelAddPublisher() {
+    this.newPublisherData = {
+      name: '',
+      location: '',
+      website: '',
+      description: ''
+    };
+    this.showAddPublisherDialog = false;
   }
 
   onCoverUpload(event: any) {

@@ -14,7 +14,7 @@ public class OAuth2RoleConverter implements Converter<Jwt, Collection<GrantedAut
     @SuppressWarnings("unchecked")
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        List<String> scopes = (List<String>) jwt.getClaims().get("scopes");
+        List<String> scopes = (List<String>) jwt.getClaims().get("authorities");
 
         return scopes
                 .stream().map(roleName -> "ROLE_" + roleName)
