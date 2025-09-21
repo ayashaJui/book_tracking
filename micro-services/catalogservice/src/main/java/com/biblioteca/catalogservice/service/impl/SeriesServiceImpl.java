@@ -6,8 +6,9 @@ import com.biblioteca.catalogservice.dto.series.SeriesCreateDTO;
 import com.biblioteca.catalogservice.dto.series.SeriesDTO;
 import com.biblioteca.catalogservice.dto.series.SeriesUpdateDTO;
 import com.biblioteca.catalogservice.dto.seriesAuthor.SeriesAuthorCreateDTO;
-import com.biblioteca.catalogservice.dto.seriesAuthor.SeriesAuthorDTO;
+import com.biblioteca.catalogservice.dto.seriesAuthor.SeriesAuthorUpdateDTO;
 import com.biblioteca.catalogservice.dto.seriesGenre.SeriesGenreCreateDTO;
+import com.biblioteca.catalogservice.dto.seriesGenre.SeriesGenreUpdateDTO;
 import com.biblioteca.catalogservice.entity.*;
 import com.biblioteca.catalogservice.repository.*;
 import com.biblioteca.catalogservice.service.SeriesService;
@@ -25,9 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,8 +35,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SeriesServiceImpl implements SeriesService {
     private final SeriesRepository seriesRepository;
-    private  final SeriesAuthorRepository seriesAuthorRepository;
-    private final SeriesGenreRepository seriesGenreRepository;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
 
@@ -151,12 +149,44 @@ public class SeriesServiceImpl implements SeriesService {
 
         Series updatedSeries = fromUpdateDTO(seriesUpdateDTO, series);
 
-        return null;
+        // Handle Series Authors Update - Complete Replacement Strategy
+        updateSeriesAuthors(series, seriesUpdateDTO.getSeriesAuthorsUpdateDTOS());
+        
+        // Handle Series Genres Update - Complete Replacement Strategy  
+        updateSeriesGenres(series, seriesUpdateDTO.getSeriesGenresUpdateDTOS());
+
+        try {
+            seriesRepository.save(updatedSeries);
+            log.info("Series updated successfully with id: {}", updatedSeries.getId());
+            return convertToDTO(updatedSeries);
+        } catch (Exception e) {
+            log.error("Error occurred while updating series: {}", e.getMessage());
+            throw new CustomException("Failed to update series", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 
     @Override
+    @Transactional
     public String deleteSeries(Integer id, HttpServletRequest request, Jwt jwt) {
-        return "";
+        log.info("deleteSeries in SeriesController is called with id: {} by user: {}", id, jwt.getSubject());
+
+        Series series = findById(id);
+
+        int authorCount = series.getSeriesAuthors().size();
+        int genreCount = series.getSeriesGenres().size();
+
+        try {
+            seriesRepository.delete(series);
+            
+            log.info("Successfully deleted series with id: {} and its {} SeriesAuthor and {} SeriesGenre relationships", id, authorCount, genreCount);
+            
+            return "Series with id " + id + " has been successfully deleted along with its relationships";
+            
+        } catch (Exception e) {
+            log.error("Error occurred while deleting series with id: {}: {}", id, e.getMessage());
+            throw new CustomException("Failed to delete series: " + e.getMessage(), 
+                    HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 
     private Series findById(Integer id) {
@@ -178,5 +208,160 @@ public class SeriesServiceImpl implements SeriesService {
 
     private SeriesAuthor fromSeriesAuthorCreateDTO(SeriesAuthorCreateDTO seriesAuthorCreateDTO) {
         return SeriesAuthorMapper.fromCreateDTO(seriesAuthorCreateDTO);
+    }
+
+    /**
+     * Updates series authors using Natural Key strategy to preserve existing IDs
+     * Uses composite key (series_id + author_id) to identify existing relationships
+     * This prevents unnecessary ID increments while handling all scenarios:
+     * 1. Existing relationship (same author): Update role only
+     * 2. New relationship: Create new SeriesAuthor  
+     * 3. Missing relationship: Remove existing SeriesAuthor
+     */
+    private void updateSeriesAuthors(Series series, List<SeriesAuthorUpdateDTO> authorsUpdateDTOS) {
+        log.info("Updating series authors for series id: {} using natural key strategy", series.getId());
+        
+        if (authorsUpdateDTOS == null || authorsUpdateDTOS.isEmpty()) {
+            // Remove all existing authors
+            series.getSeriesAuthors().clear();
+            log.info("No authors provided, all existing authors removed from series");
+            return;
+        }
+        
+        // Validate all author IDs exist before proceeding
+        List<Integer> incomingAuthorIds = authorsUpdateDTOS.stream()
+                .map(SeriesAuthorUpdateDTO::getAuthorId)
+                .distinct()
+                .toList();
+        
+        List<Author> existingAuthors = authorRepository.findAllById(incomingAuthorIds);
+        
+        if (existingAuthors.size() != incomingAuthorIds.size()) {
+            List<Integer> foundIds = existingAuthors.stream().map(Author::getId).toList();
+            List<Integer> missingIds = incomingAuthorIds.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .toList();
+            throw new CustomException("Authors not found with IDs: " + missingIds, 
+                    HttpStatus.NOT_FOUND.value());
+        }
+        
+        // Get current SeriesAuthor entities
+        List<SeriesAuthor> currentAuthors = series.getSeriesAuthors();
+        
+        // Create maps for efficient lookup
+        Map<Integer, SeriesAuthor> currentAuthorMap = currentAuthors.stream()
+                .collect(Collectors.toMap(sa -> sa.getAuthor().getId(), sa -> sa));
+        
+        Map<Integer, Author> authorMap = existingAuthors.stream()
+                .collect(Collectors.toMap(Author::getId, author -> author));
+        
+        // Track which authors should remain
+        Set<Integer> authorsToKeep = new HashSet<>(incomingAuthorIds);
+        
+        // Remove SeriesAuthors for authors not in the incoming list
+        currentAuthors.removeIf(sa -> !authorsToKeep.contains(sa.getAuthor().getId()));
+        
+        // Process incoming authors
+        for (SeriesAuthorUpdateDTO authorDTO : authorsUpdateDTOS) {
+            Integer authorId = authorDTO.getAuthorId();
+            
+            if (currentAuthorMap.containsKey(authorId)) {
+                // Update existing relationship - only role can change, preserves ID
+                SeriesAuthor existing = currentAuthorMap.get(authorId);
+                existing.setRole(authorDTO.getAuthorRole() != null ? 
+                        authorDTO.getAuthorRole().name() : null);
+                log.debug("Updated role for existing SeriesAuthor ID: {}, Author ID: {}", 
+                        existing.getId(), authorId);
+            } else {
+                // Create new relationship
+                Author author = authorMap.get(authorId);
+                SeriesAuthor newSeriesAuthor = SeriesAuthor.builder()
+                        .series(series)
+                        .author(author)
+                        .role(authorDTO.getAuthorRole() != null ? 
+                                authorDTO.getAuthorRole().name() : null)
+                        .build();
+                        
+                currentAuthors.add(newSeriesAuthor);
+                log.debug("Created new SeriesAuthor for Author ID: {}", authorId);
+            }
+        }
+        
+        log.info("Successfully updated series authors, final count: {}", currentAuthors.size());
+    }
+
+    /**
+     * Updates series genres using Natural Key strategy to preserve existing IDs
+     * Uses composite key (series_id + genre_id) to identify existing relationships
+     * This prevents unnecessary ID increments while handling all scenarios:
+     * 1. Existing relationship (same genre): Keep existing SeriesGenre
+     * 2. New relationship: Create new SeriesGenre
+     * 3. Missing relationship: Remove existing SeriesGenre  
+     */
+    private void updateSeriesGenres(Series series, List<SeriesGenreUpdateDTO> genresUpdateDTOS) {
+        log.info("Updating series genres for series id: {} using natural key strategy", series.getId());
+        
+        if (genresUpdateDTOS == null || genresUpdateDTOS.isEmpty()) {
+            // Remove all existing genres
+            series.getSeriesGenres().clear();
+            log.info("No genres provided, all existing genres removed from series");
+            return;
+        }
+        
+        // Validate all genre IDs exist before proceeding
+        List<Integer> incomingGenreIds = genresUpdateDTOS.stream()
+                .map(SeriesGenreUpdateDTO::getGenreId)
+                .distinct()
+                .toList();
+        
+        List<Genre> existingGenres = genreRepository.findAllById(incomingGenreIds);
+        
+        if (existingGenres.size() != incomingGenreIds.size()) {
+            List<Integer> foundIds = existingGenres.stream().map(Genre::getId).toList();
+            List<Integer> missingIds = incomingGenreIds.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .toList();
+            throw new CustomException("Genres not found with IDs: " + missingIds, 
+                    HttpStatus.NOT_FOUND.value());
+        }
+        
+        // Get current SeriesGenre entities
+        List<SeriesGenre> currentGenres = series.getSeriesGenres();
+        
+        // Create maps for efficient lookup
+        Map<Integer, SeriesGenre> currentGenreMap = currentGenres.stream()
+                .collect(Collectors.toMap(sg -> sg.getGenre().getId(), sg -> sg));
+        
+        Map<Integer, Genre> genreMap = existingGenres.stream()
+                .collect(Collectors.toMap(Genre::getId, genre -> genre));
+        
+        // Track which genres should remain
+        Set<Integer> genresToKeep = new HashSet<>(incomingGenreIds);
+        
+        // Remove SeriesGenres for genres not in the incoming list
+        currentGenres.removeIf(sg -> !genresToKeep.contains(sg.getGenre().getId()));
+        
+        // Process incoming genres
+        for (SeriesGenreUpdateDTO genreDTO : genresUpdateDTOS) {
+            Integer genreId = genreDTO.getGenreId();
+            
+            if (currentGenreMap.containsKey(genreId)) {
+                // Relationship already exists - keep existing SeriesGenre (preserves ID)
+                log.debug("Keeping existing SeriesGenre ID: {}, Genre ID: {}", 
+                        currentGenreMap.get(genreId).getId(), genreId);
+            } else {
+                // Create new relationship
+                Genre genre = genreMap.get(genreId);
+                SeriesGenre newSeriesGenre = SeriesGenre.builder()
+                        .series(series)
+                        .genre(genre)
+                        .build();
+                        
+                currentGenres.add(newSeriesGenre);
+                log.debug("Created new SeriesGenre for Genre ID: {}", genreId);
+            }
+        }
+        
+        log.info("Successfully updated series genres, final count: {}", currentGenres.size());
     }
 }

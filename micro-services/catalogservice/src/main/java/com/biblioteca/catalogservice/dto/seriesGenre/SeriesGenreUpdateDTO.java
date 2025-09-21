@@ -10,12 +10,8 @@ import lombok.*;
 @Builder
 @ToString
 public class SeriesGenreUpdateDTO {
-    @NotNull(message = "ID cannot be null")
-    private Integer id;
-
-//    @NotNull(message = "Series ID cannot be null")
-//    private Integer seriesId;
-
+    // No ID field - we use natural key (seriesId + genreId) to identify relationships
+    
     @NotNull(message = "Genre ID cannot be null")
     private Integer genreId;
 }
