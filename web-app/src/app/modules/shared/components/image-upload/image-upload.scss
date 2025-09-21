@@ -1,0 +1,30 @@
+.image-upload-container {
+  .group:hover .absolute {
+    transition: all 0.3s ease;
+  }
+  
+  .drag-over {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.image-upload-dialog {
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+  
+  .p-dialog-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+  }
+}
+
+/* Dark mode styles */
+:host-context(.dark) {
+  .image-upload-dialog .p-dialog-footer {
+    border-top-color: #374151;
+    background-color: #1f2937;
+  }
+}

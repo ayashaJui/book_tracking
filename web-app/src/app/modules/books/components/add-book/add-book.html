@@ -134,6 +134,42 @@
                 >
                 </app-author-selector>
               </div>
+
+              <!-- Author Roles Section -->
+              <div class="space-y-2" *ngIf="selectedAuthorsWithRoles.length > 0">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <i class="pi pi-users text-indigo-500 mr-2"></i>
+                  Author Roles
+                </label>
+                <div class="space-y-3">
+                  <div 
+                    *ngFor="let authorRole of selectedAuthorsWithRoles; let i = index"
+                    class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                  >
+                    <!-- Author Name -->
+                    <div class="flex-1">
+                      <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {{ authorRole.authorName }}
+                      </span>
+                    </div>
+                    
+                    <!-- Role Dropdown -->
+                    <div class="w-40">
+                      <p-select
+                        [options]="roleOptions"
+                        [(ngModel)]="authorRole.role"
+                        (ngModelChange)="onAuthorRoleChange(authorRole.authorId, $event)"
+                        placeholder="Select role"
+                        class="w-full"
+                        [name]="'author-role-' + i"
+                      ></p-select>
+                    </div>
+                  </div>
+                </div>
+                <small class="text-gray-500 dark:text-gray-400">
+                  Specify the role each author played in this book.
+                </small>
+              </div>
               
               <div class="space-y-2">
                 <label

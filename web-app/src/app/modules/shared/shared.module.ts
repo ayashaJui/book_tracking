@@ -6,6 +6,7 @@ import { ToastMsg } from './components/toast-msg/toast-msg';
 import { NotFoundComponent } from './components/not-found/not-found';
 import { GenreSelectorComponent } from './components/genre-selector.component';
 import { AuthorSelectorComponent } from './components/author-selector/author-selector';
+import { ImageUploadComponent } from './components/image-upload/image-upload';
 
 import { ButtonModule } from 'primeng/button';
 import { Rating } from 'primeng/rating';
@@ -49,7 +50,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @NgModule({
-  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, AuthorSelectorComponent],
+  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, AuthorSelectorComponent, ImageUploadComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -133,6 +134,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DividerModule,
     GenreSelectorComponent,
     AuthorSelectorComponent,
+    ImageUploadComponent,
     ProgressSpinnerModule,
     Select,
     Textarea,

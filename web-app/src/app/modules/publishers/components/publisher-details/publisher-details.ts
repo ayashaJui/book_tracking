@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { PublisherService } from '../../services/publisher.service';
 import { BookService } from '../../../books/services/book.service';
+import { ImageService } from '../../../shared/services/image.service';
 import { Publisher } from '../../models/publisher.model';
 
 interface PublisherBook {
@@ -31,7 +33,8 @@ interface PublisherStats {
   selector: 'app-publisher-details',
   standalone: false,
   templateUrl: './publisher-details.html',
-  styleUrls: ['./publisher-details.scss']
+  styleUrls: ['./publisher-details.scss'],
+  providers: [MessageService]
 })
 export class PublisherDetailsComponent implements OnInit {
   publisherId?: number;
@@ -43,7 +46,9 @@ export class PublisherDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private publisherService: PublisherService,
-    private bookService: BookService
+    private bookService: BookService,
+    private messageService: MessageService,
+    private imageService: ImageService
   ) {}
 
   ngOnInit(): void {
@@ -304,5 +309,65 @@ export class PublisherDetailsComponent implements OnInit {
     });
 
     return decades;
+  }
+
+  onImageUploaded(imageUrl: string) {
+    if (this.publisher && this.publisher.id) {
+      const updatedPublisher = {
+        id: this.publisher.id,
+        name: this.publisher.name,
+        location: this.publisher.location,
+        website: this.publisher.website,
+        description: this.publisher.description,
+        logo: imageUrl
+      };
+      
+      const success = this.publisherService.updatePublisher(updatedPublisher);
+      
+      if (success) {
+        this.publisher.logo = imageUrl;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Logo Updated',
+          detail: 'Publisher logo has been updated successfully'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update publisher logo'
+        });
+      }
+    }
+  }
+
+  onImageRemoved() {
+    if (this.publisher && this.publisher.id) {
+      const updatedPublisher = {
+        id: this.publisher.id,
+        name: this.publisher.name,
+        location: this.publisher.location,
+        website: this.publisher.website,
+        description: this.publisher.description,
+        logo: undefined
+      };
+      
+      const success = this.publisherService.updatePublisher(updatedPublisher);
+      
+      if (success) {
+        this.publisher.logo = undefined;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Logo Removed',
+          detail: 'Publisher logo has been removed successfully'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to remove publisher logo'
+        });
+      }
+    }
   }
 }

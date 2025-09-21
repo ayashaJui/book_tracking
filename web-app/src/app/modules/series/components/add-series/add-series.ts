@@ -3,8 +3,9 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
-import { Series, SeriesBook } from '../../models/series.model';
+import { Series, SeriesBook, SeriesAuthor } from '../../models/series.model';
 import { GenreService } from '../../../shared/services/genre.service';
+import { Author } from '../../../authors/models/author.model';
 
 @Component({
   selector: 'app-add-series',
@@ -26,6 +27,16 @@ export class AddSeries implements OnInit {
     { label: 'Reading', value: 'Reading' },
     { label: 'Finished', value: 'Finished' },
     { label: 'On Hold', value: 'On Hold' },
+  ];
+
+  // Role options for authors
+  roleOptions = [
+    { label: 'Author', value: 'Author' },
+    { label: 'Co-Author', value: 'Co-Author' },
+    { label: 'Editor', value: 'Editor' },
+    { label: 'Illustrator', value: 'Illustrator' },
+    { label: 'Translator', value: 'Translator' },
+    { label: 'Contributor', value: 'Contributor' },
   ];
 
   constructor(
@@ -53,7 +64,7 @@ export class AddSeries implements OnInit {
   initializeForm() {
     this.seriesForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(2)]],
-      author: ['', [Validators.required, Validators.minLength(2)]],
+      authors: this.fb.array([]), // Changed from single author to authors array
       totalBooks: [
         null,
         [Validators.required, Validators.min(1), Validators.max(100)],
@@ -64,12 +75,54 @@ export class AddSeries implements OnInit {
       books: this.fb.array([]),
     });
 
+    // Add initial author
+    this.addAuthor();
     // Add initial book
     this.addBook();
   }
 
   get booksArray(): FormArray {
     return this.seriesForm.get('books') as FormArray;
+  }
+
+  get authorsArray(): FormArray {
+    return this.seriesForm.get('authors') as FormArray;
+  }
+
+  addAuthor() {
+    const authorForm = this.fb.group({
+      author: [null, [Validators.required]], // Store the complete Author object
+      name: [''], // This will be set when author is selected
+      role: ['Author', Validators.required],
+    });
+
+    this.authorsArray.push(authorForm);
+  }
+
+  removeAuthor(index: number) {
+    if (this.authorsArray.length > 1) {
+      this.authorsArray.removeAt(index);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'A series must have at least one author',
+      });
+    }
+  }
+
+  onAuthorSelected(author: Author | Author[], index: number) {
+    const authorControl = this.authorsArray.at(index);
+    if (author && authorControl) {
+      // Since we're using single mode, author should be a single Author object
+      const selectedAuthor = Array.isArray(author) ? author[0] : author;
+      if (selectedAuthor) {
+        authorControl.patchValue({
+          author: selectedAuthor,
+          name: selectedAuthor.name
+        });
+      }
+    }
   }
 
   addBook() {
@@ -132,9 +185,17 @@ export class AddSeries implements OnInit {
       this.isSubmitting = true;
 
       const formValue = this.seriesForm.value;
+      
+      // Transform authors from form format to SeriesAuthor format
+      const authors: SeriesAuthor[] = formValue.authors.map((authorForm: any) => ({
+        authorId: authorForm.author?.id,
+        name: authorForm.name || authorForm.author?.name,
+        role: authorForm.role
+      }));
+      
       const newSeries: Series = {
         title: formValue.title,
-        author: formValue.author,
+        authors: authors,
         genres: formValue.genres,
         description: formValue.description,
         coverUrl: formValue.coverUrl || 'assets/images/product-not-found.png',
@@ -240,6 +301,11 @@ export class AddSeries implements OnInit {
     return !!(field?.invalid && field?.touched);
   }
 
+  isAuthorFieldInvalid(index: number, fieldName: string): boolean {
+    const field = this.authorsArray.at(index).get(fieldName);
+    return !!(field?.invalid && field?.touched);
+  }
+
   getFieldError(fieldName: string): string {
     const field = this.seriesForm.get(fieldName);
     if (field?.errors?.['required']) return `${fieldName} is required`;
@@ -259,6 +325,14 @@ export class AddSeries implements OnInit {
       return `${fieldName} must be at least ${field.errors['min'].min}`;
     if (field?.errors?.['max'])
       return `${fieldName} must be at most ${field.errors['max'].max}`;
+    return '';
+  }
+
+  getAuthorFieldError(index: number, fieldName: string): string {
+    const field = this.authorsArray.at(index).get(fieldName);
+    if (field?.errors?.['required']) return `${fieldName} is required`;
+    if (field?.errors?.['minlength'])
+      return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
     return '';
   }
 }

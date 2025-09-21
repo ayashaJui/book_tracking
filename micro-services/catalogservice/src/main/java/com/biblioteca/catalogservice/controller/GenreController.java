@@ -82,8 +82,10 @@ public class GenreController {
 
     @GetMapping("/pagination")
     @Operation(summary = "API ID: Genre006")
-    public ResponseEntity<ResponseDTO<Page<GenreDTO>>> getAllGenresWithPagination(PageRequestDTO pageRequestDTO,  HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<ResponseDTO<Page<GenreDTO>>> getAllGenresWithPagination(@RequestParam(value = "page", required = false, defaultValue = "1") int page, @RequestParam(value = "size", required = false, defaultValue = "10") int size,  HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         log.info("getAllGenresWithPagination in GenreController is called by user: {}", jwt.getSubject());
+
+        PageRequestDTO pageRequestDTO = new PageRequestDTO(page, size);
 
         Page<GenreDTO> genreDTOPage = genreService.getAllGenresWithPagination(pageRequestDTO, request, jwt);
 

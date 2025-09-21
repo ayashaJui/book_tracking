@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Book } from '../../models/book.model';
+import { Book, BookAuthor } from '../../models/book.model';
 
 // Using the Book model from the books module instead of local interface
 
@@ -245,7 +245,7 @@ export class AllBook implements OnInit {
     // open sidepanel / dialog
   }
   editBook(book: Book) {
-    console.log('edit', book);
+    this.router.navigate(['/books/edit-book', book.id]);
   }
   deleteBook(book: Book) {
     // confirm & remove
@@ -255,5 +255,15 @@ export class AllBook implements OnInit {
 
   addBookPage() {
     this.router.navigate(['/books/add-book']);
+  }
+
+  formatAuthorsWithRoles(book: Book): string {
+    if (book.authors && book.authors.length > 0) {
+      return book.authors.map(author => `${author.authorName || 'Unknown'} (${author.role})`).join(', ');
+    } else if (book.authorNames && book.authorNames.length > 0) {
+      // Fallback for books without role information
+      return book.authorNames.join(', ');
+    }
+    return 'Unknown Author';
   }
 }

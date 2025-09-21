@@ -1,0 +1,502 @@
+<div class="min-h-screen">
+  <!-- Modern Header Section -->
+  <div
+    class="max-w-7xl mx-auto relative overflow-hidden bg-white rounded-2xl dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+  >
+    <!-- Background Pattern -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-gray-50 via-orange-50 to-amber-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-900"
+    ></div>
+    <div class="absolute inset-0 opacity-30 dark:opacity-10">
+      <div
+        class="w-full h-full"
+        style="
+          background-image: radial-gradient(
+            circle at 1px 1px,
+            rgba(251, 146, 60, 0.3) 1px,
+            transparent 0
+          );
+          background-size: 20px 20px;
+        "
+      ></div>
+    </div>
+
+    <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="max-w-7xl mx-auto">
+        <div
+          class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+        >
+          <!-- Left Side - Title and Description -->
+          <div class="flex-1">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg"
+              >
+                <i class="pi pi-pencil text-white text-xl"></i>
+              </div>
+              <div>
+                <h1
+                  class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+                >
+                  Edit Book
+                </h1>
+                <p
+                  class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
+                >
+                  Update book information and manage details
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side - Quick Actions -->
+          <div class="flex-shrink-0 w-full lg:w-auto">
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                pButton
+                label="Back"
+                icon="pi pi-arrow-left"
+                class="p-button-outlined"
+                (click)="goBack()"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class="py-6 lg:py-8 max-w-7xl mx-auto" *ngIf="!isLoading">
+    <div class="mx-auto">
+      <!-- Enhanced Form -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <form (ngSubmit)="updateBook()" #bookForm="ngForm" class="p-8 space-y-8">
+          <!-- Basic Information Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-indigo-100 rounded-lg">
+                <i class="pi pi-info-circle text-indigo-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Basic Information
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-book text-indigo-500 mr-2"></i>
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  pInputText
+                  required
+                  [(ngModel)]="book.title"
+                  name="title"
+                  placeholder="Enter book title"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                />
+              </div>
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-bookmark text-indigo-500 mr-2"></i>
+                  Status *
+                </label>
+                <p-select
+                  [options]="statusOptions"
+                  [(ngModel)]="book.status"
+                  name="status"
+                  placeholder="Select reading status"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                  [style]="{ width: '100%' }"
+                ></p-select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-file text-indigo-500 mr-2"></i>
+                  Pages
+                </label>
+                <input
+                  type="number"
+                  pInputText
+                  [(ngModel)]="book.pages"
+                  name="pages"
+                  placeholder="Number of pages"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                />
+              </div>
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-dollar text-indigo-500 mr-2"></i>
+                  Price
+                </label>
+                <input
+                  type="number"
+                  pInputText
+                  [(ngModel)]="book.price"
+                  name="price"
+                  placeholder="Book price"
+                  step="0.01"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                <i class="pi pi-shopping-cart text-indigo-500 mr-2"></i>
+                Source
+              </label>
+              <input
+                type="text"
+                pInputText
+                [(ngModel)]="book.source"
+                name="source"
+                placeholder="Where did you get this book?"
+                class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          <!-- Authors Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-purple-100 rounded-lg">
+                <i class="pi pi-users text-purple-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Authors
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-user text-purple-500 mr-2"></i>
+                  Select Authors *
+                </label>
+                <app-author-selector
+                  [multiple]="true"
+                  [showAddButton]="true"
+                  [(ngModel)]="selectedAuthors"
+                  (ngModelChange)="onAuthorSelectionChange($event)"
+                  name="authors"
+                  placeholder="Select or search for authors..."
+                  class="w-full"
+                ></app-author-selector>
+              </div>
+
+              <!-- Author Roles -->
+              <div *ngIf="selectedAuthorsWithRoles.length > 0" class="space-y-3">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-cog text-purple-500 mr-2"></i>
+                  Author Roles
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    *ngFor="let author of selectedAuthorsWithRoles"
+                    class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  >
+                    <span
+                      class="flex-1 text-sm font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {{ author.authorName }}
+                    </span>
+                    <p-select
+                      [options]="roleOptions"
+                      [(ngModel)]="author.role"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="onAuthorRoleChange(author.authorId, $event)"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="w-32"
+                    ></p-select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Genres Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-green-100 rounded-lg">
+                <i class="pi pi-tags text-green-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Categories
+              </h2>
+            </div>
+
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                <i class="pi pi-tag text-green-500 mr-2"></i>
+                Genres
+              </label>
+              <p-multiSelect
+                [options]="genreOptions"
+                [(ngModel)]="book.genres"
+                name="genres"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select genres"
+                [showClear]="true"
+                class="w-full"
+                [style]="{ width: '100%' }"
+              >
+              </p-multiSelect>
+            </div>
+          </div>
+
+          <!-- Publisher Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <i class="pi pi-building text-blue-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Publisher
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-building text-blue-500 mr-2"></i>
+                  Publisher
+                </label>
+                <div class="flex gap-2">
+                  <p-select
+                    [options]="publisherOptions"
+                    [(ngModel)]="selectedPublisherId"
+                    name="publisher"
+                    (ngModelChange)="onPublisherChange()"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select publisher"
+                    class="flex-1"
+                    [style]="{ width: '100%' }"
+                  ></p-select>
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-plus"
+                    class="p-button-outlined"
+                    (click)="showAddPublisherDialog = true"
+                    pTooltip="Add new publisher"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Series Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-red-100 rounded-lg">
+                <i class="pi pi-list text-red-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Series Information
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <p-checkbox
+                  [(ngModel)]="isPartOfSeries"
+                  name="isPartOfSeries"
+                  (onChange)="onSeriesChange()"
+                  binary="true"
+                ></p-checkbox>
+                <label
+                  class="text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer"
+                  (click)="isPartOfSeries = !isPartOfSeries; onSeriesChange()"
+                >
+                  This book is part of a series
+                </label>
+              </div>
+
+              <div *ngIf="isPartOfSeries" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                  >
+                    <i class="pi pi-list text-red-500 mr-2"></i>
+                    Series *
+                  </label>
+                  <p-select
+                    [options]="seriesOptions"
+                    [(ngModel)]="selectedSeriesId"
+                    name="series"
+                    (ngModelChange)="onSeriesChange()"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select series"
+                    class="w-full"
+                    [style]="{ width: '100%' }"
+                  ></p-select>
+                </div>
+                <div class="space-y-2" *ngIf="selectedSeriesId">
+                  <label
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                  >
+                    <i class="pi pi-sort-numeric-up text-red-500 mr-2"></i>
+                    Order in Series *
+                  </label>
+                  <p-select
+                    [options]="seriesOrderOptions"
+                    [(ngModel)]="book.seriesOrder"
+                    name="seriesOrder"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select order"
+                    class="w-full"
+                    [style]="{ width: '100%' }"
+                  ></p-select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              pButton
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-secondary"
+              (click)="onCancel()"
+            ></button>
+            <button
+              type="submit"
+              pButton
+              label="Update Book"
+              icon="pi pi-check"
+              class="p-button-success"
+              [disabled]="!bookForm.form.valid"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex justify-center items-center min-h-screen">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div>
+
+<!-- Add Publisher Dialog -->
+<p-dialog
+  header="Add New Publisher"
+  [(visible)]="showAddPublisherDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+>
+  <div class="space-y-4">
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-gray-700">Name *</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.name"
+        placeholder="Publisher name"
+        class="w-full"
+      />
+    </div>
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-gray-700">Location</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="newPublisherData.location"
+        placeholder="Publisher location"
+        class="w-full"
+      />
+    </div>
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-gray-700">Website</label>
+      <input
+        type="url"
+        pInputText
+        [(ngModel)]="newPublisherData.website"
+        placeholder="Publisher website"
+        class="w-full"
+      />
+    </div>
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-gray-700">Description</label>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="newPublisherData.description"
+        placeholder="Publisher description"
+        class="w-full"
+        rows="3"
+      ></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showAddPublisherDialog = false"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Add Publisher"
+        icon="pi pi-check"
+        (click)="addPublisher()"
+        [disabled]="!newPublisherData.name.trim()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>

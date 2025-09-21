@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Book, BookCreateRequest } from '../../models/book.model';
+import { Book, BookCreateRequest, BookAuthor } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
 import { Series } from '../../../series/models/series.model';
 import { SeriesService } from '../../../series/services/series.service';
@@ -67,6 +67,19 @@ export class AddBook implements OnInit {
 
   genreOptions: { label: string; value: string }[] = [];
 
+  // Role options for authors
+  roleOptions = [
+    { label: 'Author', value: 'Author' },
+    { label: 'Co-Author', value: 'Co-Author' },
+    { label: 'Editor', value: 'Editor' },
+    { label: 'Illustrator', value: 'Illustrator' },
+    { label: 'Translator', value: 'Translator' },
+    { label: 'Contributor', value: 'Contributor' },
+  ];
+
+  // Authors with roles for the book
+  selectedAuthorsWithRoles: BookAuthor[] = [];
+
   // Add author dialog properties
   showAddAuthorDialog: boolean = false;
   newAuthorData = {
@@ -112,6 +125,20 @@ export class AddBook implements OnInit {
   onAuthorsChange(authors: Author[]) {
     this.selectedAuthors = authors;
     this.newBook.authorIds = authors.map(a => a.id!).filter(id => id !== undefined);
+    
+    // Update authors with roles - assign default "Author" role for new authors
+    this.selectedAuthorsWithRoles = authors.map(author => {
+      // Check if this author already has a role assigned
+      const existingRole = this.selectedAuthorsWithRoles.find(ar => ar.authorId === author.id);
+      return {
+        authorId: author.id!,
+        authorName: author.name,
+        role: existingRole?.role || 'Author' // Keep existing role or default to 'Author'
+      };
+    });
+    
+    // Update the book's authors array
+    this.newBook.authors = this.selectedAuthorsWithRoles;
   }
 
   onAddNewAuthor() {
@@ -210,12 +237,14 @@ export class AddBook implements OnInit {
         // Generate available positions in the series
         this.updateAvailableSeriesOrders(series);
 
-        // Auto-fill author if no authors selected and series has author
-        if (this.selectedAuthors.length === 0 && series.author) {
+        // Auto-fill author if no authors selected and series has authors
+        if (this.selectedAuthors.length === 0 && series.authors && series.authors.length > 0) {
           // Try to find matching author in our author system
           const authors = this.authorService.getAuthors();
           const matchingAuthor = authors.find(author => 
-            author.name.toLowerCase() === series.author.toLowerCase()
+            series.authors.some(seriesAuthor => 
+              author.name.toLowerCase() === seriesAuthor.name.toLowerCase()
+            )
           );
           if (matchingAuthor) {
             this.selectedAuthors = [matchingAuthor];
@@ -260,7 +289,7 @@ export class AddBook implements OnInit {
     if (this.newSeriesData.title && this.newSeriesData.author) {
       const newSeries: Series = {
         title: this.newSeriesData.title,
-        author: this.newSeriesData.author,
+        authors: [{ name: this.newSeriesData.author, role: 'Author' }],
         totalBooks: this.newSeriesData.totalBooks,
         readBooks: 0,
         genres: this.newSeriesData.genres,
@@ -282,6 +311,16 @@ export class AddBook implements OnInit {
         totalBooks: 1,
         genres: [],
       };
+    }
+  }
+
+  onAuthorRoleChange(authorId: number, newRole: string) {
+    // Update the role for the specific author
+    const authorIndex = this.selectedAuthorsWithRoles.findIndex(ar => ar.authorId === authorId);
+    if (authorIndex >= 0) {
+      this.selectedAuthorsWithRoles[authorIndex].role = newRole;
+      // Update the book's authors array
+      this.newBook.authors = [...this.selectedAuthorsWithRoles];
     }
   }
 
@@ -313,6 +352,7 @@ export class AddBook implements OnInit {
     const bookData: BookCreateRequest = {
       ...this.newBook,
       authorIds: this.newBook.authorIds,
+      authors: this.selectedAuthorsWithRoles, // Include authors with roles
       publisherId: (typeof this.selectedPublisherId === 'number') ? this.selectedPublisherId : undefined
     };
 

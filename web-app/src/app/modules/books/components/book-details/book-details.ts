@@ -5,7 +5,7 @@ import { BookService } from '../../services/book.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { PublisherService } from '../../../publishers/services/publisher.service';
 import { GenreService } from '../../../shared/services/genre.service';
-import { Book } from '../../models/book.model';
+import { Book, BookAuthor } from '../../models/book.model';
 import { Author } from '../../../authors/models/author.model';
 import { Publisher } from '../../../publishers/models/publisher.model';
 
@@ -341,18 +341,8 @@ export class BookDetails implements OnInit {
 
   // Edit Book functionality
   openEditBookDialog() {
-    this.editingBook = { ...this.book };
-    this.selectedPublisherId = this.book.publisherId || null;
-    
-    // Load selected authors
-    if (this.book.authorIds && this.book.authorIds.length > 0) {
-      this.selectedAuthors = this.book.authorIds.map(id => {
-        const author = this.authorService.getAuthorById(id);
-        return author || { id, name: 'Unknown Author' };
-      }).filter(author => author) as Author[];
-    }
-    
-    this.showEditBookDialog = true;
+    // Navigate to edit book page
+    this.router.navigate(['/books/edit-book', this.book.id]);
   }
 
   onAuthorsChange(authors: Author[]) {
@@ -506,5 +496,50 @@ export class BookDetails implements OnInit {
 
   private loadAuthorOptions() {
     this.authorOptions = this.authorService.getAuthors();
+  }
+
+  formatAuthorsWithRoles(book: Book): string {
+    if (book.authors && book.authors.length > 0) {
+      return book.authors.map(author => `${author.authorName || 'Unknown'} (${author.role})`).join(', ');
+    } else if (book.authorNames && book.authorNames.length > 0) {
+      // Fallback for books without role information
+      return book.authorNames.join(', ');
+    }
+    return 'Unknown Author';
+  }
+
+  getAuthorsWithRoles(book: Book): BookAuthor[] {
+    return book.authors || [];
+  }
+
+  // Image upload methods
+  onImageUploaded(imageUrl: string) {
+    // Update the book's cover URL
+    this.book.cover = imageUrl;
+    
+    // Update the book in the service if you want persistence
+    if (this.book.id) {
+      const updateRequest = {
+        id: this.book.id,
+        cover: imageUrl
+      };
+      // Note: You might need to add a method to BookService to update just the cover
+      // For now, we'll just update the local book object
+    }
+  }
+
+  onImageRemoved() {
+    // Remove the book's cover URL
+    this.book.cover = undefined;
+    
+    // Update the book in the service if you want persistence
+    if (this.book.id) {
+      const updateRequest = {
+        id: this.book.id,
+        cover: undefined
+      };
+      // Note: You might need to add a method to BookService to update just the cover
+      // For now, we'll just update the local book object
+    }
   }
 }

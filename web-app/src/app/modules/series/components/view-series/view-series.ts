@@ -50,6 +50,20 @@ export class ViewSeries implements OnInit {
     this.isLoading = false;
   }
 
+  formatAuthors(series: Series): string {
+    if (!series.authors || series.authors.length === 0) {
+      return 'Unknown Author';
+    }
+    return series.authors.map(a => `${a.name} (${a.role})`).join(', ');
+  }
+
+  getAuthorNames(series: Series): string {
+    if (!series.authors || series.authors.length === 0) {
+      return 'Unknown Author';
+    }
+    return series.authors.map(a => a.name).join(', ');
+  }
+
   editSeries() {
     if (this.seriesId) {
       this.router.navigate(['/series/edit', this.seriesId]);
@@ -105,5 +119,28 @@ export class ViewSeries implements OnInit {
   getOnHoldCount(): number {
     if (!this.series) return 0;
     return this.series.books.filter((book) => book.status === 'On Hold').length;
+  }
+
+  // Image upload methods
+  onImageUploaded(imageUrl: string) {
+    if (this.series) {
+      // Update the series cover URL
+      this.series.coverUrl = imageUrl;
+      
+      // Update the series in the service if you want persistence
+      // Note: You might need to add a method to SeriesService to update just the cover
+      // For now, we'll just update the local series object
+    }
+  }
+
+  onImageRemoved() {
+    if (this.series) {
+      // Remove the series cover URL
+      this.series.coverUrl = undefined;
+      
+      // Update the series in the service if you want persistence
+      // Note: You might need to add a method to SeriesService to update just the cover
+      // For now, we'll just update the local series object
+    }
   }
 }

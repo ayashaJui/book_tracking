@@ -10,8 +10,9 @@ public class SeriesAuthorMapper {
     public static SeriesAuthorDTO toDTO(SeriesAuthor seriesAuthor) {
         return SeriesAuthorDTO.builder()
                 .id(seriesAuthor.getId())
-                .seriesId(seriesAuthor.getSeries().getId())
+//                .seriesId(seriesAuthor.getSeries().getId())
                 .authorId(seriesAuthor.getAuthor().getId())
+                .authorName(seriesAuthor.getAuthor().getName())
                 .authorRole(seriesAuthor.getRole() != null ? AuthorRoleEnums.valueOf(seriesAuthor.getRole()) : null)
                 .build();
     }

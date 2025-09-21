@@ -6,6 +6,7 @@ import com.biblioteca.catalogservice.dto.series.SeriesUpdateDTO;
 import com.biblioteca.catalogservice.entity.Series;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class SeriesMapper {
     public static SeriesDTO toDTO(Series series) {
@@ -15,6 +16,8 @@ public class SeriesMapper {
                 .description(series.getDescription())
                 .totalBooks(series.getTotalBooks())
                 .isCompleted(series.getIsCompleted())
+                .seriesAuthors(series.getSeriesAuthors() != null ? series.getSeriesAuthors().stream().map(SeriesAuthorMapper::toDTO).toList() : new ArrayList<>())
+                .seriesGenres(series.getSeriesGenres() != null ? series.getSeriesGenres().stream().map(SeriesGenreMapper::toDTO).toList() : new ArrayList<>())
                 .createdAt(series.getCreatedAt())
                 .updatedAt(series.getUpdatedAt())
                 .build();
@@ -26,6 +29,8 @@ public class SeriesMapper {
                 .description(seriesCreateDTO.getDescription())
                 .totalBooks(seriesCreateDTO.getTotalBooks())
                 .isCompleted(seriesCreateDTO.getIsCompleted() != null ? seriesCreateDTO.getIsCompleted() : false)
+                .seriesAuthors(new ArrayList<>())
+                .seriesGenres(new ArrayList<>())
                 .createdAt(LocalDateTime.now())
                 .build();
     }

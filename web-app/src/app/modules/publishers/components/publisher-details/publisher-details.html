@@ -16,19 +16,16 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
 
     <div *ngIf="publisher" class="flex items-start gap-6">
-      <!-- Publisher Logo -->
+      <!-- Publisher Logo with Image Upload -->
       <div class="flex-shrink-0">
-        <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-600">
-          <img 
-            *ngIf="publisher.logo" 
-            [src]="publisher.logo" 
-            [alt]="publisher.name + ' logo'"
-            class="w-full h-full object-cover" 
-          />
-          <div *ngIf="!publisher.logo" class="w-full h-full flex items-center justify-center text-gray-400">
-            <i class="pi pi-building text-2xl"></i>
-          </div>
-        </div>
+        <app-image-upload
+          [entityType]="'publisher'"
+          [entityId]="publisher.id || 0"
+          [entityName]="publisher.name || ''"
+          [currentImageUrl]="publisher.logo || null"
+          (imageUploaded)="onImageUploaded($event)"
+          (imageRemoved)="onImageRemoved()"
+        ></app-image-upload>
       </div>
 
       <!-- Publisher Info -->

@@ -5,6 +5,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 import { Author, AuthorStats } from '../../models/author.model';
 import { AuthorService } from '../../services/author.service';
+import { ImageService } from '../../../shared/services/image.service';
 
 @Component({
   selector: 'app-author-details',
@@ -32,7 +33,8 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private imageService: ImageService
   ) {}
 
   ngOnInit() {
@@ -306,72 +308,75 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPhotoUpload(event: any) {
-    const file = event.target.files[0];
-    if (!file || !this.author) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Invalid File',
-        detail: 'Please select an image file'
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'File Too Large',
-        detail: 'Please select an image smaller than 5MB'
-      });
-      return;
-    }
-
-    // In a real app, you would upload to a server and get back a URL
-    // For now, we'll create a local URL for demonstration
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      if (this.author && this.author.id) {
-        const updatedAuthor = {
-          id: this.author.id,
-          name: this.author.name,
-          biography: this.author.biography,
-          photoUrl: e.target.result,
-          birthDate: this.author.birthDate,
-          deathDate: this.author.deathDate,
-          nationality: this.author.nationality,
-          website: this.author.website,
-          socialLinks: this.author.socialLinks,
-          genres: this.author.genres,
-          isActive: this.author.isActive,
-          notes: this.author.notes
-        };
-        
-        // Update the author in the service
-        const success = this.authorService.updateAuthor(updatedAuthor);
-        
-        if (success) {
-          this.author.photoUrl = e.target.result;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Photo Updated',
-            detail: 'Author photo has been updated successfully'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to update author photo'
-          });
-        }
+  onImageUploaded(imageUrl: string) {
+    if (this.author && this.author.id) {
+      const updatedAuthor = {
+        id: this.author.id,
+        name: this.author.name,
+        biography: this.author.biography,
+        photoUrl: imageUrl,
+        birthDate: this.author.birthDate,
+        deathDate: this.author.deathDate,
+        nationality: this.author.nationality,
+        website: this.author.website,
+        socialLinks: this.author.socialLinks,
+        genres: this.author.genres,
+        isActive: this.author.isActive,
+        notes: this.author.notes
+      };
+      
+      const success = this.authorService.updateAuthor(updatedAuthor);
+      
+      if (success) {
+        this.author.photoUrl = imageUrl;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Photo Updated',
+          detail: 'Author photo has been updated successfully'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update author photo'
+        });
       }
-    };
-    reader.readAsDataURL(file);
+    }
+  }
 
-    // Reset the file input
-    event.target.value = '';
+  onImageRemoved() {
+    if (this.author && this.author.id) {
+      const updatedAuthor = {
+        id: this.author.id,
+        name: this.author.name,
+        biography: this.author.biography,
+        photoUrl: undefined,
+        birthDate: this.author.birthDate,
+        deathDate: this.author.deathDate,
+        nationality: this.author.nationality,
+        website: this.author.website,
+        socialLinks: this.author.socialLinks,
+        genres: this.author.genres,
+        isActive: this.author.isActive,
+        notes: this.author.notes
+      };
+      
+      const success = this.authorService.updateAuthor(updatedAuthor);
+      
+      if (success) {
+        this.author.photoUrl = undefined;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Photo Removed',
+          detail: 'Author photo has been removed successfully'
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to remove author photo'
+        });
+      }
+    }
   }
 }

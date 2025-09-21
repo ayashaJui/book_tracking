@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
-import { Series, SeriesBook } from '../../models/series.model';
+import { Series, SeriesBook, SeriesAuthor } from '../../models/series.model';
 
 @Component({
   selector: 'app-edit-series',
@@ -13,7 +13,7 @@ import { Series, SeriesBook } from '../../models/series.model';
 export class EditSeries implements OnInit {
   series: Series = {
     title: '',
-    author: '',
+    authors: [{ name: '', role: 'Author' }],
     totalBooks: 0,
     readBooks: 0,
     books: [],
@@ -28,6 +28,16 @@ export class EditSeries implements OnInit {
     { label: 'Reading', value: 'Reading' },
     { label: 'Finished', value: 'Finished' },
     { label: 'On Hold', value: 'On Hold' },
+  ];
+
+  // Role options for authors
+  roleOptions = [
+    { label: 'Author', value: 'Author' },
+    { label: 'Co-Author', value: 'Co-Author' },
+    { label: 'Editor', value: 'Editor' },
+    { label: 'Illustrator', value: 'Illustrator' },
+    { label: 'Translator', value: 'Translator' },
+    { label: 'Contributor', value: 'Contributor' },
   ];
 
   constructor(
@@ -144,8 +154,24 @@ export class EditSeries implements OnInit {
     this.updateReadBooks();
   }
 
+  addAuthor() {
+    this.series.authors.push({ name: '', role: 'Author' });
+  }
+
+  removeAuthor(index: number) {
+    if (this.series.authors.length > 1) {
+      this.series.authors.splice(index, 1);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'A series must have at least one author',
+      });
+    }
+  }
+
   onSubmit() {
-    if (!this.series.title || !this.series.author) {
+    if (!this.series.title || !this.series.authors || this.series.authors.length === 0 || !this.series.authors[0].name.trim()) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Warning',

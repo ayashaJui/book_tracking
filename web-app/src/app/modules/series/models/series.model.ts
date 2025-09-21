@@ -1,7 +1,13 @@
+export interface SeriesAuthor {
+  authorId?: number; // Reference to Author ID for data consistency
+  name: string;
+  role: string; // e.g., "Author", "Co-Author", "Editor", "Illustrator", "Translator", etc.
+}
+
 export interface Series {
   id?: number;
   title: string;
-  author: string;
+  authors: SeriesAuthor[]; // Changed from single author string to multiple authors with roles
   totalBooks: number;
   readBooks: number;
   coverUrl?: string;

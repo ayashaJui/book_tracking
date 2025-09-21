@@ -77,37 +77,16 @@
 
           <!-- Author Profile -->
           <div class="flex flex-col lg:flex-row items-start gap-6">
-            <!-- Author Avatar -->
-            <div class="flex-shrink-0 relative group">
-              <div 
-                *ngIf="!author.photoUrl"
-                class="w-24 h-24 lg:w-32 lg:h-32 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-lg">
-                <span class="text-2xl lg:text-3xl font-bold text-green-600 dark:text-green-400">
-                  {{ getInitials(author.name) }}
-                </span>
-              </div>
-              <img 
-                *ngIf="author.photoUrl"
-                [src]="author.photoUrl" 
-                [alt]="author.name"
-                class="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl object-cover shadow-lg border border-gray-200 dark:border-gray-700">
-              
-              <!-- Photo Upload Overlay -->
-              <div class="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center cursor-pointer"
-                   (click)="fileInput.click()">
-                <div class="text-center">
-                  <i class="pi pi-camera text-white text-xl mb-1 block"></i>
-                  <span class="text-white text-xs font-medium">Upload Photo</span>
-                </div>
-              </div>
-              
-              <!-- Hidden File Input -->
-              <input 
-                #fileInput
-                type="file" 
-                accept="image/*" 
-                style="display: none"
-                (change)="onPhotoUpload($event)">
+            <!-- Author Avatar with Image Upload -->
+            <div class="flex-shrink-0">
+              <app-image-upload
+                [entityType]="'author'"
+                [entityId]="author.id || 0"
+                [entityName]="author.name || ''"
+                [currentImageUrl]="author.photoUrl || null"
+                (imageUploaded)="onImageUploaded($event)"
+                (imageRemoved)="onImageRemoved()"
+              ></app-image-upload>
             </div>
 
             <!-- Author Info -->

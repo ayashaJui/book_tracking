@@ -110,9 +110,17 @@
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-white">
                   {{ seriesForm.get("title")?.value || "Series Title" }}
                 </h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                  by {{ seriesForm.get("author")?.value || "Author Name" }}
-                </p>
+                <div class="text-gray-600 dark:text-gray-400">
+                  <span *ngIf="authorsArray.length === 0">by Author Name</span>
+                  <span *ngIf="authorsArray.length > 0">
+                    by 
+                    <span *ngFor="let author of authorsArray.controls; let i = index">
+                      {{ author.get('name')?.value || 'Author Name' }} 
+                      <span class="text-sm text-gray-500">({{ author.get('role')?.value }})</span>
+                      <span *ngIf="i < authorsArray.length - 1">, </span>
+                    </span>
+                  </span>
+                </div>
                 <p
                   class="text-sm text-gray-500 mt-2"
                   *ngIf="seriesForm.get('genre')?.value"
@@ -179,23 +187,80 @@
               </small>
             </div>
 
-            <!-- Author -->
-            <div class="space-y-2">
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Author <span class="text-red-500">*</span>
-              </label>
-              <input
-                pInputText
-                type="text"
-                placeholder="Enter author name"
-                formControlName="author"
-                class="w-full"
-                [class.ng-invalid]="isFieldInvalid('author')"
-              />
-              <small class="text-red-500" *ngIf="isFieldInvalid('author')">
-                {{ getFieldError("author") }}
+            <!-- Authors -->
+            <div class="md:col-span-2 space-y-4">
+              <div class="flex items-center justify-between">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Authors <span class="text-red-500">*</span>
+                </label>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-plus"
+                  label="Add Author"
+                  class="p-button-sm p-button-outlined"
+                  (click)="addAuthor()"
+                ></button>
+              </div>
+              
+              <div 
+                *ngFor="let author of authorsArray.controls; let i = index" 
+                class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                
+                <!-- Author Selection -->
+                <div class="md:col-span-2 space-y-2">
+                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    Author Name
+                  </label>
+                  <app-author-selector
+                    [placeholder]="'Select author...'"
+                    [formControl]="$any(author.get('author'))"
+                    [multiple]="false"
+                    [showAddButton]="true"
+                    [required]="true"
+                    (authorSelected)="onAuthorSelected($event, i)"
+                    class="w-full"
+                    [class.ng-invalid]="isAuthorFieldInvalid(i, 'author')"
+                  ></app-author-selector>
+                  <small class="text-red-500" *ngIf="isAuthorFieldInvalid(i, 'author')">
+                    Author is required
+                  </small>
+                </div>
+
+                <!-- Author Role -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    Role
+                  </label>
+                  <p-select
+                    [formControl]="$any(author.get('role'))"
+                    [options]="roleOptions"
+                    placeholder="Select role"
+                    class="w-full"
+                    [class.ng-invalid]="isAuthorFieldInvalid(i, 'role')"
+                  ></p-select>
+                  <small class="text-red-500" *ngIf="isAuthorFieldInvalid(i, 'role')">
+                    {{ getAuthorFieldError(i, 'role') }}
+                  </small>
+                </div>
+
+                <!-- Remove Author Button -->
+                <div class="flex items-end justify-end" *ngIf="authorsArray.length > 1">
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-sm p-button-text p-button-danger"
+                    (click)="removeAuthor(i)"
+                    pTooltip="Remove Author"
+                  ></button>
+                </div>
+              </div>
+              
+              <small class="text-gray-500 dark:text-gray-400">
+                You can add multiple authors and specify their roles in the series.
               </small>
             </div>
 

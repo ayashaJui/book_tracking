@@ -38,12 +38,10 @@ public class Series {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "series_authors",
-            joinColumns = @JoinColumn(name = "series_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    private List<Author> authors = new ArrayList<>();
+    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeriesAuthor> seriesAuthors = new ArrayList<>();
+
+    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeriesGenre> seriesGenres = new ArrayList<>();
 
 }

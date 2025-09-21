@@ -10,7 +10,9 @@ export class SeriesService {
     {
       id: 1,
       title: 'The Lord of the Rings',
-      author: 'J.R.R. Tolkien',
+      authors: [
+        { name: 'J.R.R. Tolkien', role: 'Author' }
+      ],
       totalBooks: 3,
       readBooks: 2,
       coverUrl: 'assets/images/product-not-found.png',
@@ -43,7 +45,9 @@ export class SeriesService {
     {
       id: 2,
       title: 'Harry Potter',
-      author: 'J.K. Rowling',
+      authors: [
+        { name: 'J.K. Rowling', role: 'Author' }
+      ],
       totalBooks: 7,
       readBooks: 4,
       coverUrl: 'assets/images/product-not-found.png',
@@ -131,7 +135,7 @@ export class SeriesService {
   // Helper method to get series options for dropdowns
   getSeriesOptions(): { label: string; value: number }[] {
     return this.seriesSubject.value.map((series) => ({
-      label: `${series.title} by ${series.author}`,
+      label: `${series.title} by ${series.authors.map(a => a.name).join(', ')}`,
       value: series.id!,
     }));
   }

@@ -62,21 +62,75 @@
                 class="w-full"
               />
             </div>
-            <div class="space-y-2">
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Author <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                pInputText
-                [(ngModel)]="series.author"
-                name="author"
-                required
-                placeholder="Enter author name"
-                class="w-full"
-              />
+            
+            <!-- Authors -->
+            <div class="md:col-span-2 space-y-4">
+              <div class="flex items-center justify-between">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Authors <span class="text-red-500">*</span>
+                </label>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-plus"
+                  label="Add Author"
+                  class="p-button-sm p-button-outlined"
+                  (click)="addAuthor()"
+                ></button>
+              </div>
+              
+              <div 
+                *ngFor="let author of series.authors; let i = index" 
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+                
+                <!-- Author Name -->
+                <div class="md:col-span-2 space-y-2">
+                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    Author Name
+                  </label>
+                  <input
+                    pInputText
+                    type="text"
+                    placeholder="Enter author name"
+                    [(ngModel)]="author.name"
+                    [name]="'author-name-' + i"
+                    class="w-full"
+                    required
+                  />
+                </div>
+
+                <!-- Author Role -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    Role
+                  </label>
+                  <p-select
+                    [(ngModel)]="author.role"
+                    [options]="roleOptions"
+                    [name]="'author-role-' + i"
+                    placeholder="Select role"
+                    class="w-full"
+                  ></p-select>
+                </div>
+
+                <!-- Remove Author Button -->
+                <div class="md:col-span-3 flex justify-end" *ngIf="series.authors.length > 1">
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-sm p-button-text p-button-danger"
+                    (click)="removeAuthor(i)"
+                    pTooltip="Remove Author"
+                  ></button>
+                </div>
+              </div>
+              
+              <small class="text-gray-500 dark:text-gray-400">
+                You can add multiple authors and specify their roles in the series.
+              </small>
             </div>
           </div>
 

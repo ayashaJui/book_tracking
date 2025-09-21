@@ -50,7 +50,9 @@ export class AllSeries implements OnInit {
   seriesList: Series[] = [
     {
       title: 'The Lord of the Rings',
-      author: 'J.R.R. Tolkien',
+      authors: [
+        { name: 'J.R.R. Tolkien', role: 'Author' }
+      ],
       totalBooks: 3,
       readBooks: 2,
       coverUrl: 'assets/images/product-not-found.png',
@@ -75,7 +77,9 @@ export class AllSeries implements OnInit {
     },
     {
       title: 'Harry Potter',
-      author: 'J.K. Rowling',
+      authors: [
+        { name: 'J.K. Rowling', role: 'Author' }
+      ],
       totalBooks: 7,
       readBooks: 4,
       coverUrl: 'assets/images/product-not-found.png',
@@ -228,7 +232,7 @@ export class AllSeries implements OnInit {
       list = list.filter(
         (s) =>
           s.title.toLowerCase().includes(q) ||
-          s.author.toLowerCase().includes(q) ||
+          s.authors.some(author => author.name.toLowerCase().includes(q)) ||
           (s.genres || []).some((genre) => genre.toLowerCase().includes(q))
       );
     }
@@ -250,7 +254,11 @@ export class AllSeries implements OnInit {
     } else if (this.sortOption === 'Title') {
       list.sort((a, b) => a.title.localeCompare(b.title));
     } else if (this.sortOption === 'Author') {
-      list.sort((a, b) => a.author.localeCompare(b.author));
+      list.sort((a, b) => {
+        const aAuthor = a.authors[0]?.name || '';
+        const bAuthor = b.authors[0]?.name || '';
+        return aAuthor.localeCompare(bAuthor);
+      });
     }
     return list;
   }
@@ -443,5 +451,12 @@ export class AllSeries implements OnInit {
     this.searchQuery = '';
     this.filterStatus = 'All';
     this.sortOption = 'Completion';
+  }
+
+  formatAuthors(series: Series): string {
+    if (!series.authors || series.authors.length === 0) {
+      return 'Unknown Author';
+    }
+    return series.authors.map(a => a.name).join(', ');
   }
 }

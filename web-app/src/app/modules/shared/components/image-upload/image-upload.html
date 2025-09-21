@@ -1,0 +1,188 @@
+<div class="image-upload-container">
+  <!-- Image Display with Upload Button -->
+  <div class="relative group">
+    <!-- Current Image Display -->
+    <div class="relative overflow-hidden rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <img 
+        [src]="displayImageUrl" 
+        [alt]="entityName || 'Image'"
+        class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+        (error)="onImageError($event)"
+      />
+      
+      <!-- Overlay on Hover -->
+      <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div class="flex gap-2">
+          <button
+            type="button"
+            pButton
+            icon="pi pi-camera"
+            [label]="hasCurrentImage ? 'Update Image' : 'Add Image'"
+            class="p-button-sm"
+            (click)="openDialog()"
+            pTooltip="Click to upload or update image"
+          ></button>
+          
+          <button
+            *ngIf="hasCurrentImage"
+            type="button"
+            pButton
+            icon="pi pi-trash"
+            class="p-button-sm p-button-danger"
+            (click)="removeImage()"
+            pTooltip="Remove image"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Upload Button (always visible) -->
+    <button
+      type="button"
+      class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+      (click)="openDialog()"
+      pTooltip="Upload image"
+    >
+      <i class="pi pi-camera text-gray-600 dark:text-gray-300 text-sm"></i>
+    </button>
+  </div>
+
+  <!-- Upload Dialog -->
+  <p-dialog
+    header="Manage Image"
+    [(visible)]="showDialog"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '500px', maxWidth: '90vw' }"
+    styleClass="image-upload-dialog"
+  >
+    <div class="space-y-6">
+      <!-- Current Image Preview -->
+      <div class="text-center">
+        <div class="relative inline-block">
+          <img 
+            [src]="displayImageUrl" 
+            [alt]="entityName || 'Preview'"
+            class="w-48 h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
+            (error)="onImageError($event)"
+          />
+          <div *ngIf="previewUrl" class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+            New
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload Area -->
+      <div class="space-y-4">
+        <div class="text-center">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {{ hasCurrentImage ? 'Update Image' : 'Upload Image' }}
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Choose a new image for this {{ entityType }}
+          </p>
+        </div>
+
+        <!-- Drag & Drop Area -->
+        <div 
+          class="border-2 border-dashed rounded-lg p-6 text-center transition-colors"
+          [ngClass]="{
+            'border-blue-400 bg-blue-50 dark:bg-blue-900/20': dragOver,
+            'border-gray-300 dark:border-gray-600': !dragOver
+          }"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+        >
+          <div class="space-y-2">
+            <i class="pi pi-cloud-upload text-3xl text-gray-400"></i>
+            <div>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Drag and drop an image here, or
+              </p>
+              <label class="inline-block mt-2">
+                <input
+                  type="file"
+                  class="hidden"
+                  [accept]="acceptedFormats"
+                  (change)="onFileSelect($event)"
+                />
+                <span class="cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                  browse files
+                </span>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500">
+              Max file size: {{ maxFileSize / 1000000 }}MB
+            </p>
+          </div>
+        </div>
+
+        <!-- Selected File Info -->
+        <div *ngIf="selectedFile" class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-file text-blue-500"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ selectedFile.name }}
+                </p>
+                <p class="text-xs text-gray-500">
+                  {{ (selectedFile.size / 1000000).toFixed(2) }} MB
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              (click)="resetUpload()"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog Footer -->
+    <ng-template pTemplate="footer">
+      <div class="flex justify-between items-center gap-3">
+        <!-- Remove Button (if image exists) -->
+        <button
+          *ngIf="hasCurrentImage"
+          type="button"
+          pButton
+          label="Remove Image"
+          icon="pi pi-trash"
+          class="p-button-danger p-button-outlined"
+          (click)="removeImage()"
+        ></button>
+        
+        <div class="flex gap-2 ml-auto">
+          <!-- Cancel Button -->
+          <button
+            type="button"
+            pButton
+            label="Cancel"
+            icon="pi pi-times"
+            class="p-button-text"
+            (click)="closeDialog()"
+            [disabled]="isUploading"
+          ></button>
+          
+          <!-- Upload Button -->
+          <button
+            type="button"
+            pButton
+            [label]="isUploading ? 'Uploading...' : (hasCurrentImage ? 'Update' : 'Upload')"
+            [icon]="isUploading ? 'pi pi-spin pi-spinner' : 'pi pi-upload'"
+            (click)="uploadImage()"
+            [disabled]="!selectedFile || isUploading"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

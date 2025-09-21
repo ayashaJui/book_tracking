@@ -472,7 +472,7 @@
               </td>
 
               <td class="px-6 py-4">
-                <div class="font-medium">{{ book.authorNames?.join(', ') || 'Unknown Author' }}</div>
+                <div class="font-medium">{{ formatAuthorsWithRoles(book) }}</div>
               </td>
               <td class="px-6 py-4 text-center">
                 <div class="flex flex-wrap gap-1 justify-center">
@@ -675,7 +675,7 @@
                   {{ book.title }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                  by {{ book.authorNames?.join(', ') || 'Unknown Author' }}
+                  by {{ formatAuthorsWithRoles(book) }}
                 </p>
               </div>
 

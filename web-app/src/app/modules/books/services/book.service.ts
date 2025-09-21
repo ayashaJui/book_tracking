@@ -203,6 +203,18 @@ export class BookService {
       : undefined;
     const editionCount = this.editionService.getEditionsByBook(book.id || 0).length;
 
+    // If the book has new authors array with roles, populate author names
+    if (book.authors && book.authors.length > 0) {
+      book.authors.forEach(author => {
+        if (!author.authorName && author.authorId) {
+          const authorDetails = this.authorService.getAuthorById(author.authorId);
+          if (authorDetails) {
+            author.authorName = authorDetails.name;
+          }
+        }
+      });
+    }
+
     return {
       ...book,
       authorNames,

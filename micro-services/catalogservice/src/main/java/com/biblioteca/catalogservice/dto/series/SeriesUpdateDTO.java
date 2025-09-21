@@ -1,7 +1,11 @@
 package com.biblioteca.catalogservice.dto.series;
 
+import com.biblioteca.catalogservice.dto.seriesAuthor.SeriesAuthorUpdateDTO;
+import com.biblioteca.catalogservice.dto.seriesGenre.SeriesGenreUpdateDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,4 +25,8 @@ public class SeriesUpdateDTO {
     private Integer totalBooks;
 
     private Boolean isCompleted;
+
+    List<SeriesAuthorUpdateDTO> seriesAuthorsUpdateDTOS;
+
+    List<SeriesGenreUpdateDTO> seriesGenresUpdateDTOS;
 }

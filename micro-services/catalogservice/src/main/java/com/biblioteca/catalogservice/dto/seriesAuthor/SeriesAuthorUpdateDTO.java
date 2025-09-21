@@ -14,8 +14,8 @@ public class SeriesAuthorUpdateDTO {
     @NotNull(message = "ID cannot be null")
     private Integer id;
 
-    @NotNull(message = "Series ID cannot be null")
-    private Integer seriesId;
+//    @NotNull(message = "Series ID cannot be null")
+//    private Integer seriesId;
 
     @NotNull(message = "Author ID cannot be null")
     private Integer authorId;

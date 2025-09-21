@@ -1,7 +1,14 @@
+export interface BookAuthor {
+  authorId: number; // Reference to Author ID
+  authorName?: string; // Computed field for display purposes (optional)
+  role: string; // e.g., "Author", "Co-Author", "Editor", "Illustrator", "Translator", etc.
+}
+
 export interface Book {
   id?: number;
   title: string;
-  authorIds: number[]; // References to Author IDs - support multiple authors
+  authorIds: number[]; // References to Author IDs - support multiple authors (kept for backward compatibility)
+  authors?: BookAuthor[]; // New field for authors with roles
   authorNames?: string[]; // Computed field for display purposes (optional)
   genres: string[];
   pages?: number;
@@ -24,6 +31,7 @@ export interface Book {
 export interface BookCreateRequest {
   title: string;
   authorIds: number[];
+  authors?: BookAuthor[]; // New field for authors with roles
   genres: string[];
   pages?: number;
   status?: string;

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from '../shared/shared.module';
 
 // PrimeNG imports
 import { ButtonModule } from 'primeng/button';
@@ -35,6 +36,7 @@ import { PublishersRoutingModule } from './publishers-routing-module';
     FormsModule,
     ReactiveFormsModule,
     PublishersRoutingModule,
+    SharedModule,
     
     // PrimeNG modules
     ButtonModule,

@@ -17,7 +17,7 @@
                 {{ series.title }}
               </h1>
               <p class="text-gray-600 dark:text-gray-400 text-sm">
-                by {{ series.author }}
+                by {{ formatAuthors(series) }}
               </p>
             </div>
           </div>
@@ -51,12 +51,14 @@
         >
           <div class="p-6">
             <div class="text-center mb-6">
-              <img
-                [src]="series.coverUrl || 'assets/images/product-not-found.png'"
-                [alt]="series.title"
-                class="w-40 h-60 object-cover rounded-lg mx-auto shadow-md"
-                onerror="this.src='assets/images/product-not-found.png'"
-              />
+              <app-image-upload
+                [entityType]="'series'"
+                [entityId]="series.id || 0"
+                [entityName]="series.title || ''"
+                [currentImageUrl]="series.coverUrl || null"
+                (imageUploaded)="onImageUploaded($event)"
+                (imageRemoved)="onImageRemoved()"
+              ></app-image-upload>
             </div>
 
             <div class="space-y-4">
@@ -72,7 +74,7 @@
                       >Author:</span
                     >
                     <span class="font-medium text-gray-900 dark:text-white">{{
-                      series.author
+                      getAuthorNames(series)
                     }}</span>
                   </div>
                   <div class="flex justify-between">

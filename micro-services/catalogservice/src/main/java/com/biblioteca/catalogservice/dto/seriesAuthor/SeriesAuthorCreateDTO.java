@@ -11,8 +11,6 @@ import lombok.*;
 @Builder
 @ToString
 public class SeriesAuthorCreateDTO {
-    @NotNull(message = "Series ID cannot be null")
-    private Integer seriesId;
 
     @NotNull(message = "Author ID cannot be null")
     private Integer authorId;

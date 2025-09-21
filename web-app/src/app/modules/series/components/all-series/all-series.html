@@ -534,7 +534,7 @@
                 {{ series.title }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ series.author }}
+                {{ formatAuthors(series) }}
               </p>
             </div>
 
@@ -659,7 +659,7 @@
                     {{ series.title }}
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ series.author }}
+                    {{ formatAuthors(series) }}
                   </p>
                   <div
                     class="flex flex-wrap gap-1"
