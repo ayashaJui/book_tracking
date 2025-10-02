@@ -5,6 +5,12 @@ import { MessageService } from 'primeng/api';
 
 import { Author, AuthorCreateRequest, AuthorUpdateRequest } from '../../models/author.model';
 import { AuthorService } from '../../services/author.service';
+import { CatalogService } from '../../../shared/services/catalog.service';
+import {
+  CatalogSearchResult,
+  DuplicateDetectionResult
+} from '../../../shared/models/catalog.model';
+import { DuplicateDialogAction } from '../../../shared/components/duplicate-dialog/duplicate-dialog.component';
 
 @Component({
   selector: 'app-add-author',
@@ -43,9 +49,17 @@ export class AddAuthorComponent implements OnInit {
     'Polish', 'Czech', 'Hungarian', 'Portuguese', 'Swiss', 'Austrian'
   ].sort();
 
+  // Catalog search properties
+  catalogSearchPerformed = false;
+  selectedCatalogAuthor: CatalogSearchResult | null = null;
+  showDuplicateDialog = false;
+  duplicateResult?: DuplicateDetectionResult;
+  searchTerm = '';
+
   constructor(
     private fb: FormBuilder,
     private authorService: AuthorService,
+    private catalogService: CatalogService,
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService
@@ -302,10 +316,98 @@ export class AddAuthorComponent implements OnInit {
   }
 
   get nationalitySelectOptions() {
-    return this.nationalityOptions.map(n => ({label: n, value: n}));
+    return this.nationalityOptions.map(n => ({ label: n, value: n }));
   }
 
   get genreSelectOptions() {
-    return this.availableGenres.map(g => ({label: g, value: g}));
+    return this.availableGenres.map(g => ({ label: g, value: g }));
+  }
+
+  // Catalog search methods
+  onCatalogAuthorSelected(author: CatalogSearchResult) {
+    if (author.type === 'author') {
+      this.selectedCatalogAuthor = author;
+
+      // Pre-fill form with catalog data
+      this.authorForm.patchValue({
+        name: author.name || author.title,
+        biography: author.description || '',
+        // Add other mappings as needed
+      });
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Author Selected',
+        detail: `Selected "${author.name || author.title}" from catalog`
+      });
+    }
+  }
+
+  onCreateNewFromCatalog(searchTerm: string) {
+    this.searchTerm = searchTerm;
+
+    // Search for potential duplicates
+    this.catalogService.search({
+      query: searchTerm,
+      type: 'author',
+      limit: 10
+    }).subscribe({
+      next: (results) => {
+        if (results.length > 0) {
+          // Create a simple duplicate result structure
+          this.duplicateResult = {
+            hasMatches: true,
+            exactMatches: results.filter(r =>
+              r.name?.toLowerCase() === searchTerm.toLowerCase() ||
+              r.title?.toLowerCase() === searchTerm.toLowerCase()
+            ),
+            similarMatches: results.filter(r =>
+              r.name?.toLowerCase() !== searchTerm.toLowerCase() &&
+              r.title?.toLowerCase() !== searchTerm.toLowerCase()
+            ),
+            confidence: 'medium' as const,
+            suggestion: 'review_required' as const
+          };
+          this.showDuplicateDialog = true;
+        } else {
+          this.proceedWithNewAuthor(searchTerm);
+        }
+      },
+      error: (error) => {
+        console.error('Error checking for duplicates:', error);
+        this.proceedWithNewAuthor(searchTerm);
+      }
+    });
+  }
+
+  onDuplicateAction(action: DuplicateDialogAction) {
+    this.showDuplicateDialog = false;
+
+    switch (action.action) {
+      case 'use_existing':
+        if (action.selectedItem) {
+          this.onCatalogAuthorSelected(action.selectedItem);
+        }
+        break;
+      case 'create_new':
+        this.proceedWithNewAuthor(this.searchTerm);
+        break;
+      case 'cancel':
+        // User cancelled, do nothing
+        break;
+    }
+  }
+
+  private proceedWithNewAuthor(searchTerm: string) {
+    // Pre-fill the name field with the search term
+    this.authorForm.patchValue({
+      name: searchTerm
+    });
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Create New Author',
+      detail: `Creating new author: "${searchTerm}"`
+    });
   }
 }

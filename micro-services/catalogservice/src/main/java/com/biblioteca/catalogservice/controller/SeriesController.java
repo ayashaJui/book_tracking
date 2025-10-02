@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.controller;
 
+import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.response.ResponseDTO;
 import com.biblioteca.catalogservice.dto.series.SeriesCreateDTO;
@@ -26,7 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/series")
-@Tag(name = "4. Series Controller", description = "Publisher Related APIs")
+@Tag(name = "4. Series Controller", description = "Series Related APIs")
 public class SeriesController {
     private final SeriesService seriesService;
 
@@ -94,5 +95,25 @@ public class SeriesController {
         String message = seriesService.deleteSeries(id, request, jwt);
 
         return new ResponseEntity<>(new ResponseDTO<>(message, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "API ID: Series007")
+    @GetMapping("/authors/{authorId}")
+    public ResponseEntity<ResponseDTO<List<SeriesDTO>>> getSeriesByAuthorId(@PathVariable(value = "authorId") Integer authorId, HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        log.info("getSeriesByAuthorId in SeriesController is called with id: {}", authorId);
+
+        List<SeriesDTO> seriesDTO = seriesService.getSeriesByAuthorId(authorId, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(seriesDTO, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "API ID: Series008")
+    @GetMapping("/genres/{genreId}")
+    public ResponseEntity<ResponseDTO<List<SeriesDTO>>> getSeriesByGenreId(@PathVariable(value = "genreId") Integer genreId, HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        log.info("getSeriesByGenreId in SeriesController is called with id: {}", genreId);
+
+        List<SeriesDTO> seriesDTOS = seriesService.getSeriesByGenreId(genreId, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(seriesDTOS, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
 }

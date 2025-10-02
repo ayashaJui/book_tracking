@@ -11,6 +11,8 @@ public class BookEditionMapper {
     public static BookEditionDTO toDTO(BookEdition bookEdition) {
         return BookEditionDTO.builder()
                 .id(bookEdition.getId())
+                .bookId(bookEdition.getBook().getId())
+                .publisherId(bookEdition.getPublisher().getId())
                 .format(bookEdition.getFormat())
                 .isbn(bookEdition.getIsbn())
                 .publicationDate(bookEdition.getPublicationDate())
@@ -27,7 +29,7 @@ public class BookEditionMapper {
     public static BookEdition fromCreateDTO(BookEditionCreateDTO bookEditionCreateDTO) {
         return BookEdition.builder()
                 .format(bookEditionCreateDTO.getFormat())
-                .isbn(bookEditionCreateDTO.getIsbn())
+                .isbn(bookEditionCreateDTO.getIsbn().trim())
                 .publicationDate(bookEditionCreateDTO.getPublishedDate())
                 .pageCount(bookEditionCreateDTO.getPageCount())
                 .price(bookEditionCreateDTO.getPrice())
@@ -40,7 +42,7 @@ public class BookEditionMapper {
 
     public  static BookEdition fromUpdateDTO(BookEditionUpdateDTO bookEditionUpdateDTO, BookEdition bookEdition) {
         bookEdition.setFormat(bookEditionUpdateDTO.getFormat());
-        bookEdition.setIsbn(bookEditionUpdateDTO.getIsbn());
+        bookEdition.setIsbn(bookEditionUpdateDTO.getIsbn().trim());
         bookEdition.setPublicationDate(bookEditionUpdateDTO.getPublishedDate());
         bookEdition.setPageCount(bookEditionUpdateDTO.getPageCount());
         bookEdition.setPrice(bookEditionUpdateDTO.getPrice());

@@ -8,7 +8,8 @@ public class BookGenreMapper {
     public static BookGenreDTO toDTO(BookGenre bookGenre) {
         return BookGenreDTO.builder()
                 .id(bookGenre.getId())
-                .bookId(bookGenre.getBook().getId())
+//                .bookId(bookGenre.getBook().getId())
+                .genreName(bookGenre.getGenre().getName())
                 .genreId(bookGenre.getGenre().getId())
                 .build();
     }

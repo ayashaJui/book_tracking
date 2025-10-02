@@ -28,7 +28,7 @@
         >
           <!-- Left Side - Title and Description -->
           <div class="flex-1">
-            <div class="flex items-center  gap-4">
+            <div class="flex items-center gap-4">
               <div
                 class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg"
               >
@@ -71,20 +71,61 @@
   </div>
 
   <!-- Main Content Container -->
-  <div class=" py-6 lg:py-8">
+  <div class="py-6 lg:py-8">
     <div class="max-w-7xl mx-auto">
       <!-- Enhanced Form -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
-        <form [formGroup]="authorForm" (ngSubmit)="onSubmit()" class="p-8 space-y-8">
+        <form
+          [formGroup]="authorForm"
+          (ngSubmit)="onSubmit()"
+          class="p-8 space-y-8"
+        >
+          <!-- Catalog Search Section -->
+          <div class="space-y-6">
+            <div
+              class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <i class="pi pi-search text-blue-600 dark:text-blue-400"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Search Catalog First
+              </h2>
+            </div>
+
+            <div
+              class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+            >
+              <p class="text-blue-800 dark:text-blue-300 text-sm mb-4">
+                <i class="pi pi-info-circle mr-2"></i>
+                Search our catalog first to avoid creating duplicate authors. If
+                the author doesn't exist, you can create a new one.
+              </p>
+
+              <app-catalog-search
+                searchType="author"
+                placeholder="Search for authors..."
+                (itemSelected)="onCatalogAuthorSelected($event)"
+                (createNewClicked)="onCreateNewFromCatalog($event)"
+                (searchPerformed)="catalogSearchPerformed = true"
+              >
+              </app-catalog-search>
+            </div>
+          </div>
+
           <!-- Basic Information Section -->
           <div class="space-y-6">
             <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
               <div class="p-2 bg-indigo-100 rounded-lg">
                 <i class="pi pi-info-circle text-indigo-600"></i>
               </div>
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
                 Basic Information
               </h2>
             </div>
@@ -92,7 +133,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Name -->
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-user text-indigo-500 mr-2"></i>
                   Author Name *
                 </label>
@@ -103,14 +146,19 @@
                   class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
                   [class.ng-invalid]="isFieldInvalid('name')"
                 />
-                <small *ngIf="isFieldInvalid('name')" class="text-red-500 block">
-                  {{ getFieldError('name') }}
+                <small
+                  *ngIf="isFieldInvalid('name')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("name") }}
                 </small>
               </div>
 
               <!-- Nationality -->
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-globe text-indigo-500 mr-2"></i>
                   Nationality
                 </label>
@@ -120,16 +168,22 @@
                   placeholder="Select nationality"
                   [filter]="true"
                   [showClear]="true"
-                  class="w-full">
+                  class="w-full"
+                >
                 </p-select>
-                <small *ngIf="isFieldInvalid('nationality')" class="text-red-500 block">
-                  {{ getFieldError('nationality') }}
+                <small
+                  *ngIf="isFieldInvalid('nationality')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("nationality") }}
                 </small>
               </div>
 
               <!-- Biography -->
               <div class="md:col-span-2 space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-align-left text-indigo-500 mr-2"></i>
                   Biography
                 </label>
@@ -141,14 +195,19 @@
                   rows="4"
                   [class.ng-invalid]="isFieldInvalid('biography')"
                 ></textarea>
-                <small *ngIf="isFieldInvalid('biography')" class="text-red-500 block">
-                  {{ getFieldError('biography') }}
+                <small
+                  *ngIf="isFieldInvalid('biography')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("biography") }}
                 </small>
               </div>
 
               <!-- Birth Date -->
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-calendar text-indigo-500 mr-2"></i>
                   Birth Date
                 </label>
@@ -160,16 +219,22 @@
                   iconDisplay="input"
                   inputId="birthDate"
                   dateFormat="mm/dd/yy"
-                  [maxDate]="today">
+                  [maxDate]="today"
+                >
                 </p-datePicker>
-                <small *ngIf="isFieldInvalid('birthDate')" class="text-red-500 block">
-                  {{ getFieldError('birthDate') }}
+                <small
+                  *ngIf="isFieldInvalid('birthDate')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("birthDate") }}
                 </small>
               </div>
 
               <!-- Death Date -->
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-calendar text-indigo-500 mr-2"></i>
                   Death Date
                 </label>
@@ -182,7 +247,8 @@
                   inputId="deathDate"
                   dateFormat="mm/dd/yy"
                   [maxDate]="today"
-                  [minDate]="authorForm.get('birthDate')?.value">
+                  [minDate]="authorForm.get('birthDate')?.value"
+                >
                 </p-datePicker>
                 <small class="text-gray-600 dark:text-gray-400 block">
                   Leave empty if author is still alive
@@ -191,7 +257,9 @@
 
               <!-- Genres -->
               <div class="md:col-span-2 space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-tags text-indigo-500 mr-2"></i>
                   Genres
                 </label>
@@ -201,7 +269,8 @@
                   placeholder="Select genres this author writes in"
                   [filter]="true"
                   [showToggleAll]="true"
-                  class="w-full">
+                  class="w-full"
+                >
                 </p-multiSelect>
                 <small class="text-gray-600 dark:text-gray-400 block">
                   Select the main genres this author is known for writing in
@@ -210,7 +279,9 @@
 
               <!-- Notes -->
               <div class="md:col-span-2 space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-book text-indigo-500 mr-2"></i>
                   Notes
                 </label>
@@ -219,10 +290,14 @@
                   placeholder="Any additional notes about this author"
                   class="w-full border-0 bg-gray-50"
                   rows="3"
-                  [class.ng-invalid]="isFieldInvalid('notes')">
+                  [class.ng-invalid]="isFieldInvalid('notes')"
+                >
                 </p-textarea>
-                <small *ngIf="isFieldInvalid('notes')" class="text-red-500 block">
-                  {{ getFieldError('notes') }}
+                <small
+                  *ngIf="isFieldInvalid('notes')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("notes") }}
                 </small>
               </div>
             </div>
@@ -234,7 +309,9 @@
               <div class="p-2 bg-blue-100 rounded-lg">
                 <i class="pi pi-globe text-blue-600"></i>
               </div>
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
                 Online Presence
               </h2>
             </div>
@@ -242,7 +319,9 @@
             <div class="space-y-6">
               <!-- Website -->
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
                   <i class="pi pi-link text-blue-500 mr-2"></i>
                   Official Website
                 </label>
@@ -253,22 +332,31 @@
                   class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
                   [class.ng-invalid]="isFieldInvalid('website')"
                 />
-                <small *ngIf="isFieldInvalid('website')" class="text-red-500 block">
-                  {{ getFieldError('website') }}
+                <small
+                  *ngIf="isFieldInvalid('website')"
+                  class="text-red-500 block"
+                >
+                  {{ getFieldError("website") }}
                 </small>
               </div>
 
               <!-- Social Links -->
               <div formGroupName="socialLinks" class="space-y-4">
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4"
+                >
                   <i class="pi pi-share-alt text-blue-500 mr-2"></i>
                   Social Media Links
                 </label>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
                   <!-- Twitter -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <label
+                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                    >
                       <i class="pi pi-twitter text-blue-400 mr-1"></i>
                       Twitter
                     </label>
@@ -282,7 +370,9 @@
 
                   <!-- Instagram -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <label
+                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                    >
                       <i class="pi pi-instagram text-pink-500 mr-1"></i>
                       Instagram
                     </label>
@@ -296,7 +386,9 @@
 
                   <!-- Facebook -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <label
+                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                    >
                       <i class="pi pi-facebook text-blue-600 mr-1"></i>
                       Facebook
                     </label>
@@ -310,7 +402,9 @@
 
                   <!-- LinkedIn -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <label
+                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                    >
                       <i class="pi pi-linkedin text-blue-700 mr-1"></i>
                       LinkedIn
                     </label>
@@ -324,7 +418,9 @@
 
                   <!-- Goodreads -->
                   <div class="space-y-2">
-                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <label
+                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                    >
                       <i class="pi pi-book text-yellow-600 mr-1"></i>
                       Goodreads
                     </label>
@@ -341,7 +437,9 @@
           </div>
 
           <!-- Form Actions -->
-          <div class="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-gray-200">
+          <div
+            class="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-gray-200"
+          >
             <button
               type="button"
               pButton
@@ -374,3 +472,14 @@
     </div>
   </div>
 </div>
+
+<!-- Duplicate Detection Dialog -->
+<app-duplicate-detection-dialog
+  [visible]="showDuplicateDialog"
+  [duplicateResult]="duplicateResult!"
+  [searchTerm]="searchTerm"
+  entityType="author"
+  (actionSelected)="onDuplicateAction($event)"
+  (dialogClosed)="showDuplicateDialog = false"
+>
+</app-duplicate-detection-dialog>

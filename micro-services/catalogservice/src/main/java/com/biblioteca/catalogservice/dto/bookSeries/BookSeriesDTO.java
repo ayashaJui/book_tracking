@@ -11,7 +11,7 @@ import lombok.*;
 public class BookSeriesDTO {
     private Integer id;
 
-    private Integer bookId;
+    private String seriesName;
 
     private Integer seriesId;
 

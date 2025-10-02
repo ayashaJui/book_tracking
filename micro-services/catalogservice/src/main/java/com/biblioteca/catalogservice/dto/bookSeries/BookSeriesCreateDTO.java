@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 @ToString
 public class BookSeriesCreateDTO {
-    @NotNull(message = "Book ID cannot be null" )
-    private Integer bookId;
+//    @NotNull(message = "Book ID cannot be null" )
+//    private Integer bookId;
 
     @NotNull(message = "Series ID cannot be null" )
     private Integer seriesId;

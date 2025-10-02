@@ -22,4 +22,8 @@ public interface SeriesService {
     SeriesDTO updateSeries(SeriesUpdateDTO seriesUpdateDTO, HttpServletRequest request, Jwt jwt);
 
     String deleteSeries(Integer id, HttpServletRequest request, Jwt jwt);
+
+    List<SeriesDTO> getSeriesByAuthorId(Integer authorId, HttpServletRequest request, Jwt jwt);
+
+    List<SeriesDTO> getSeriesByGenreId(Integer genreId, HttpServletRequest request, Jwt jwt);
 }

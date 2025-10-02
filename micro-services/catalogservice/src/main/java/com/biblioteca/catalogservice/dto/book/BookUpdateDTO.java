@@ -1,9 +1,13 @@
 package com.biblioteca.catalogservice.dto.book;
 
+import com.biblioteca.catalogservice.dto.bookAuthor.BookAuthorUpdateDTO;
+import com.biblioteca.catalogservice.dto.bookGenre.BookGenreUpdateDTO;
+import com.biblioteca.catalogservice.dto.bookSeries.BookSeriesUpdateDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,4 +41,10 @@ public class BookUpdateDTO {
     private String googleBooksId;
 
     private Boolean isActive;
+
+    private List<BookAuthorUpdateDTO> bookAuthorUpdateDTOs;
+
+    private List<BookGenreUpdateDTO> bookGenreUpdateDTOS;
+
+    private List<BookSeriesUpdateDTO> bookSeriesUpdateDTOS;
 }

@@ -10,7 +10,8 @@ public class BookAuthorMapper {
     public static BookAuthorDTO toDTO(BookAuthor bookAuthor) {
         return BookAuthorDTO.builder()
                 .id(bookAuthor.getId())
-                .bookId(bookAuthor.getBook().getId())
+//                .bookId(bookAuthor.getBook().getId())
+                .authorName(bookAuthor.getAuthor().getName())
                 .authorId(bookAuthor.getAuthor().getId())
                 .authorRole(bookAuthor.getRole() != null ? AuthorRoleEnums.valueOf(bookAuthor.getRole()) : null)
                 .build();

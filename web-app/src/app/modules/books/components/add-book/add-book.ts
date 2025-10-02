@@ -10,6 +10,18 @@ import { AuthorService } from '../../../authors/services/author.service';
 import { Author } from '../../../authors/models/author.model';
 import { PublisherService } from '../../../publishers/services/publisher.service';
 import { Publisher } from '../../../publishers/models/publisher.model';
+import { CatalogService } from '../../../shared/services/catalog.service';
+import {
+  CatalogSearchResult,
+  DuplicateDetectionResult,
+  BookCreateNewRequest,
+  CatalogBook,
+  CatalogAuthor,
+  CatalogPublisher
+} from '../../../shared/models/catalog.model';
+import { DuplicateDialogAction } from '../../../shared/components/duplicate-dialog/duplicate-dialog.component';
+import { Observable, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-book',
@@ -91,6 +103,26 @@ export class AddBook implements OnInit {
     isAlive: true
   };
 
+  // ===== NEW CATALOG PROPERTIES =====
+
+  // Catalog search state
+  showCatalogSearch: boolean = true;
+  catalogSearchPerformed: boolean = false;
+  selectedCatalogBook: CatalogSearchResult | null = null;
+  showCreateNewForm: boolean = false;
+
+  // Duplicate detection
+  showDuplicateDialog: boolean = false;
+  duplicateResult: DuplicateDetectionResult | null = null;
+  searchTerm: string = '';
+
+  // Step-by-step flow
+  currentStep: 'search' | 'duplicate_check' | 'create_new' | 'add_to_library' = 'search';
+
+  // Enhanced author search
+  catalogAuthors: CatalogAuthor[] = [];
+  catalogPublishers: CatalogPublisher[] = [];
+
   constructor(
     private location: Location,
     private router: Router,
@@ -98,8 +130,9 @@ export class AddBook implements OnInit {
     private genreService: GenreService,
     private bookService: BookService,
     private authorService: AuthorService,
-    private publisherService: PublisherService
-  ) {}
+    private publisherService: PublisherService,
+    private catalogService: CatalogService
+  ) { }
 
   ngOnInit() {
     this.loadSeriesOptions();
@@ -125,7 +158,7 @@ export class AddBook implements OnInit {
   onAuthorsChange(authors: Author[]) {
     this.selectedAuthors = authors;
     this.newBook.authorIds = authors.map(a => a.id!).filter(id => id !== undefined);
-    
+
     // Update authors with roles - assign default "Author" role for new authors
     this.selectedAuthorsWithRoles = authors.map(author => {
       // Check if this author already has a role assigned
@@ -136,7 +169,7 @@ export class AddBook implements OnInit {
         role: existingRole?.role || 'Author' // Keep existing role or default to 'Author'
       };
     });
-    
+
     // Update the book's authors array
     this.newBook.authors = this.selectedAuthorsWithRoles;
   }
@@ -241,8 +274,8 @@ export class AddBook implements OnInit {
         if (this.selectedAuthors.length === 0 && series.authors && series.authors.length > 0) {
           // Try to find matching author in our author system
           const authors = this.authorService.getAuthors();
-          const matchingAuthor = authors.find(author => 
-            series.authors.some(seriesAuthor => 
+          const matchingAuthor = authors.find(author =>
+            series.authors.some(seriesAuthor =>
               author.name.toLowerCase() === seriesAuthor.name.toLowerCase()
             )
           );
@@ -324,6 +357,260 @@ export class AddBook implements OnInit {
     }
   }
 
+  // ===== NEW CATALOG-AWARE METHODS =====
+
+  // Handle catalog search results
+  onCatalogBookSelected(result: CatalogSearchResult) {
+    this.selectedCatalogBook = result;
+    this.currentStep = 'add_to_library';
+    this.showCatalogSearch = false;
+  }
+
+  // Handle "create new" from catalog search
+  onCreateNewFromCatalog(searchTerm: string) {
+    this.searchTerm = searchTerm;
+    this.newBook.title = searchTerm;
+    this.checkForDuplicatesBeforeCreate();
+  }
+
+  // Check for duplicates before creating new book
+  checkForDuplicatesBeforeCreate() {
+    if (!this.newBook.title.trim()) {
+      this.showCreateNewForm = true;
+      return;
+    }
+
+    const catalogBookData: Partial<CatalogBook> = {
+      title: this.newBook.title,
+      authorIds: this.selectedAuthors.map(a => a.id!),
+      genres: this.newBook.genres
+    };
+
+    this.bookService.checkForDuplicates(catalogBookData).subscribe({
+      next: (result) => {
+        this.duplicateResult = result;
+
+        if (result.hasMatches && (result.confidence === 'high' || result.confidence === 'medium')) {
+          this.showDuplicateDialog = true;
+          this.currentStep = 'duplicate_check';
+        } else {
+          this.showCreateNewForm = true;
+          this.currentStep = 'create_new';
+        }
+      },
+      error: (error) => {
+        console.error('Error checking duplicates:', error);
+        this.showCreateNewForm = true;
+        this.currentStep = 'create_new';
+      }
+    });
+  }
+
+  // Handle duplicate dialog actions
+  onDuplicateAction(action: DuplicateDialogAction) {
+    this.showDuplicateDialog = false;
+
+    switch (action.action) {
+      case 'use_existing':
+        this.selectedCatalogBook = action.selectedItem || null;
+        this.currentStep = 'add_to_library';
+        break;
+      case 'create_new':
+        this.showCreateNewForm = true;
+        this.currentStep = 'create_new';
+        break;
+      case 'cancel':
+        this.resetToSearch();
+        break;
+    }
+  }
+
+  // Enhanced author search with catalog
+  onAuthorSearch(query: string) {
+    if (query.length < 2) return;
+
+    this.bookService.searchCatalogAuthors(query).subscribe({
+      next: (authors) => {
+        this.catalogAuthors = authors;
+
+        // Also search local authors for backward compatibility
+        const localAuthors = this.authorService.searchAuthors(query);
+        // Merge and deduplicate if needed
+      },
+      error: (error) => {
+        console.error('Error searching catalog authors:', error);
+        // Fallback to local search
+        this.catalogAuthors = [];
+      }
+    });
+  }
+
+  // Add author from catalog or create new
+  onSelectCatalogAuthor(author: CatalogAuthor) {
+    // Convert catalog author to local author format for compatibility
+    const localAuthor: Author = {
+      id: author.id,
+      name: author.name,
+      biography: author.biography || '',
+      birthDate: author.birthDate ? new Date(author.birthDate) : undefined,
+      nationality: author.nationality || '',
+      genres: [], // Will be populated separately
+      isActive: !author.deathDate,
+      totalBooks: 0,
+      averageRating: 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.selectedAuthors.push(localAuthor);
+    this.newBook.authorIds = this.selectedAuthors.map(a => a.id!).filter(id => id !== undefined);
+  }
+
+  // Override existing onAddAuthorDialogSave with catalog integration
+  // (This replaces the existing method to add catalog functionality)
+
+  // Create new author in catalog
+  createNewAuthorInCatalog() {
+    const catalogAuthorData: Omit<CatalogAuthor, 'id'> = {
+      name: this.newAuthorData.name.trim(),
+      biography: this.newAuthorData.biography,
+      birthDate: this.newAuthorData.birthDate?.toISOString(),
+      nationality: this.newAuthorData.nationality
+    };
+
+    this.bookService.ensureAuthorInCatalog(catalogAuthorData).subscribe({
+      next: (catalogAuthor) => {
+        this.onSelectCatalogAuthor(catalogAuthor);
+        this.resetAddAuthorDialog();
+      },
+      error: (error) => {
+        console.error('Error creating author in catalog:', error);
+        // Fallback to local creation
+        this.createAuthorLocally();
+      }
+    });
+  }
+
+  // Fallback to local author creation
+  createAuthorLocally() {
+    const newAuthor: Author = {
+      name: this.newAuthorData.name.trim(),
+      biography: this.newAuthorData.biography,
+      birthDate: this.newAuthorData.birthDate || undefined,
+      nationality: this.newAuthorData.nationality,
+      genres: this.newAuthorData.genres,
+      isActive: this.newAuthorData.isAlive,
+      totalBooks: 0,
+      averageRating: 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const addedAuthor = this.authorService.addAuthor(newAuthor);
+    this.selectedAuthors.push(addedAuthor);
+    this.newBook.authorIds = this.selectedAuthors.map(a => a.id!).filter(id => id !== undefined);
+    this.resetAddAuthorDialog();
+  }
+
+  // Enhanced book creation with catalog integration
+  addBookWithCatalog() {
+    if (this.selectedCatalogBook) {
+      // Add existing book from catalog to user library
+      this.addExistingBookToLibrary();
+    } else {
+      // Create completely new book
+      this.createCompletelyNewBook();
+    }
+  }
+
+  // Add existing catalog book to user library
+  addExistingBookToLibrary() {
+    if (!this.selectedCatalogBook) return;
+
+    const request = {
+      catalogBookId: this.selectedCatalogBook.id,
+      status: this.newBook.status || 'Want to Read',
+      personalRating: this.newBook.rating,
+      price: this.newBook.price,
+      source: this.newBook.source
+    };
+
+    this.bookService.createBookFromCatalog(request).subscribe({
+      next: (userLibraryBook) => {
+        console.log('Book added to library:', userLibraryBook);
+        this.goBack();
+      },
+      error: (error) => {
+        console.error('Error adding book to library:', error);
+      }
+    });
+  }
+
+  // Create completely new book with catalog
+  createCompletelyNewBook() {
+    const authorNames = this.selectedAuthors.map(a => a.name);
+
+    const request: BookCreateNewRequest = this.bookService.convertToBookCreateNewRequest(
+      this.convertToBookCreateRequest(),
+      authorNames
+    );
+
+    this.bookService.createNewBookWithCatalogCheck(request).subscribe({
+      next: (userLibraryBook) => {
+        console.log('New book created:', userLibraryBook);
+        this.handleSeriesAssignment();
+        this.goBack();
+      },
+      error: (error) => {
+        console.error('Error creating new book:', error);
+        // Fallback to legacy method
+        this.addBook();
+      }
+    });
+  }
+
+  // Helper methods
+  resetToSearch() {
+    this.currentStep = 'search';
+    this.showCatalogSearch = true;
+    this.showCreateNewForm = false;
+    this.selectedCatalogBook = null;
+    this.duplicateResult = null;
+  }
+
+  resetAddAuthorDialog() {
+    this.showAddAuthorDialog = false;
+    this.newAuthorData = {
+      name: '',
+      biography: '',
+      birthDate: null,
+      nationality: '',
+      genres: [],
+      isAlive: true
+    };
+  }
+
+  convertToBookCreateRequest(): BookCreateRequest {
+    return {
+      ...this.newBook,
+      authorIds: this.newBook.authorIds,
+      authors: this.selectedAuthorsWithRoles,
+      publisherId: (typeof this.selectedPublisherId === 'number') ? this.selectedPublisherId : undefined
+    };
+  }
+
+  handleSeriesAssignment() {
+    if (this.isPartOfSeries && this.selectedSeriesId && this.newBook.seriesOrder) {
+      this.seriesService.addBookToSeries(
+        this.selectedSeriesId,
+        this.newBook.title,
+        this.newBook.seriesOrder
+      );
+    }
+  }
+
+  // ===== END CATALOG METHODS =====
+
   addBook() {
     console.log('Book added:', this.newBook);
 
@@ -402,10 +689,10 @@ export class AddBook implements OnInit {
       if (newPublisher) {
         // Reload publisher options
         this.loadPublisherOptions();
-        
+
         // Select the newly created publisher
         this.selectedPublisherId = newPublisher.id!;
-        
+
         // Reset form and close dialog
         this.newPublisherData = {
           name: '',

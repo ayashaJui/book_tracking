@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.service.impl;
 
+import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.pagination.PaginationUtil;
 import com.biblioteca.catalogservice.dto.series.SeriesCreateDTO;
@@ -189,6 +190,36 @@ public class SeriesServiceImpl implements SeriesService {
         }
     }
 
+    @Override
+    public List<SeriesDTO> getSeriesByAuthorId(Integer authorId, HttpServletRequest request, Jwt jwt) {
+        log.info("getSeriesByAuthorId in SeriesServiceImpl is called with authorId: {} by user: {}", authorId, jwt.getSubject());
+
+        authorRepository.findById(authorId).orElseThrow(() -> {
+            log.error("Author with id {} not found", authorId);
+            return new CustomException("Author with id " + authorId + " not found", HttpStatus.NOT_FOUND.value());
+        });
+
+        List<Series> series = seriesRepository.findBySeriesAuthors(authorId);
+        List<SeriesDTO> seriesDTOS = series.stream().map(this::convertToDTO).toList();
+
+        return seriesDTOS;
+    }
+
+    @Override
+    public List<SeriesDTO> getSeriesByGenreId(Integer genreId, HttpServletRequest request, Jwt jwt) {
+        log.info("getSeriesByGenreId in SeriesServiceImpl is called with genreId: {} by user: {}", genreId, jwt.getSubject());
+
+        genreRepository.findById(genreId).orElseThrow(() -> {
+            log.error("Genre with id {} not found", genreId);
+            return new CustomException("Genre with id " + genreId + " not found", HttpStatus.NOT_FOUND.value());
+        });
+
+        List<Series> series = seriesRepository.findBySeriesGenres(genreId);
+        List<SeriesDTO> seriesDTOS = series.stream().map(this::convertToDTO).toList();
+
+        return seriesDTOS;
+    }
+
     private Series findById(Integer id) {
         return seriesRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Series with id " + id + " not found", HttpStatus.NOT_FOUND.value()));
@@ -219,7 +250,7 @@ public class SeriesServiceImpl implements SeriesService {
      * 3. Missing relationship: Remove existing SeriesAuthor
      */
     private void updateSeriesAuthors(Series series, List<SeriesAuthorUpdateDTO> authorsUpdateDTOS) {
-        log.info("Updating series authors for series id: {} using natural key strategy", series.getId());
+        log.info("Updating series authors for series id: {} ", series.getId());
         
         if (authorsUpdateDTOS == null || authorsUpdateDTOS.isEmpty()) {
             // Remove all existing authors
@@ -299,7 +330,7 @@ public class SeriesServiceImpl implements SeriesService {
      * 3. Missing relationship: Remove existing SeriesGenre  
      */
     private void updateSeriesGenres(Series series, List<SeriesGenreUpdateDTO> genresUpdateDTOS) {
-        log.info("Updating series genres for series id: {} using natural key strategy", series.getId());
+        log.info("Updating series genres for series id: {}", series.getId());
         
         if (genresUpdateDTOS == null || genresUpdateDTOS.isEmpty()) {
             // Remove all existing genres

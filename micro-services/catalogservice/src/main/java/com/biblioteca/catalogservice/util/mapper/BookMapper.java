@@ -6,6 +6,7 @@ import com.biblioteca.catalogservice.dto.book.BookUpdateDTO;
 import com.biblioteca.catalogservice.entity.Book;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class BookMapper {
     public static BookDTO toDTO(Book book){
@@ -21,7 +22,10 @@ public class BookMapper {
                 .totalRatings(book.getTotalRatings() )
                 .goodreadsId(book.getGoodreadsId())
                 .googleBooksId(book.getGoogleBooksId())
-                .isActive(book.getIsActive() )
+                .isActive(book.getIsActive())
+                .bookAuthors(book.getBookAuthors() != null ? book.getBookAuthors().stream().map(BookAuthorMapper::toDTO).toList() : null)
+                .bookGenres(book.getBookGenres() != null ? book.getBookGenres().stream().map(BookGenreMapper::toDTO).toList() : null)
+                .bookSeries(book.getBookSeries() != null ? book.getBookSeries().stream().map(BookSeriesMapper::toDTO).toList() : null)
                 .createdAt(book.getCreatedAt())
                 .updatedAt(book.getUpdatedAt())
                 .build();
@@ -39,6 +43,9 @@ public class BookMapper {
                 .totalRatings(bookCreateDTO.getTotalRatings() != null ? bookCreateDTO.getTotalRatings() : 0)
                 .goodreadsId(bookCreateDTO.getGoodreadsId())
                 .googleBooksId(bookCreateDTO.getGoogleBooksId())
+                .bookAuthors(new ArrayList<>())
+                .bookGenres(new ArrayList<>())
+                .bookSeries(new ArrayList<>())
                 .isActive(bookCreateDTO.getIsActive() != null ? bookCreateDTO.getIsActive() : true)
                 .createdAt(LocalDateTime.now())
                 .build();

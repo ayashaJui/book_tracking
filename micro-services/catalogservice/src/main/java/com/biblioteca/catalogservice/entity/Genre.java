@@ -41,4 +41,10 @@ public class Genre {
 
     @OneToMany(mappedBy = "parentGenreId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Genre> subGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeriesGenre> seriesGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookGenre> bookGenres = new ArrayList<>();
 }

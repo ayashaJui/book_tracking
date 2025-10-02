@@ -9,7 +9,8 @@ public class BookSeriesMapper {
     public static BookSeriesDTO toDTO(BookSeries bookSeries) {
         return BookSeriesDTO.builder()
                 .id(bookSeries.getId())
-                .bookId(bookSeries.getBook().getId())
+//                .bookId(bookSeries.getBook().getId())
+                .seriesName(bookSeries.getSeries().getName())
                 .seriesId(bookSeries.getSeries().getId())
                 .position(bookSeries.getPosition())
                 .build();

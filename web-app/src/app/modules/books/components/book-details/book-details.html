@@ -269,61 +269,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-4">
-          <!-- Book Details -->
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3
-              class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
-            >
-              <i class="pi pi-info-circle text-blue-500 mr-2"></i>
-              Book Details
-            </h3>
-            <div class="space-y-3">
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400"
-                  >Genre</span
-                >
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.genres[0] || "Unknown" }}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400"
-                  >Status</span
-                >
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.status || "Unknown" }}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400"
-                  >Pages</span
-                >
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ book.pages || "0" }}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400"
-                  >Est. Time</span
-                >
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ bookDetails.estimatedTime || "0" }}h
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600 dark:text-gray-400"
-                  >Actual Time</span
-                >
-                <span class="font-medium text-gray-900 dark:text-white">
-                  {{ bookDetails.actualTime || "0" }}h
-                </span>
-              </div>
-            </div>
-          </div>
 
           <!-- Publisher Info -->
           <div 
@@ -467,6 +412,63 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-4">
+          <!-- Book Details -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center"
+            >
+              <i class="pi pi-info-circle text-blue-500 mr-2"></i>
+              Book Details
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >Genre</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ book.genres[0] || "Unknown" }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >Status</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ book.status || "Unknown" }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >Pages</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ book.pages || "0" }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >Est. Time</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ bookDetails.estimatedTime || "0" }}h
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-600 dark:text-gray-400"
+                  >Actual Time</span
+                >
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ bookDetails.actualTime || "0" }}h
+                </span>
+              </div>
+            </div>
+          </div>
+
+          
 
           <!-- Purchase Info -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">

@@ -13,4 +13,4 @@ import { EditBook } from './components/edit-book/edit-book';
   declarations: [AllBook, AddBook, BookDetails, BookEditionsComponent, EditBook],
   imports: [CommonModule, SharedModule, BooksRoutingModule],
 })
-export class BooksModule {}
+export class BooksModule { }

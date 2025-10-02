@@ -1,9 +1,13 @@
 package com.biblioteca.catalogservice.dto.book;
 
+import com.biblioteca.catalogservice.dto.bookAuthor.BookAuthorDTO;
+import com.biblioteca.catalogservice.dto.bookGenre.BookGenreDTO;
+import com.biblioteca.catalogservice.dto.bookSeries.BookSeriesDTO;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,6 +39,12 @@ public class BookDTO {
     private String googleBooksId;
 
     private Boolean isActive;
+
+    private List<BookAuthorDTO> bookAuthors;
+
+    private List<BookGenreDTO> bookGenres;
+
+    private List<BookSeriesDTO> bookSeries;
 
     private LocalDateTime createdAt;
 

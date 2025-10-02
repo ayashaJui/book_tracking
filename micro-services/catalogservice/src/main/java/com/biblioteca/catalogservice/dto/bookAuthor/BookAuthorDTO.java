@@ -14,7 +14,7 @@ public class BookAuthorDTO {
 
     private Integer authorId;
 
-    private Integer bookId;
+    private String authorName;
 
     private AuthorRoleEnums authorRole;
 }

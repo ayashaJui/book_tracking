@@ -1,0 +1,210 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [resizable]="false"
+  [draggable]="false"
+  (onHide)="onDialogHide()"
+  [header]="dialogTitle"
+  styleClass="w-full max-w-4xl mx-4"
+>
+  <div class="space-y-6">
+    <!-- Search Context -->
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <h4 class="font-medium text-gray-900 dark:text-white mb-2">
+        You were trying to create:
+      </h4>
+      <p class="text-gray-700 dark:text-gray-300">
+        "{{ searchTerm }}" ({{ entityType }})
+      </p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        {{ dialogMessage }}
+      </p>
+    </div>
+
+    <!-- Exact Matches -->
+    <div *ngIf="hasExactMatches" class="space-y-3">
+      <h4 class="font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="pi pi-exclamation-triangle text-red-500 mr-2"></i>
+        Exact Matches Found ({{ duplicateResult.exactMatches.length }})
+      </h4>
+
+      <div class="space-y-2">
+        <div
+          *ngFor="let item of duplicateResult.exactMatches"
+          class="border rounded-lg p-4 cursor-pointer transition-all duration-200"
+          [ngClass]="{
+            'border-blue-500 bg-blue-50 dark:bg-blue-900/20':
+              selectedExistingItem?.id === item.id,
+            'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600':
+              selectedExistingItem?.id !== item.id
+          }"
+          (click)="onExistingItemSelect(item)"
+        >
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 mt-1">
+              <i
+                [class]="getItemTypeIcon(item.type)"
+                class="text-lg"
+                [ngClass]="
+                  selectedExistingItem?.id === item.id
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
+                "
+              ></i>
+            </div>
+
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h5 class="font-medium text-gray-900 dark:text-white">
+                  {{ getItemDisplayName(item) }}
+                </h5>
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                >
+                  Exact Match
+                </span>
+              </div>
+
+              <p
+                *ngIf="item.description"
+                class="text-sm text-gray-600 dark:text-gray-400 mt-1"
+              >
+                {{ item.description }}
+              </p>
+            </div>
+
+            <div *ngIf="item.coverUrl || item.imageUrl" class="flex-shrink-0">
+              <img
+                [src]="item.coverUrl || item.imageUrl"
+                [alt]="getItemDisplayName(item)"
+                class="w-16 h-20 object-cover rounded border"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Similar Matches -->
+    <div *ngIf="hasSimilarMatches" class="space-y-3">
+      <h4 class="font-semibold text-gray-900 dark:text-white flex items-center">
+        <i class="pi pi-info-circle text-yellow-500 mr-2"></i>
+        Similar Matches Found ({{ duplicateResult.similarMatches.length }})
+      </h4>
+
+      <div class="space-y-2">
+        <div
+          *ngFor="let item of duplicateResult.similarMatches"
+          class="border rounded-lg p-4 cursor-pointer transition-all duration-200"
+          [ngClass]="{
+            'border-blue-500 bg-blue-50 dark:bg-blue-900/20':
+              selectedExistingItem?.id === item.id,
+            'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600':
+              selectedExistingItem?.id !== item.id
+          }"
+          (click)="onExistingItemSelect(item)"
+        >
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 mt-1">
+              <i
+                [class]="getItemTypeIcon(item.type)"
+                class="text-lg"
+                [ngClass]="
+                  selectedExistingItem?.id === item.id
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
+                "
+              ></i>
+            </div>
+
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h5 class="font-medium text-gray-900 dark:text-white">
+                  {{ getItemDisplayName(item) }}
+                </h5>
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                  >
+                    Similar
+                  </span>
+                </div>
+              </div>
+
+              <p
+                *ngIf="item.description"
+                class="text-sm text-gray-600 dark:text-gray-400 mt-1"
+              >
+                {{ item.description }}
+              </p>
+            </div>
+
+            <div *ngIf="item.coverUrl || item.imageUrl" class="flex-shrink-0">
+              <img
+                [src]="item.coverUrl || item.imageUrl"
+                [alt]="getItemDisplayName(item)"
+                class="w-16 h-20 object-cover rounded border"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendation Box -->
+    <div
+      class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+    >
+      <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">
+        <i class="pi pi-lightbulb mr-2"></i>
+        Recommendation
+      </h4>
+      <p class="text-blue-800 dark:text-blue-300 text-sm">
+        To maintain data quality, we recommend using existing items when
+        possible. This helps prevent duplicates and ensures consistency across
+        the platform.
+      </p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between items-center pt-4">
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        <span *ngIf="selectedExistingItem"
+          >Selected: {{ getItemDisplayName(selectedExistingItem!) }}</span
+        >
+        <span *ngIf="!selectedExistingItem"
+          >Select an item above or create a new one</span
+        >
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors duration-200"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="onUseExisting()"
+          [disabled]="!canUseExisting()"
+          class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors duration-200"
+        >
+          Use Selected
+        </button>
+
+        <button
+          type="button"
+          (click)="onCreateNew()"
+          class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors duration-200"
+        >
+          Create New Anyway
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

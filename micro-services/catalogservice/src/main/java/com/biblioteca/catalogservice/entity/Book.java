@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -51,6 +53,15 @@ public class Book {
 
     @Column(name = "is_active", columnDefinition = "BOOLEAN" )
     private Boolean isActive = true;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookAuthor> bookAuthors = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookGenre> bookGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookSeries> bookSeries = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

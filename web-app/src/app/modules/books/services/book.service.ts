@@ -1,9 +1,21 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 import { Book, BookCreateRequest, BookUpdateRequest, LegacyBook } from '../models/book.model';
 import { AuthorService } from '../../authors/services/author.service';
 import { PublisherService } from '../../publishers/services/publisher.service';
 import { EditionService } from './edition.service';
+import { CatalogService } from '../../shared/services/catalog.service';
+import {
+  CatalogBook,
+  CatalogAuthor,
+  CatalogPublisher,
+  CatalogSeries,
+  UserLibraryBook,
+  BookCreateNewRequest,
+  BookCreateFromCatalogRequest,
+  DuplicateDetectionResult
+} from '../../shared/models/catalog.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +27,8 @@ export class BookService {
   constructor(
     private authorService: AuthorService,
     private publisherService: PublisherService,
-    private editionService: EditionService
+    private editionService: EditionService,
+    private catalogService: CatalogService
   ) {
     this.loadBooksFromStorage();
   }
@@ -61,7 +74,7 @@ export class BookService {
   createBook(bookData: BookCreateRequest): Book {
     const books = this.booksSubject.value;
     const newId = this.generateId();
-    
+
     const newBook: Book = {
       ...bookData,
       id: newId,
@@ -71,15 +84,122 @@ export class BookService {
     const updatedBooks = [...books, newBook];
     this.saveBooksToStorage(updatedBooks);
     this.booksSubject.next(updatedBooks);
-    
+
     return this.populateBookDetails(newBook);
   }
+
+  // ===== NEW CATALOG-AWARE METHODS =====
+
+  // Create book from existing catalog entry
+  createBookFromCatalog(request: BookCreateFromCatalogRequest): Observable<UserLibraryBook> {
+    const userLibraryData: Omit<UserLibraryBook, 'id' | 'userId'> = {
+      catalogBookId: request.catalogBookId,
+      status: request.status || 'Want to Read',
+      personalRating: request.personalRating,
+      personalNotes: request.personalNotes,
+      price: request.price,
+      source: request.source,
+      isOwned: request.isOwned,
+      condition: request.condition,
+      location: request.location,
+      dateAdded: new Date().toISOString()
+    };
+
+    return this.catalogService.addBookToUserLibrary(userLibraryData);
+  }
+
+  // Create completely new book (checks catalog first)
+  createNewBookWithCatalogCheck(request: BookCreateNewRequest): Observable<UserLibraryBook> {
+    return this.catalogService.createCompleteBook(request);
+  }
+
+  // Enhanced search that includes catalog
+  searchCatalogAndLibrary(query: string): Observable<{
+    libraryBooks: Book[];
+    catalogResults: any[];
+  }> {
+    // Search local library
+    const libraryBooks = this.searchBooks(query);
+
+    // Search catalog
+    return this.catalogService.search({
+      query,
+      type: 'all'
+    }).pipe(
+      map(catalogResults => ({
+        libraryBooks,
+        catalogResults
+      }))
+    );
+  }
+
+  // Get available authors from catalog
+  searchCatalogAuthors(name: string): Observable<CatalogAuthor[]> {
+    return this.catalogService.searchAuthors(name);
+  }
+
+  // Check for duplicates (wrapper for catalog service)
+  checkForDuplicates(bookData: Partial<CatalogBook>): Observable<DuplicateDetectionResult> {
+    return this.catalogService.detectDuplicates(bookData);
+  }
+
+  // Get available publishers from catalog
+  searchCatalogPublishers(name: string): Observable<CatalogPublisher[]> {
+    return this.catalogService.searchPublishers(name);
+  }
+
+  // Get available series from catalog
+  searchCatalogSeries(name: string): Observable<CatalogSeries[]> {
+    return this.catalogService.searchSeries(name);
+  }
+
+  // Create author in catalog if not exists
+  ensureAuthorInCatalog(authorData: Omit<CatalogAuthor, 'id'>): Observable<CatalogAuthor> {
+    return this.catalogService.ensureAuthorInCatalog(authorData);
+  }
+
+  // Create publisher in catalog if not exists
+  ensurePublisherInCatalog(publisherData: Omit<CatalogPublisher, 'id'>): Observable<CatalogPublisher> {
+    return this.catalogService.ensurePublisherInCatalog(publisherData);
+  }
+
+  // Create series in catalog if not exists
+  ensureSeriesInCatalog(seriesData: Omit<CatalogSeries, 'id'>): Observable<CatalogSeries> {
+    return this.catalogService.ensureSeriesInCatalog(seriesData);
+  }
+
+  // Convert legacy book request to new catalog-aware request
+  convertToBookCreateNewRequest(bookData: BookCreateRequest, authorNames: string[]): BookCreateNewRequest {
+    return {
+      catalogBook: {
+        title: bookData.title,
+        authorIds: [], // Will be populated after author creation
+        publisherId: bookData.publisherId,
+        genres: bookData.genres,
+        pages: bookData.pages,
+        seriesId: bookData.seriesId,
+        seriesOrder: bookData.seriesOrder
+      },
+      authors: authorNames.map(name => ({ name })),
+      publisher: bookData.publisherId ? undefined : undefined, // Will need publisher data
+      series: bookData.seriesName ? { name: bookData.seriesName } : undefined,
+      userLibraryData: {
+        status: bookData.status || 'Want to Read',
+        personalRating: bookData.rating,
+        price: bookData.price,
+        source: bookData.source
+        // catalogBookId will be set by the catalog service
+      }
+    };
+  }
+
+  // ===== END CATALOG-AWARE METHODS =====
 
   // Update existing book
   updateBook(bookData: BookUpdateRequest): Book | null {
     const books = this.booksSubject.value;
     const index = books.findIndex(b => b.id === bookData.id);
-    
+
     if (index === -1) {
       return null;
     }
@@ -91,10 +211,10 @@ export class BookService {
 
     const updatedBooks = [...books];
     updatedBooks[index] = updatedBook;
-    
+
     this.saveBooksToStorage(updatedBooks);
     this.booksSubject.next(updatedBooks);
-    
+
     return this.populateBookDetails(updatedBook);
   }
 
@@ -102,7 +222,7 @@ export class BookService {
   deleteBook(id: number): boolean {
     const books = this.booksSubject.value;
     const filteredBooks = books.filter(b => b.id !== id);
-    
+
     if (filteredBooks.length === books.length) {
       return false; // Book not found
     }
@@ -171,7 +291,7 @@ export class BookService {
     let authorIds: number[] = [];
 
     // Simple name matching (in real app, you might want more sophisticated matching)
-    const matchingAuthor = authors.find(author => 
+    const matchingAuthor = authors.find(author =>
       author.name.toLowerCase() === legacyBook.author.toLowerCase()
     );
 
@@ -198,8 +318,8 @@ export class BookService {
   // Private helper methods
   private populateBookDetails(book: Book): Book {
     const authorNames = this.getAuthorNames(book.authorIds);
-    const publisherName = book.publisherId 
-      ? this.publisherService.getPublisherById(book.publisherId)?.name 
+    const publisherName = book.publisherId
+      ? this.publisherService.getPublisherById(book.publisherId)?.name
       : undefined;
     const editionCount = this.editionService.getEditionsByBook(book.id || 0).length;
 

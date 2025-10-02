@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { PublisherService } from '../../services/publisher.service';
 import { PublisherCreateRequest } from '../../models/publisher.model';
+import { CatalogService } from '../../../shared/services/catalog.service';
+import { CatalogSearchResult, CatalogSearchQuery } from '../../../shared/models/catalog.model';
+import { DuplicateDialogAction } from '../../../shared/components/duplicate-dialog/duplicate-dialog.component';
 
 @Component({
   selector: 'app-add-publisher',
@@ -17,12 +20,19 @@ export class AddPublisherComponent implements OnInit {
   loading: boolean = false;
   logoFile: File | null = null;
 
+  // Catalog-related properties
+  showCatalogSearch: boolean = true;
+  showDuplicateDialog: boolean = false;
+  selectedCatalogPublisher: CatalogSearchResult | null = null;
+  potentialDuplicates: CatalogSearchResult[] = [];
+
   constructor(
     private fb: FormBuilder,
     private publisherService: PublisherService,
     private router: Router,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private catalogService: CatalogService
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -62,7 +72,7 @@ export class AddPublisherComponent implements OnInit {
 
     this.loading = true;
     const formData = this.publisherForm.value;
-    
+
     const publisherData: PublisherCreateRequest = {
       name: formData.name.trim(),
       location: formData.location?.trim(),
@@ -73,7 +83,7 @@ export class AddPublisherComponent implements OnInit {
 
     try {
       const newPublisher = this.publisherService.createPublisher(publisherData);
-      
+
       this.messageService.add({
         severity: 'success',
         summary: 'Success',
@@ -93,6 +103,67 @@ export class AddPublisherComponent implements OnInit {
         detail: 'Failed to add publisher'
       });
     }
+  }
+
+  // Catalog event handlers
+  onCatalogPublisherSelected(result: CatalogSearchResult): void {
+    this.selectedCatalogPublisher = result;
+
+    // Search for potential duplicates
+    const searchQuery: CatalogSearchQuery = {
+      query: result.name || result.title || '',
+      type: 'publisher'
+    };
+
+    this.catalogService.search(searchQuery).subscribe({
+      next: (searchResults) => {
+        if (searchResults.length > 0) {
+          this.potentialDuplicates = searchResults;
+          this.showDuplicateDialog = true;
+        } else {
+          this.prefillFormFromCatalog(result);
+        }
+      },
+      error: (error) => {
+        console.error('Error checking for duplicates:', error);
+        this.prefillFormFromCatalog(result);
+      }
+    });
+  }
+
+  onCreateNewFromCatalog(): void {
+    this.showCatalogSearch = false;
+  }
+
+  onDuplicateAction(action: DuplicateDialogAction): void {
+    this.showDuplicateDialog = false;
+
+    switch (action.action) {
+      case 'use_existing':
+        if (action.selectedItem) {
+          this.router.navigate(['/publishers/details', action.selectedItem.id]);
+        }
+        break;
+      case 'create_new':
+        if (this.selectedCatalogPublisher) {
+          this.prefillFormFromCatalog(this.selectedCatalogPublisher);
+        }
+        break;
+      case 'cancel':
+        this.showCatalogSearch = true;
+        break;
+    }
+  }
+
+  private prefillFormFromCatalog(result: CatalogSearchResult): void {
+    this.showCatalogSearch = false;
+
+    this.publisherForm.patchValue({
+      name: result.name || result.title,
+      description: result.description
+      // Note: Additional fields like location and website would need to be fetched
+      // from the full publisher details using the catalog service
+    });
   }
 
   goBack(): void {
