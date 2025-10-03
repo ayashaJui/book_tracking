@@ -1,0 +1,1156 @@
+User Service Database: user_db → postgresql
+
+-- Users table
+CREATE TABLE auth_users (
+    id SERIAL PRIMARY KEY,
+    email_address VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    enabled BOOLEAN DEFAULT true,
+    account_non_expired BOOLEAN NOT NULL DEFAULT true,
+    account_non_locked BOOLEAN NOT NULL DEFAULT true,
+    credentials_non_expired BOOLEAN DEFAULT true,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+    blocked_at TIMESTAMP,
+    blocked_to TIMESTAMP,
+    login_attempt INTEGER NOT NULL DEFAULT 0,
+    otp_retry_count INTEGER,
+    otp_date TIMESTAMP,
+    email_verified BOOLEAN,
+    reset_password_token VARCHAR(255),
+    token_valid_upto TIMESTAMP,
+    otp VARCHAR(100)
+);
+
+
+CREATE TABLE user_profiles (
+    id int PRIMARY KEY DEFAULT gen_random_uuid(),
+    auth_user_id INTEGER NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    bio TEXT,
+    location VARCHAR(250),
+    profile_image_id VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_auth_user
+        FOREIGN KEY(auth_user_id)
+        REFERENCES auth_users(id)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX idx_user_profiles_auth_user_id ON user_profiles(auth_user_id);
+
+
+-- User preferences
+CREATE TABLE user_preferences (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    theme VARCHAR(50) DEFAULT 'light',
+    language VARCHAR(10) DEFAULT 'en',
+    timezone VARCHAR(100) DEFAULT 'UTC',
+    date_format VARCHAR(20) DEFAULT 'MM/dd/yyyy',
+    currency VARCHAR(10) DEFAULT 'USD',
+    privacy_settings JSONB DEFAULT '{}',
+    notification_settings JSONB DEFAULT '{}',
+    reading_goals_settings JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User sessions
+CREATE TABLE user_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    session_token VARCHAR(255) UNIQUE NOT NULL,
+    refresh_token VARCHAR(255),
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User activities
+CREATE TABLE user_activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    activity_type VARCHAR(100) NOT NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id UUID NOT NULL,
+    activity_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User profile settings
+CREATE TABLE user_profile_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    profile_visibility VARCHAR(20) DEFAULT 'public', -- public, friends, private
+    show_reading_progress BOOLEAN DEFAULT true,
+    show_reading_goals BOOLEAN DEFAULT true,
+    show_currently_reading BOOLEAN DEFAULT true,
+    show_reviews BOOLEAN DEFAULT true,
+    show_quotes BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add user connection for social features (future)
+CREATE TABLE user_follows (
+    follower_id UUID REFERENCES users(id),
+    following_id UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, following_id)
+);
+
+
+-- Indexes
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_user_activities_user_type ON user_activities(user_id, activity_type);
+
+
+Catalog service database: catalog_db → postgresql
+-- Authors table
+CREATE TABLE authors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    bio TEXT,
+    birth_date DATE,
+    death_date DATE,
+    nationality VARCHAR(100),
+    website VARCHAR(500),
+    image_id VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Genres table
+CREATE TABLE genres (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    parent_genre_id INT REFERENCES genres(id),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Publishers table
+CREATE TABLE publishers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    location VARCHAR(255),
+    website VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Series table
+CREATE TABLE series (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    total_books INTEGER DEFAULT 0,
+    is_completed BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE series_genres (
+    id SERIAL PRIMARY KEY,
+    series_id INT NOT NULL REFERENCES series(id) ON DELETE CASCADE,
+    genre_id INT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    UNIQUE (series_id, genre_id)
+);
+
+-- Series Author table
+CREATE TABLE series_authors (
+    id SERIAL PRIMARY KEY,
+    series_id INT NOT NULL REFERENCES series(id) ON DELETE CASCADE,
+    author_id INT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+    role VARCHAR(50) DEFAULT 'AUTHOR',
+    UNIQUE (series_id, author_id, role)
+);
+
+-- Books table (represents the WORK, not an edition)
+CREATE TABLE books (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    subtitle VARCHAR(500),
+    description TEXT,
+    publication_date DATE,
+    page_count INTEGER,
+    language VARCHAR(10) DEFAULT 'en',
+    average_rating DECIMAL(3,2) DEFAULT 0,
+    total_ratings INTEGER DEFAULT 0,
+    goodreads_id VARCHAR(50),
+    google_books_id VARCHAR(50),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- Book-Author relationships (many-to-many)
+CREATE TABLE book_authors (
+    id SERIAL PRIMARY KEY,
+    book_id INT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    author_id INT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+    role VARCHAR(50) DEFAULT 'AUTHOR',
+    UNIQUE (book_id, author_id, role)
+);
+
+-- Book-Genre relationships (many-to-many)
+CREATE TABLE book_genres (
+    id SERIAL PRIMARY KEY,
+    book_id INT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    genre_id INT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+    UNIQUE (book_id, genre_id)
+);
+
+
+-- Book-Series relationships (many-to-many)
+CREATE TABLE book_series (
+    id SERIAL PRIMARY KEY,
+    book_id INT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    series_id INT NOT NULL REFERENCES series(id) ON DELETE CASCADE,
+    position INT,
+    UNIQUE (book_id, series_id)
+);
+
+
+-- Book editions (different formats/ISBNs for same book)
+CREATE TABLE book_editions (
+    id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(id) ON DELETE CASCADE,
+    format VARCHAR(50) NOT NULL,
+    isbn VARCHAR(20),
+    publisher_id INT REFERENCES publishers(id),
+    publication_date DATE,
+    page_count INTEGER,
+    price DECIMAL(10,2),
+    currency VARCHAR(10) DEFAULT 'USD',
+    cover_image_id INT,
+    availability_status VARCHAR(50) DEFAULT 'available',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Partial unique index for ISBN if not null
+CREATE UNIQUE INDEX uq_book_editions_isbn
+ON book_editions(isbn)
+WHERE isbn IS NOT NULL;
+
+
+
+
+User library service: user_library_db → postgresql
+
+-- User-specific book data linked to catalog service books (the WORK level)
+CREATE TABLE user_books (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL, -- References user_service.users.id
+    catalog_book_id BIGINT NOT NULL, -- References catalog_service.books.id (the work, not edition)
+    status VARCHAR(50) NOT NULL, -- want_to_read, currently_reading, read, did_not_finish, on_hold
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+    progress_percentage DECIMAL(5,2) DEFAULT 0,
+    current_page INTEGER DEFAULT 0,
+    start_date DATE,
+    finish_date DATE,
+    is_favorite BOOLEAN DEFAULT false,
+    reading_format VARCHAR(50) DEFAULT 'physical',
+    notes TEXT,
+    private_notes TEXT,
+    acquired_date DATE,
+    acquisition_method VARCHAR(100),
+    purchase_price DECIMAL(10,2),
+    purchase_currency VARCHAR(10) DEFAULT 'USD',
+    purchase_location VARCHAR(255),
+    condition VARCHAR(50), -- new, used, excellent, good, fair
+    location VARCHAR(255), -- where the book is stored
+    source_type VARCHAR(50) DEFAULT 'catalog_existing', -- catalog_existing, catalog_created, manual
+    original_search_query TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, catalog_book_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_books_user ON user_books(user_id);
+CREATE INDEX idx_user_books_catalog_book ON user_books(catalog_book_id);
+CREATE INDEX idx_user_books_status ON user_books(user_id, status);
+CREATE INDEX idx_user_books_rating ON user_books(user_id, rating) WHERE rating IS NOT NULL;
+CREATE INDEX idx_user_books_favorite ON user_books(user_id, is_favorite) WHERE is_favorite = true;
+CREATE INDEX idx_user_books_dates ON user_books(user_id, start_date, finish_date);
+
+-- Comments
+COMMENT ON COLUMN user_books.catalog_book_id IS 'References catalog_service.books.id (the work, not edition)';
+
+
+-- Specific editions owned by user for each book
+CREATE TABLE user_book_editions (
+    id BIGSERIAL PRIMARY KEY,
+    user_book_id BIGINT REFERENCES user_books(id) ON DELETE CASCADE,
+    catalog_edition_id BIGINT NOT NULL, -- References catalog_service.book_editions.id
+    is_primary_edition BOOLEAN DEFAULT true,
+    condition VARCHAR(50), -- new, used, excellent, good, fair
+    acquisition_date DATE,
+    acquisition_method VARCHAR(100), -- purchase, gift, borrowed, library
+    purchase_price DECIMAL(10,2),
+    purchase_currency VARCHAR(10) DEFAULT 'USD',
+    purchase_location VARCHAR(255),
+    storage_location VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_book_id, catalog_edition_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_book_editions_user_book ON user_book_editions(user_book_id);
+CREATE INDEX idx_user_book_editions_catalog ON user_book_editions(catalog_edition_id);
+CREATE INDEX idx_user_book_editions_primary ON user_book_editions(user_book_id, is_primary_edition) WHERE is_primary_edition = true;
+
+-- Comments
+COMMENT ON COLUMN user_book_editions.catalog_edition_id IS 'References catalog_service.book_editions.id';
+COMMENT ON COLUMN user_book_editions.is_primary_edition IS 'Which edition user considers primary';
+
+
+-- User-specific series tracking linked to catalog service series
+CREATE TABLE user_series (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    catalog_series_id BIGINT NOT NULL, -- References catalog_service.series.id
+    books_read INTEGER DEFAULT 0,
+    books_owned INTEGER DEFAULT 0,
+    completion_percentage DECIMAL(5,2) DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'active', -- active, completed, paused, dropped
+    start_date DATE,
+    completion_date DATE,
+    is_favorite BOOLEAN DEFAULT false,
+    reading_order_preference VARCHAR(50) DEFAULT 'publication',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, catalog_series_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_series_user ON user_series(user_id);
+CREATE INDEX idx_user_series_catalog ON user_series(catalog_series_id);
+CREATE INDEX idx_user_series_status ON user_series(user_id, status);
+CREATE INDEX idx_user_series_favorite ON user_series(user_id, is_favorite) WHERE is_favorite = true;
+
+-- Comments
+COMMENT ON COLUMN user_series.catalog_series_id IS 'References catalog_service.series.id';
+
+
+-- User-specific tracking of books within a series
+CREATE TABLE user_series_books (
+    id BIGSERIAL PRIMARY KEY,
+    user_series_id BIGINT REFERENCES user_series(id) ON DELETE CASCADE,
+    catalog_book_id BIGINT NOT NULL,
+    user_book_id BIGINT REFERENCES user_books(id),
+    order_in_series INTEGER,
+    is_read BOOLEAN DEFAULT false,
+    reading_priority INTEGER DEFAULT 3,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_series_id, catalog_book_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_series_books_series ON user_series_books(user_series_id);
+CREATE INDEX idx_user_series_books_catalog_book ON user_series_books(catalog_book_id);
+CREATE INDEX idx_user_series_books_user_book ON user_series_books(user_book_id);
+CREATE INDEX idx_user_series_books_order ON user_series_books(user_series_id, order_in_series);
+
+
+-- User preferences for catalog genres
+CREATE TABLE user_genre_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    catalog_genre_id BIGINT NOT NULL, -- References catalog_service.genres.id
+    preference_level INTEGER DEFAULT 3 CHECK (preference_level >= 1 AND preference_level <= 5),
+    is_excluded BOOLEAN DEFAULT false,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, catalog_genre_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_genre_preferences_user ON user_genre_preferences(user_id);
+CREATE INDEX idx_user_genre_preferences_catalog ON user_genre_preferences(catalog_genre_id);
+CREATE INDEX idx_user_genre_preferences_level ON user_genre_preferences(user_id, preference_level);
+
+-- Comments
+COMMENT ON COLUMN user_genre_preferences.catalog_genre_id IS 'References catalog_service.genres.id';
+
+
+-- User preferences for catalog authors
+CREATE TABLE user_author_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL, -- References user_service.users.id
+    catalog_author_id BIGINT NOT NULL, -- References catalog_service.authors.id
+    preference_level INTEGER DEFAULT 3 CHECK (preference_level >= 1 AND preference_level <= 5),
+    is_favorite BOOLEAN DEFAULT false,
+    is_excluded BOOLEAN DEFAULT false,
+    personal_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, catalog_author_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_author_preferences_user ON user_author_preferences(user_id);
+CREATE INDEX idx_user_author_preferences_catalog ON user_author_preferences(catalog_author_id);
+CREATE INDEX idx_user_author_preferences_favorite ON user_author_preferences(user_id, is_favorite) WHERE is_favorite = true;
+
+-- Comments
+COMMENT ON COLUMN user_author_preferences.catalog_author_id IS 'References catalog_service.authors.id';
+
+
+-- User preferences for catalog publishers
+CREATE TABLE user_publisher_preferences (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL, -- References user_service.users.id
+    catalog_publisher_id BIGINT NOT NULL, -- References catalog_service.publishers.id
+    preference_level INTEGER DEFAULT 3 CHECK (preference_level >= 1 AND preference_level <= 5),
+    is_favorite BOOLEAN DEFAULT false,
+    personal_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, catalog_publisher_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_publisher_preferences_user ON user_publisher_preferences(user_id);
+CREATE INDEX idx_user_publisher_preferences_catalog ON user_publisher_preferences(catalog_publisher_id);
+
+-- Comments
+COMMENT ON COLUMN user_publisher_preferences.catalog_publisher_id IS 'References catalog_service.publishers.id';
+
+
+--------------- ❌ not needed -------------------------------------------------
+-- User-created custom genres/tags not in main catalog
+CREATE TABLE user_custom_genres (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, name)
+);
+
+-- Indexes
+CREATE INDEX idx_user_custom_genres_user ON user_custom_genres(user_id);
+
+
+-- Mapping between user books and custom genres
+CREATE TABLE user_book_custom_genres (
+    user_id BIGINT NOT NULL,
+    catalog_book_id BIGINT NOT NULL,
+    custom_genre_id BIGINT REFERENCES user_custom_genres(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, catalog_book_id, custom_genre_id)
+);
+
+-- Indexes
+CREATE INDEX idx_user_book_custom_genres_user ON user_book_custom_genres(user_id);
+CREATE INDEX idx_user_book_custom_genres_book ON user_book_custom_genres(catalog_book_id);
+---------------------- ❌ not needed ------------------------------------------------------
+
+-- User-defined collections (custom reading lists)
+CREATE TABLE reading_collections (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_public BOOLEAN DEFAULT false,
+    is_default BOOLEAN DEFAULT false, -- e.g. "Currently Reading"
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, name)
+);
+
+-- Indexes
+CREATE INDEX idx_reading_collections_user ON reading_collections(user_id);
+CREATE INDEX idx_reading_collections_public ON reading_collections(is_public) WHERE is_public = true;
+CREATE INDEX idx_reading_collections_default ON reading_collections(user_id, is_default) WHERE is_default = true;
+
+
+-- Books inside reading collections
+CREATE TABLE reading_collection_books (
+    id BIGSERIAL PRIMARY KEY,
+    collection_id BIGINT REFERENCES reading_collections(id) ON DELETE CASCADE,
+    user_book_id BIGINT REFERENCES user_books(id) ON DELETE CASCADE,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    display_order INTEGER DEFAULT 0,
+    notes TEXT,
+    UNIQUE(collection_id, user_book_id)
+);
+
+-- Indexes
+CREATE INDEX idx_reading_collection_books_collection ON reading_collection_books(collection_id);
+CREATE INDEX idx_reading_collection_books_user_book ON reading_collection_books(user_book_id);
+CREATE INDEX idx_reading_collection_books_order ON reading_collection_books(collection_id, display_order);
+
+
+-- Tracks how books were added to user library for analytics/debugging
+CREATE TABLE user_book_sources (
+    id BIGSERIAL PRIMARY KEY,
+    user_book_id BIGINT REFERENCES user_books(id) ON DELETE CASCADE,
+    source_type VARCHAR(50) NOT NULL, -- catalog_existing, catalog_created, manual, import
+    catalog_search_query TEXT,
+    duplicate_detection_results JSONB,
+    user_choice VARCHAR(50), -- used_existing, created_new, ignored_duplicates
+    created_entities JSONB, -- track new entities created in catalog
+    import_source VARCHAR(100), -- e.g. goodreads, csv, etc.
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_user_book_sources_user_book ON user_book_sources(user_book_id);
+CREATE INDEX idx_user_book_sources_type ON user_book_sources(source_type);
+
+
+
+
+Wishlist Service: wishlist_db → postgresql
+-- Wishlist categories
+CREATE TABLE wishlist_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, name)
+);
+
+-- Wishlists
+CREATE TABLE wishlists (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    category_id UUID REFERENCES wishlist_categories(id),
+    priority INTEGER DEFAULT 3 CHECK (priority >= 1 AND priority <= 5),
+    price_limit DECIMAL(10,2),
+    preferred_format VARCHAR(50) DEFAULT 'any',
+    notes TEXT,
+    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_wanted DATE,
+    is_gift BOOLEAN DEFAULT false,
+    gift_for VARCHAR(255),
+    source VARCHAR(255),
+    availability_alerts BOOLEAN DEFAULT false,
+    price_alerts BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, book_id)
+);
+
+-- Wishlist sharing
+CREATE TABLE wishlist_shares (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    shared_with_user_id UUID,
+    shared_with_email VARCHAR(255),
+    category_id UUID REFERENCES wishlist_categories(id),
+    share_token VARCHAR(255) UNIQUE,
+    expires_at TIMESTAMP,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Price tracking history
+CREATE TABLE wishlist_price_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    wishlist_id UUID REFERENCES wishlists(id) ON DELETE CASCADE,
+    price DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) DEFAULT 'USD',
+    source VARCHAR(255),
+    availability VARCHAR(50),
+    tracked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_wishlists_user ON wishlists(user_id);
+CREATE INDEX idx_wishlists_priority ON wishlists(user_id, priority DESC);
+CREATE INDEX idx_wishlists_category ON wishlists(category_id);
+
+
+Reading logs service: reading_logs_db → postgresql
+-- Reading logs/sessions
+CREATE TABLE reading_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    user_book_id UUID, -- References user_books.id from User Library Service
+    session_date DATE NOT NULL,
+    start_time TIME,
+    end_time TIME,
+    duration_minutes INTEGER,
+    pages_read INTEGER DEFAULT 0,
+    start_page INTEGER,
+    end_page INTEGER,
+    location VARCHAR(255),
+    mood VARCHAR(50),
+    environment VARCHAR(50),
+    reading_method VARCHAR(50) DEFAULT 'physical', -- physical, ebook, audiobook
+    notes TEXT,
+    estimated_time_hrs INTEGER,
+    actual_time_hrs INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reading goals
+CREATE TABLE reading_goals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    year INTEGER NOT NULL,
+    goal_type VARCHAR(50) NOT NULL,
+    target_value INTEGER NOT NULL,
+    current_value INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, year, goal_type)
+);
+
+-- Reading challenges
+CREATE TABLE reading_challenges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    challenge_type VARCHAR(100),
+    target_criteria JSONB,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    is_completed BOOLEAN DEFAULT false,
+    progress_percentage DECIMAL(5,2) DEFAULT 0,
+    is_public BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reading challenge progress
+CREATE TABLE reading_challenge_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    challenge_id UUID REFERENCES reading_challenges(id) ON DELETE CASCADE,
+    book_id UUID NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT
+);
+
+-- Reading streaks
+CREATE TABLE reading_streaks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    current_streak_days INTEGER DEFAULT 1,
+    longest_streak_days INTEGER DEFAULT 1,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reading milestones
+CREATE TABLE reading_milestones (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    milestone_type VARCHAR(100) NOT NULL, -- books_read, pages_read, hours_read
+    milestone_value INTEGER NOT NULL,
+    achieved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    book_id UUID, -- the book that achieved the milestone
+    celebration_shown BOOLEAN DEFAULT false
+);
+
+-- Indexes
+CREATE INDEX idx_reading_logs_user_date ON reading_logs(user_id, session_date);
+CREATE INDEX idx_reading_logs_book ON reading_logs(book_id);
+CREATE INDEX idx_reading_logs_user_book ON reading_logs(user_id, book_id);
+CREATE INDEX idx_reading_goals_user_year ON reading_goals(user_id, year);
+CREATE INDEX idx_reading_streaks_user ON reading_streaks(user_id, is_active);
+
+
+Spending Service: spending_db → postgresql
+-- Spending categories
+CREATE TABLE spending_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID,
+    name VARCHAR(100) NOT NULL,
+    parent_category_id UUID REFERENCES spending_categories(id),
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, name)
+);
+
+-- Book spendings
+CREATE TABLE spendings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID,
+    transaction_date DATE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) DEFAULT 'USD',
+    category_id UUID REFERENCES spending_categories(id),
+    store VARCHAR(255),
+    format VARCHAR(50),
+    is_gift BOOLEAN DEFAULT false,
+    gift_recipient VARCHAR(255),
+    payment_method VARCHAR(100),
+    transaction_type VARCHAR(50) DEFAULT 'purchase', -- purchase, subscription, rental
+    description TEXT,
+    receipt_url VARCHAR(500),
+    receipt_number VARCHAR(255),
+    tax_amount DECIMAL(10,2),
+    discount_amount DECIMAL(10,2),
+    shipping_cost DECIMAL(10,2),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Spending budgets
+CREATE TABLE spending_budgets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    period_type VARCHAR(20) NOT NULL,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    budget_amount DECIMAL(10,2) NOT NULL,
+    spent_amount DECIMAL(10,2) DEFAULT 0,
+    category_id UUID REFERENCES spending_categories(id),
+    is_active BOOLEAN DEFAULT true,
+    alert_threshold DECIMAL(5,2) DEFAULT 80.00, -- alert when 80% spent
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Recurring expenses (subscriptions)
+CREATE TABLE recurring_expenses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) DEFAULT 'USD',
+    frequency VARCHAR(20) NOT NULL, -- monthly, quarterly, yearly
+    start_date DATE NOT NULL,
+    end_date DATE,
+    category_id UUID REFERENCES spending_categories(id),
+    is_active BOOLEAN DEFAULT true,
+    last_charged_date DATE,
+    next_charge_date DATE,
+    auto_track BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_spendings_user_date ON spendings(user_id, transaction_date);
+CREATE INDEX idx_spendings_category ON spendings(category_id);
+CREATE INDEX idx_spending_budgets_user_period ON spending_budgets(user_id, period_start, period_end);
+
+
+User content service: user_content_db → postgresql
+-- Reviews
+CREATE TABLE reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    title VARCHAR(255),
+    content TEXT NOT NULL,
+    is_spoiler BOOLEAN DEFAULT false,
+    is_private BOOLEAN DEFAULT false,
+    reading_date DATE,
+    review_date DATE DEFAULT CURRENT_DATE,
+    helpful_votes INTEGER DEFAULT 0,
+    total_votes INTEGER DEFAULT 0,
+    is_published BOOLEAN DEFAULT true,
+    reading_format VARCHAR(50), -- how they read it
+    recommended_for TEXT, -- who would enjoy this book
+    content_warnings TEXT, -- trigger warnings
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, book_id)
+);
+
+
+
+-- Review votes
+CREATE TABLE review_votes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,
+    voter_user_id UUID NOT NULL,
+    vote_type VARCHAR(20) NOT NULL, -- helpful, not_helpful
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(review_id, voter_user_id)
+);
+
+-- Quotes
+CREATE TABLE quotes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    quote_text TEXT NOT NULL,
+    page_number INTEGER,
+    chapter VARCHAR(100),
+    context TEXT,
+    personal_note TEXT,
+    is_favorite BOOLEAN DEFAULT false,
+    is_private BOOLEAN DEFAULT false,
+    quote_date DATE DEFAULT CURRENT_DATE,
+    tags TEXT, -- comma-separated tags
+    mood VARCHAR(50), -- how the quote made you feel
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Book notes
+CREATE TABLE book_notes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    note_type VARCHAR(50) DEFAULT 'general', -- general, character, plot, theme
+    title VARCHAR(255),
+    content TEXT NOT NULL,
+    page_number INTEGER,
+    chapter VARCHAR(100),
+    is_private BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reading discussions/comments
+CREATE TABLE reading_discussions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    discussion_type VARCHAR(50) DEFAULT 'general', -- general, spoiler, question
+    is_spoiler BOOLEAN DEFAULT false,
+    is_public BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Discussion comments
+CREATE TABLE discussion_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    discussion_id UUID REFERENCES reading_discussions(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    content TEXT NOT NULL,
+    parent_comment_id UUID REFERENCES discussion_comments(id),
+    is_spoiler BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_reviews_user ON reviews(user_id);
+CREATE INDEX idx_reviews_book ON reviews(book_id);
+CREATE INDEX idx_reviews_content ON reviews USING gin(to_tsvector('english', content));
+CREATE INDEX idx_quotes_user ON quotes(user_id);
+CREATE INDEX idx_quotes_text ON quotes USING gin(to_tsvector('english', quote_text));
+CREATE INDEX idx_book_notes_user_book ON book_notes(user_id, book_id);
+
+
+Analytics Service: analytics_db → postgresql+redis
+-- User reading statistics
+CREATE TABLE user_reading_stats (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    stat_period VARCHAR(20) NOT NULL,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    books_read INTEGER DEFAULT 0,
+    pages_read INTEGER DEFAULT 0,
+    reading_time_minutes INTEGER DEFAULT 0,
+    average_rating DECIMAL(3,2),
+    favorite_genre VARCHAR(100),
+    reading_streak_days INTEGER DEFAULT 0,
+    longest_book_pages INTEGER,
+    shortest_book_pages INTEGER,
+    most_productive_hour INTEGER,
+    total_books_owned INTEGER,
+    completion_rate DECIMAL(5,2),
+    books_dnf INTEGER DEFAULT 0, -- did not finish
+    unique_authors_read INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, stat_period, period_start)
+);
+
+-- Dashboard metrics cache
+CREATE TABLE dashboard_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    metric_type VARCHAR(100) NOT NULL,
+    metric_value JSONB NOT NULL,
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    UNIQUE(user_id, metric_type)
+);
+
+-- Reading trends
+CREATE TABLE reading_trends (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    trend_date DATE NOT NULL,
+    books_completed INTEGER DEFAULT 0,
+    pages_read INTEGER DEFAULT 0,
+    reading_minutes INTEGER DEFAULT 0,
+    unique_authors INTEGER DEFAULT 0,
+    unique_genres INTEGER DEFAULT 0,
+    average_session_minutes DECIMAL(5,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, trend_date)
+);
+
+-- Aggregated analytics views
+CREATE TABLE aggregated_analytics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    analytics_type VARCHAR(100) NOT NULL, -- yearly_summary, monthly_genre_breakdown, etc.
+    data JSONB NOT NULL,
+    period_start DATE,
+    period_end DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, analytics_type, period_start)
+);
+
+-- User computed metrics (for analytics dashboard)
+CREATE TABLE user_computed_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value JSONB NOT NULL,
+    computation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    UNIQUE(user_id, metric_name)
+);
+
+-- User recommendations cache
+CREATE TABLE user_recommendations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    recommendation_type VARCHAR(50) NOT NULL, -- similar_books, new_releases, trending
+    score DECIMAL(5,4) NOT NULL,
+    reason TEXT,
+    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    is_dismissed BOOLEAN DEFAULT false
+);
+
+-- Indexes
+CREATE INDEX idx_user_reading_stats_user_period ON user_reading_stats(user_id, stat_period);
+CREATE INDEX idx_reading_trends_user_date ON reading_trends(user_id, trend_date);
+CREATE INDEX idx_user_recommendations_user ON user_recommendations(user_id, recommendation_type);
+
+
+File Storage service: postgres + alfresco
+-- File types reference table
+CREATE TABLE file_types (
+    type_code VARCHAR(50) PRIMARY KEY,
+    display_name VARCHAR(100) NOT NULL,
+    allowed_mime_types VARCHAR(255)[],
+    max_file_size_kb INTEGER,
+    thumbnail_settings JSONB,
+    storage_policy VARCHAR(50), -- default, long-term, temporary
+    description TEXT,
+    is_active BOOLEAN DEFAULT true
+);
+
+-- Files metadata
+CREATE TABLE files (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID,
+    file_type VARCHAR(50) REFERENCES file_types(type_code),
+    entity_type VARCHAR(50), -- user, book, author, spending, etc.
+    entity_id UUID, -- ID of the entity this file belongs to
+    original_filename VARCHAR(255),
+    stored_filename VARCHAR(255) NOT NULL,
+    file_size BIGINT,
+    mime_type VARCHAR(100),
+    storage_path VARCHAR(1000) NOT NULL,
+    storage_bucket VARCHAR(255) NOT NULL,
+    cdn_url VARCHAR(1000), -- public access URL if applicable
+    is_public BOOLEAN DEFAULT false,
+    alt_text VARCHAR(500), -- for accessibility
+    caption TEXT,
+    metadata JSONB DEFAULT '{}', -- additional file-specific metadata
+    upload_source VARCHAR(100), -- web_upload, api, bulk_import
+    processing_status VARCHAR(50) DEFAULT 'completed',
+    version INTEGER DEFAULT 1, -- for versioning of files
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- File tags
+CREATE TABLE file_tags (
+    file_id UUID REFERENCES files(id) ON DELETE CASCADE,
+    tag_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (file_id, tag_name)
+);
+
+-- File access permissions
+CREATE TABLE file_access_permissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_id UUID REFERENCES files(id) ON DELETE CASCADE,
+    user_id UUID, -- NULL means public
+    permission_type VARCHAR(50) NOT NULL, -- read, write, delete
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP
+);
+
+-- File access logs
+CREATE TABLE file_access_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_id UUID REFERENCES files(id) ON DELETE CASCADE,
+    user_id UUID,
+    access_type VARCHAR(50) NOT NULL, -- view, download, update, delete
+    ip_address INET,
+    user_agent TEXT,
+    accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Populate file types
+INSERT INTO file_types 
+(type_code, display_name, allowed_mime_types, max_file_size_kb, thumbnail_settings, storage_policy, description)
+VALUES
+('user_profile_image', 'User Profile Image', ARRAY['image/jpeg', 'image/png', 'image/gif'], 5120, 
+  '{"sizes": ["50x50", "200x200", "500x500"]}', 'default', 'User profile pictures'),
+('book_cover_image', 'Book Cover Image', ARRAY['image/jpeg', 'image/png'], 10240,
+  '{"sizes": ["thumbnail", "medium", "large"]}', 'long-term', 'Cover images for books'),
+('author_profile_image', 'Author Profile Image', ARRAY['image/jpeg', 'image/png'], 5120,
+  '{"sizes": ["thumbnail", "medium", "large"]}', 'long-term', 'Author profile pictures'),
+('receipt_image', 'Receipt Image', ARRAY['image/jpeg', 'image/png', 'application/pdf'], 20480,
+  '{"sizes": ["thumbnail", "preview"]}', 'long-term', 'Book purchase receipts'),
+('quote_attachment', 'Quote Attachment', ARRAY['image/jpeg', 'image/png'], 10240,
+  '{"sizes": ["thumbnail", "medium"]}', 'default', 'Images attached to book quotes'),
+('review_image', 'Review Image', ARRAY['image/jpeg', 'image/png'], 10240,
+  '{"sizes": ["thumbnail", "medium"]}', 'default', 'Images attached to book reviews');
+
+-- Indexes
+CREATE INDEX idx_files_entity ON files(entity_type, entity_id);
+CREATE INDEX idx_files_user ON files(user_id);
+CREATE INDEX idx_files_type ON files(file_type);
+CREATE INDEX idx_file_access_logs_file ON file_access_logs(file_id);
+
+
+Tagging service: tagging_db → mongodb
+// Tags collection
+{
+  _id: ObjectId,
+  userId: String,
+  name: String,
+  color: String, // hex color
+  description: String,
+  category: String, // book, review, quote, series
+  isPrivate: Boolean,
+  usageCount: Number,
+  createdAt: Date,
+  updatedAt: Date
+}
+
+// Tag mappings collection
+{
+  _id: ObjectId,
+  userId: String,
+  tagId: ObjectId,
+  entityType: String, // book, review, quote, series
+  entityId: String,
+  createdAt: Date
+}
+
+// User tag preferences
+{
+  _id: ObjectId,
+  userId: String,
+  preferredTags: [ObjectId], // Array of frequently used tag IDs
+  recentTags: [ObjectId], // Recently used tags
+  tagCategories: [String], // User-defined tag categories
+  updatedAt: Date
+}
+
+// Tag synonyms
+{
+  _id: ObjectId,
+  userId: String,
+  primaryTag: ObjectId,
+  synonyms: [String],
+  createdAt: Date
+}
+
+
+
+Notification Service: notification_db → mongodb
+// Notifications collection
+{
+  _id: ObjectId,
+  userId: String,
+  type: String, // reading_reminder, goal_update, book_recommendation
+  title: String,
+  message: String,
+  data: Object, // flexible additional data
+  isRead: Boolean,
+  isPersistent: Boolean,
+  priority: String, // low, medium, high, urgent
+  scheduledFor: Date,
+  sentAt: Date,
+  readAt: Date,
+  expiresAt: Date,
+  actionUrl: String,
+  category: String, // reading, social, system, promotional
+  createdAt: Date
+}
+
+// Notification preferences
+{
+  _id: ObjectId,
+  userId: String,
+  preferences: {
+    readingReminders: Boolean,
+    goalUpdates: Boolean,
+    bookRecommendations: Boolean,
+    reviewLikes: Boolean,
+    friendActivity: Boolean,
+    systemUpdates: Boolean,
+    promotional: Boolean
+  },
+  channels: {
+    email: Boolean,
+    push: Boolean,
+    inApp: Boolean
+  },
+  quietHours: {
+    enabled: Boolean,
+    start: String, // "22:00"
+    end: String,   // "08:00"
+    timezone: String
+  },
+  updatedAt: Date
+}
+
+// Notification templates
+{
+  _id: ObjectId,
+  type: String,
+  subject: String,
+  template: String,
+  variables: [String],
+  isActive: Boolean,
+  createdAt: Date
+}
+
+bookTracking123456!
