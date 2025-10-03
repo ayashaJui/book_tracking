@@ -21,7 +21,7 @@
   </div>
 
   <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-    <div class=" mx-auto">
+    <div class="mx-auto">
       <div
         class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
       >
@@ -76,7 +76,7 @@
 <!-- Main Content -->
 <div class="max-w-7xl mx-auto py-6 lg:py-8">
   <!-- Form Container -->
-  <div class=" mx-auto">
+  <div class="mx-auto">
     <form [formGroup]="seriesForm" (ngSubmit)="onSubmit()">
       <!-- Preview Mode -->
       <div *ngIf="previewMode" class="mb-8">
@@ -113,10 +113,17 @@
                 <div class="text-gray-600 dark:text-gray-400">
                   <span *ngIf="authorsArray.length === 0">by Author Name</span>
                   <span *ngIf="authorsArray.length > 0">
-                    by 
-                    <span *ngFor="let author of authorsArray.controls; let i = index">
-                      {{ author.get('name')?.value || 'Author Name' }} 
-                      <span class="text-sm text-gray-500">({{ author.get('role')?.value }})</span>
+                    by
+                    <span
+                      *ngFor="
+                        let author of authorsArray.controls;
+                        let i = index
+                      "
+                    >
+                      {{ author.get("name")?.value || "Author Name" }}
+                      <span class="text-sm text-gray-500"
+                        >({{ author.get("role")?.value }})</span
+                      >
                       <span *ngIf="i < authorsArray.length - 1">, </span>
                     </span>
                   </span>
@@ -204,14 +211,16 @@
                   (click)="addAuthor()"
                 ></button>
               </div>
-              
-              <div 
-                *ngFor="let author of authorsArray.controls; let i = index" 
-                class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
-                
+
+              <div
+                *ngFor="let author of authorsArray.controls; let i = index"
+                class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+              >
                 <!-- Author Selection -->
                 <div class="md:col-span-2 space-y-2">
-                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label
+                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
                     Author Name
                   </label>
                   <app-author-selector
@@ -224,14 +233,19 @@
                     class="w-full"
                     [class.ng-invalid]="isAuthorFieldInvalid(i, 'author')"
                   ></app-author-selector>
-                  <small class="text-red-500" *ngIf="isAuthorFieldInvalid(i, 'author')">
+                  <small
+                    class="text-red-500"
+                    *ngIf="isAuthorFieldInvalid(i, 'author')"
+                  >
                     Author is required
                   </small>
                 </div>
 
                 <!-- Author Role -->
                 <div class="space-y-2">
-                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label
+                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
                     Role
                   </label>
                   <p-select
@@ -241,13 +255,19 @@
                     class="w-full"
                     [class.ng-invalid]="isAuthorFieldInvalid(i, 'role')"
                   ></p-select>
-                  <small class="text-red-500" *ngIf="isAuthorFieldInvalid(i, 'role')">
-                    {{ getAuthorFieldError(i, 'role') }}
+                  <small
+                    class="text-red-500"
+                    *ngIf="isAuthorFieldInvalid(i, 'role')"
+                  >
+                    {{ getAuthorFieldError(i, "role") }}
                   </small>
                 </div>
 
                 <!-- Remove Author Button -->
-                <div class="flex items-end justify-end" *ngIf="authorsArray.length > 1">
+                <div
+                  class="flex items-end justify-end"
+                  *ngIf="authorsArray.length > 1"
+                >
                   <button
                     type="button"
                     pButton
@@ -258,9 +278,10 @@
                   ></button>
                 </div>
               </div>
-              
+
               <small class="text-gray-500 dark:text-gray-400">
-                You can add multiple authors and specify their roles in the series.
+                You can add multiple authors and specify their roles in the
+                series.
               </small>
             </div>
 
@@ -303,6 +324,25 @@
               ></app-genre-selector>
               <small class="text-red-500" *ngIf="isFieldInvalid('genres')">
                 {{ getFieldError("genres") }}
+              </small>
+            </div>
+
+            <!-- Custom Tags -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Custom Tags (Optional)
+              </label>
+              <app-tag-selector
+                formControlName="customTags"
+                placeholder="Add custom tags..."
+                (customTagCreated)="onCustomTagCreated($event)"
+                class="w-full"
+              ></app-tag-selector>
+              <small class="text-gray-500 text-xs">
+                Add personal tags to organize your series. Use tags like
+                "comfort-read", "reread-worthy", or create your own.
               </small>
             </div>
 

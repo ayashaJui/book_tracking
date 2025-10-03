@@ -62,7 +62,7 @@
                 class="w-full"
               />
             </div>
-            
+
             <!-- Authors -->
             <div class="md:col-span-2 space-y-4">
               <div class="flex items-center justify-between">
@@ -80,14 +80,16 @@
                   (click)="addAuthor()"
                 ></button>
               </div>
-              
-              <div 
-                *ngFor="let author of series.authors; let i = index" 
-                class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
-                
+
+              <div
+                *ngFor="let author of series.authors; let i = index"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+              >
                 <!-- Author Name -->
                 <div class="md:col-span-2 space-y-2">
-                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label
+                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
                     Author Name
                   </label>
                   <input
@@ -103,7 +105,9 @@
 
                 <!-- Author Role -->
                 <div class="space-y-2">
-                  <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <label
+                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
                     Role
                   </label>
                   <p-select
@@ -116,7 +120,10 @@
                 </div>
 
                 <!-- Remove Author Button -->
-                <div class="md:col-span-3 flex justify-end" *ngIf="series.authors.length > 1">
+                <div
+                  class="md:col-span-3 flex justify-end"
+                  *ngIf="series.authors.length > 1"
+                >
                   <button
                     type="button"
                     pButton
@@ -127,9 +134,10 @@
                   ></button>
                 </div>
               </div>
-              
+
               <small class="text-gray-500 dark:text-gray-400">
-                You can add multiple authors and specify their roles in the series.
+                You can add multiple authors and specify their roles in the
+                series.
               </small>
             </div>
           </div>
@@ -200,6 +208,26 @@
                 </button>
               </span>
             </div>
+          </div>
+
+          <!-- Custom Tags -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Custom Tags (Optional)
+            </label>
+            <app-tag-selector
+              [(ngModel)]="series.customTags"
+              name="customTags"
+              placeholder="Add custom tags..."
+              (customTagCreated)="onCustomTagCreated($event)"
+              class="w-full"
+            ></app-tag-selector>
+            <small class="text-gray-500 text-xs">
+              Add personal tags to organize your series. Use tags like
+              "comfort-read", "reread-worthy", or create your own.
+            </small>
           </div>
         </div>
       </div>

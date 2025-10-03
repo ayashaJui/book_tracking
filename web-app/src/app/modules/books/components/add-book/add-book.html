@@ -637,6 +637,28 @@
                   ></app-genre-selector>
                 </div>
 
+                <!-- Custom Tags Section -->
+                <div class="space-y-2">
+                  <label
+                    class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                  >
+                    <i class="pi pi-tags text-purple-500 mr-2"></i>
+                    Personal Tags (Optional)
+                  </label>
+                  <app-tag-selector
+                    [(ngModel)]="newBook.customTags"
+                    name="customTags"
+                    placeholder="Add personal tags like 'comfort-read', 'vacation-book'"
+                    entityType="book"
+                    (tagCreated)="onCustomTagCreated($event)"
+                  ></app-tag-selector>
+                  <small class="text-gray-500 dark:text-gray-400 text-xs">
+                    <i class="pi pi-info-circle mr-1"></i>
+                    Create personal tags to organize your books by reading mood
+                    or context
+                  </small>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="space-y-2">
                     <label

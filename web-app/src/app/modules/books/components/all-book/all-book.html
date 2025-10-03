@@ -1,4 +1,4 @@
-<div class="min-h-screen ">
+<div class="min-h-screen">
   <!-- Loading State -->
   <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
     <div class="text-center">
@@ -124,7 +124,7 @@
     </div>
 
     <!-- Main Content Container -->
-    <div class=" py-6 lg:py-8">
+    <div class="py-6 lg:py-8">
       <!-- Action Buttons -->
       <div class="mb-8">
         <div
@@ -472,7 +472,9 @@
               </td>
 
               <td class="px-6 py-4">
-                <div class="font-medium">{{ formatAuthorsWithRoles(book) }}</div>
+                <div class="font-medium">
+                  {{ formatAuthorsWithRoles(book) }}
+                </div>
               </td>
               <td class="px-6 py-4 text-center">
                 <div class="flex flex-wrap gap-1 justify-center">
@@ -693,6 +695,28 @@
                     class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500"
                   >
                     +{{ book.genres.length - 3 }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Custom Tags -->
+              <div
+                class="mb-3"
+                *ngIf="book.customTags && book.customTags.length > 0"
+              >
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="let tag of book.customTags.slice(0, 2)"
+                    class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-800 dark:to-pink-800 dark:text-purple-200 border border-purple-200 dark:border-purple-600"
+                  >
+                    <i class="pi pi-tag text-xs mr-1"></i>
+                    {{ tag }}
+                  </span>
+                  <span
+                    *ngIf="book.customTags.length > 2"
+                    class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500"
+                  >
+                    +{{ book.customTags.length - 2 }}
                   </span>
                 </div>
               </div>

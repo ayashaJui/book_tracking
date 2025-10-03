@@ -34,6 +34,7 @@ export class AddBook implements OnInit {
     title: '',
     authorIds: [],
     genres: [],
+    customTags: [], // Initialize custom tags array
     status: undefined,
     pages: undefined,
     price: undefined,
@@ -236,6 +237,12 @@ export class AddBook implements OnInit {
   onGenreCreated(genreName: string) {
     // Refresh genre options when a new genre is created
     this.loadGenreOptions();
+  }
+
+  onCustomTagCreated(tagName: string) {
+    // Handle custom tag creation
+    console.log('Custom tag created:', tagName);
+    // In a real app, this would save to the tagging service
   }
 
   // Getter for series order options

@@ -1,9 +1,9 @@
-<div class="min-h-screen ">
+<div class="min-h-screen">
   <!-- Header -->
   <div
     class="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border-b border-gray-200 dark:border-gray-700"
   >
-    <div class=" px-4 sm:px-6 lg:px-8 py-8">
+    <div class="px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col lg:flex-row items-start gap-8">
         <!-- Book Cover with Image Upload -->
         <div class="flex-shrink-0 mx-auto lg:mx-0">
@@ -16,7 +16,7 @@
               (imageUploaded)="onImageUploaded($event)"
               (imageRemoved)="onImageRemoved()"
             ></app-image-upload>
-            
+
             <span
               *ngIf="mockSeriesInfo"
               class="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded z-10"
@@ -110,9 +110,10 @@
               {{ genre }}
             </span>
             <span
-              *ngFor="let tag of []"
+              *ngFor="let tag of book.customTags || []"
               class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm font-medium"
             >
+              <i class="pi pi-tag text-xs mr-1"></i>
               {{ tag }}
             </span>
           </div>
@@ -242,7 +243,9 @@
                   Start Date
                 </div>
                 <div class="font-semibold text-gray-900 dark:text-white">
-                  {{ (bookDetails.startDate | date : "MMM dd, yyyy") || "Not set" }}
+                  {{
+                    (bookDetails.startDate | date : "MMM dd, yyyy") || "Not set"
+                  }}
                 </div>
               </div>
               <div
@@ -253,7 +256,8 @@
                 </div>
                 <div class="font-semibold text-gray-900 dark:text-white">
                   {{
-                    (bookDetails.finishDate | date : "MMM dd, yyyy") || "Not finished"
+                    (bookDetails.finishDate | date : "MMM dd, yyyy") ||
+                      "Not finished"
                   }}
                 </div>
               </div>
@@ -271,8 +275,8 @@
           </div>
 
           <!-- Publisher Info -->
-          <div 
-            *ngIf="getSelectedPublisher()" 
+          <div
+            *ngIf="getSelectedPublisher()"
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5"
           >
             <h3
@@ -284,36 +288,58 @@
             <div class="space-y-3">
               <!-- Publisher Name -->
               <div class="flex items-center justify-between">
-                <div class="flex-1 cursor-pointer" (click)="togglePublisherDetails()">
-                  <div class="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+                <div
+                  class="flex-1 cursor-pointer"
+                  (click)="togglePublisherDetails()"
+                >
+                  <div
+                    class="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
                     {{ getSelectedPublisher()?.name }}
                   </div>
-                  <div *ngIf="getSelectedPublisher()?.location" class="text-sm text-gray-600 dark:text-gray-400 flex items-center mt-1">
+                  <div
+                    *ngIf="getSelectedPublisher()?.location"
+                    class="text-sm text-gray-600 dark:text-gray-400 flex items-center mt-1"
+                  >
                     <i class="pi pi-map-marker mr-1"></i>
                     {{ getSelectedPublisher()?.location }}
                   </div>
                 </div>
                 <button
                   pButton
-                  [icon]="showPublisherDetails ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  [icon]="
+                    showPublisherDetails
+                      ? 'pi pi-chevron-up'
+                      : 'pi pi-chevron-down'
+                  "
                   class="p-button-rounded p-button-outlined p-button-sm"
-                  [pTooltip]="showPublisherDetails ? 'Hide Details' : 'Show Details'"
+                  [pTooltip]="
+                    showPublisherDetails ? 'Hide Details' : 'Show Details'
+                  "
                   (click)="togglePublisherDetails()"
                 ></button>
               </div>
 
               <!-- Publisher Stats -->
               <div class="grid grid-cols-2 gap-2">
-                <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div class="text-base font-bold text-purple-600 dark:text-purple-400">
+                <div
+                  class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                >
+                  <div
+                    class="text-base font-bold text-purple-600 dark:text-purple-400"
+                  >
                     {{ getPublisherBookCount() }}
                   </div>
                   <div class="text-xs text-gray-500 dark:text-gray-400">
                     Total Books
                   </div>
                 </div>
-                <div class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div class="text-base font-bold text-green-600 dark:text-green-400">
+                <div
+                  class="text-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                >
+                  <div
+                    class="text-base font-bold text-green-600 dark:text-green-400"
+                  >
                     {{ getPublisherOwnedCount() }}
                   </div>
                   <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -323,32 +349,43 @@
               </div>
 
               <!-- Expandable Publisher Details -->
-              <div *ngIf="showPublisherDetails" class="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 space-y-3">
+              <div
+                *ngIf="showPublisherDetails"
+                class="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 space-y-3"
+              >
                 <!-- Publisher Description -->
                 <div *ngIf="getSelectedPublisher()?.description">
-                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                  <h4
+                    class="font-medium text-gray-900 dark:text-white mb-2 flex items-center"
+                  >
                     <i class="pi pi-info-circle mr-2 text-purple-600"></i>
                     About Publisher
                   </h4>
-                  <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <p
+                    class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+                  >
                     {{ getSelectedPublisher()?.description }}
                   </p>
                 </div>
 
                 <!-- Publisher Books in Library -->
                 <div>
-                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                  <h4
+                    class="font-medium text-gray-900 dark:text-white mb-2 flex items-center"
+                  >
                     <i class="pi pi-book mr-2 text-purple-600"></i>
                     Books in Your Library ({{ getPublisherBookCount() }})
                   </h4>
                   <div class="space-y-2 max-h-40 overflow-y-auto">
-                    <div 
-                      *ngFor="let publisherBook of getPublisherBooks()" 
+                    <div
+                      *ngFor="let publisherBook of getPublisherBooks()"
                       class="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       [title]="'Book: ' + publisherBook.title"
                     >
                       <div class="flex-1 min-w-0">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <div
+                          class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                        >
                           {{ publisherBook.title }}
                         </div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -356,20 +393,27 @@
                         </div>
                       </div>
                       <div class="ml-2 flex-shrink-0">
-                        <span 
+                        <span
                           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                           [ngClass]="{
-                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300': publisherBook.status === 'Completed',
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300': publisherBook.status === 'Reading',
-                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': publisherBook.status === 'Want to Read',
-                            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300': !publisherBook.status
+                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300':
+                              publisherBook.status === 'Completed',
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300':
+                              publisherBook.status === 'Reading',
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300':
+                              publisherBook.status === 'Want to Read',
+                            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300':
+                              !publisherBook.status
                           }"
                         >
-                          {{ publisherBook.status || 'Unknown' }}
+                          {{ publisherBook.status || "Unknown" }}
                         </span>
                       </div>
                     </div>
-                    <div *ngIf="getPublisherBookCount() === 0" class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                    <div
+                      *ngIf="getPublisherBookCount() === 0"
+                      class="text-sm text-gray-500 dark:text-gray-400 text-center py-4"
+                    >
                       No other books from this publisher in your library
                     </div>
                   </div>
@@ -377,13 +421,17 @@
 
                 <!-- Publisher Genres -->
                 <div *ngIf="getSelectedPublisher()?.specializedGenres?.length">
-                  <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center">
+                  <h4
+                    class="font-medium text-gray-900 dark:text-white mb-2 flex items-center"
+                  >
                     <i class="pi pi-tags mr-2 text-purple-600"></i>
                     Specialized Genres
                   </h4>
                   <div class="flex flex-wrap gap-1">
-                    <span 
-                      *ngFor="let genre of getSelectedPublisher()?.specializedGenres" 
+                    <span
+                      *ngFor="
+                        let genre of getSelectedPublisher()?.specializedGenres
+                      "
                       class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300"
                     >
                       {{ genre }}
@@ -393,7 +441,10 @@
               </div>
 
               <!-- Publisher Website -->
-              <div *ngIf="getSelectedPublisher()?.website" class="pt-2 border-t border-gray-200 dark:border-gray-600">
+              <div
+                *ngIf="getSelectedPublisher()?.website"
+                class="pt-2 border-t border-gray-200 dark:border-gray-600"
+              >
                 <a
                   [href]="getSelectedPublisher()?.website"
                   target="_blank"
@@ -405,8 +456,13 @@
               </div>
 
               <!-- Publisher Description (only first 2 lines) -->
-              <div *ngIf="getSelectedPublisher()?.description" class="pt-2 border-t border-gray-200 dark:border-gray-600">
-                <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+              <div
+                *ngIf="getSelectedPublisher()?.description"
+                class="pt-2 border-t border-gray-200 dark:border-gray-600"
+              >
+                <p
+                  class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2"
+                >
                   {{ getSelectedPublisher()?.description }}
                 </p>
               </div>
@@ -468,8 +524,6 @@
             </div>
           </div>
 
-          
-
           <!-- Purchase Info -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <h3
@@ -492,7 +546,10 @@
                   >Purchase Date</span
                 >
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ (bookDetails.purchaseDate | date : "MMM dd, yyyy") || "Unknown" }}
+                  {{
+                    (bookDetails.purchaseDate | date : "MMM dd, yyyy") ||
+                      "Unknown"
+                  }}
                 </span>
               </div>
               <div class="flex justify-between">
@@ -987,13 +1044,13 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Book Editions Section -->
       <div class="mt-8">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <app-book-editions 
-            [bookId]="book.id!" 
-            [bookTitle]="book.title!">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+        >
+          <app-book-editions [bookId]="book.id!" [bookTitle]="book.title!">
           </app-book-editions>
         </div>
       </div>
@@ -1014,7 +1071,10 @@
   <div class="space-y-6">
     <!-- Title -->
     <div>
-      <label for="editTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        for="editTitle"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Book Title *
       </label>
       <input
@@ -1029,7 +1089,9 @@
 
     <!-- Authors -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Authors *
       </label>
       <p-multiSelect
@@ -1044,7 +1106,9 @@
 
     <!-- Genres -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Genres
       </label>
       <p-multiSelect
@@ -1060,7 +1124,9 @@
 
     <!-- Publisher -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Publisher
       </label>
       <p-select
@@ -1073,14 +1139,21 @@
         styleClass="w-full"
       ></p-select>
       <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-        Can't find your publisher? You can manage publishers in 
-        <a routerLink="/settings" class="text-blue-600 dark:text-blue-400 hover:underline">Settings → Publisher Management</a>
+        Can't find your publisher? You can manage publishers in
+        <a
+          routerLink="/settings"
+          class="text-blue-600 dark:text-blue-400 hover:underline"
+          >Settings → Publisher Management</a
+        >
       </div>
     </div>
 
     <!-- Pages -->
     <div>
-      <label for="editPages" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        for="editPages"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Pages
       </label>
       <input
@@ -1095,7 +1168,9 @@
 
     <!-- Status -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Reading Status
       </label>
       <p-select
@@ -1109,7 +1184,10 @@
     <!-- Price and Source -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="editPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          for="editPrice"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           Price
         </label>
         <input
@@ -1123,7 +1201,10 @@
         />
       </div>
       <div>
-        <label for="editSource" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          for="editSource"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
           Source
         </label>
         <input
@@ -1138,13 +1219,12 @@
 
     <!-- Rating -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
         Rating
       </label>
-      <p-rating
-        [(ngModel)]="editingBook.rating"
-        [stars]="5"
-      ></p-rating>
+      <p-rating [(ngModel)]="editingBook.rating" [stars]="5"></p-rating>
     </div>
   </div>
 

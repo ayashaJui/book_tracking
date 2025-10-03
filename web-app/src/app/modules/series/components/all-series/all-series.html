@@ -538,6 +538,27 @@
               </p>
             </div>
 
+            <!-- Custom Tags -->
+            <div
+              *ngIf="series.customTags && series.customTags.length > 0"
+              class="flex flex-wrap gap-1"
+            >
+              <span
+                *ngFor="let tag of series.customTags; let i = index"
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900/20 dark:to-pink-900/20 dark:text-purple-400 border border-purple-200 dark:border-purple-700"
+                [class.hidden]="i >= 2"
+              >
+                <i class="pi pi-tag text-xs mr-1"></i>
+                {{ tag }}
+              </span>
+              <span
+                *ngIf="series.customTags.length > 2"
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900/20 dark:to-pink-900/20 dark:text-purple-400 border border-purple-200 dark:border-purple-700"
+              >
+                +{{ series.customTags.length - 2 }} more
+              </span>
+            </div>
+
             <div class="space-y-2">
               <div
                 class="flex justify-between items-center text-xs text-gray-500"

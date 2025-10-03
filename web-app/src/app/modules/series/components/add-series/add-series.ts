@@ -45,7 +45,7 @@ export class AddSeries implements OnInit {
     private messageService: MessageService,
     private seriesService: SeriesService,
     private genreService: GenreService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.initializeForm();
@@ -61,6 +61,11 @@ export class AddSeries implements OnInit {
     this.loadGenreOptions();
   }
 
+  onCustomTagCreated(tagName: any) {
+    // Handle custom tag creation if needed
+    console.log('Custom tag created:', tagName);
+  }
+
   initializeForm() {
     this.seriesForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(2)]],
@@ -70,6 +75,7 @@ export class AddSeries implements OnInit {
         [Validators.required, Validators.min(1), Validators.max(100)],
       ],
       genres: [[], [Validators.required, Validators.minLength(1)]],
+      customTags: [[]],
       description: [''],
       coverUrl: [''],
       books: this.fb.array([]),
@@ -185,14 +191,14 @@ export class AddSeries implements OnInit {
       this.isSubmitting = true;
 
       const formValue = this.seriesForm.value;
-      
+
       // Transform authors from form format to SeriesAuthor format
       const authors: SeriesAuthor[] = formValue.authors.map((authorForm: any) => ({
         authorId: authorForm.author?.id,
         name: authorForm.name || authorForm.author?.name,
         role: authorForm.role
       }));
-      
+
       const newSeries: Series = {
         title: formValue.title,
         authors: authors,

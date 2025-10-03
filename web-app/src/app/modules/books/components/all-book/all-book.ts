@@ -45,7 +45,7 @@ export class AllBook implements OnInit {
 
   seriesMap: { [key: number]: Book[] } = {};
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
     this.loading = true;
@@ -75,6 +75,7 @@ export class AllBook implements OnInit {
         source: 'Amazon',
         seriesId: 1,
         seriesName: 'Middle-earth',
+        customTags: ['comfort-read', 'reread-worthy'],
       },
       {
         id: 2,
@@ -91,6 +92,7 @@ export class AllBook implements OnInit {
         source: 'Barnes & Noble',
         seriesId: 1,
         seriesName: 'Middle-earth',
+        customTags: ['classic', 'epic-fantasy', 'book-club'],
       },
       {
         id: 3,

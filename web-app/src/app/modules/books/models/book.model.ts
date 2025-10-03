@@ -11,6 +11,7 @@ export interface Book {
   authors?: BookAuthor[]; // New field for authors with roles
   authorNames?: string[]; // Computed field for display purposes (optional)
   genres: string[];
+  customTags?: string[]; // Personal custom tags like ['comfort-read', 'vacation-book', 'reread-worthy']
   pages?: number;
   status?: 'Read' | 'Reading' | 'Want to Read' | 'On Hold' | string;
   cover?: string;
@@ -33,6 +34,7 @@ export interface BookCreateRequest {
   authorIds: number[];
   authors?: BookAuthor[]; // New field for authors with roles
   genres: string[];
+  customTags?: string[]; // Personal custom tags
   pages?: number;
   status?: string;
   cover?: string;

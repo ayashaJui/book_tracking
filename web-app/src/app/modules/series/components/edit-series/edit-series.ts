@@ -45,7 +45,7 @@ export class EditSeries implements OnInit {
     private router: Router,
     private seriesService: SeriesService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
@@ -206,5 +206,10 @@ export class EditSeries implements OnInit {
 
   onCancel() {
     this.router.navigate(['/series']);
+  }
+
+  onCustomTagCreated(tagName: any) {
+    // Handle custom tag creation if needed
+    console.log('Custom tag created:', tagName);
   }
 }

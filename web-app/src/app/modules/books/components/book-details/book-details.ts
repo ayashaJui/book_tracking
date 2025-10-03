@@ -117,7 +117,7 @@ export class BookDetails implements OnInit {
   mockSeriesInfo: SeriesInfo | null = null;
   mockSeriesBooks: SeriesBook[] = [];
   isWishlisted = false;
-  
+
   // Publisher expansion state
   showPublisherDetails = false;
 
@@ -147,13 +147,13 @@ export class BookDetails implements OnInit {
     private authorService: AuthorService,
     private publisherService: PublisherService,
     private genreService: GenreService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadGenreOptions();
     this.loadPublisherOptions();
     this.loadAuthorOptions();
-    
+
     // Enhanced mock data for demonstration
     this.book = {
       id: 1,
@@ -161,6 +161,7 @@ export class BookDetails implements OnInit {
       authorIds: [3], // Patrick Rothfuss
       authorNames: ['Patrick Rothfuss'],
       genres: ['Fantasy', 'Adventure', 'Magic', 'Coming of Age'],
+      customTags: ['comfort-read', 'reread-worthy', 'emotional', 'page-turner'], // Example custom tags
       price: 16.99,
       source: 'Amazon',
       status: 'Read',
@@ -365,10 +366,10 @@ export class BookDetails implements OnInit {
 
       // In a real app, call bookService.updateBook
       // const updatedBook = this.bookService.updateBook(this.editingBook);
-      
+
       // For now, just update the local book object
       this.book = { ...this.editingBook };
-      
+
       this.showEditBookDialog = false;
       this.messageService.add({
         severity: 'success',
@@ -398,7 +399,7 @@ export class BookDetails implements OnInit {
   getSelectedPublisher(): Publisher | null {
     if (this.book?.publisherId) {
       let publisher = this.publisherService.getPublisherById(this.book.publisherId);
-      
+
       // If publisher doesn't exist, create a mock one for demo purposes
       if (!publisher && this.book.publisherId === 1) {
         publisher = {
@@ -411,7 +412,7 @@ export class BookDetails implements OnInit {
           bookCount: 12
         };
       }
-      
+
       return publisher;
     }
     return null;
@@ -437,7 +438,7 @@ export class BookDetails implements OnInit {
 
   togglePublisherDetails() {
     this.showPublisherDetails = !this.showPublisherDetails;
-    
+
     // Add user feedback
     if (this.showPublisherDetails) {
       console.log('Publisher details expanded');
@@ -455,7 +456,7 @@ export class BookDetails implements OnInit {
   getPublisherBooks(): any[] {
     const publisher = this.getSelectedPublisher();
     if (!publisher?.id) return [];
-    
+
     // Mock books for demo purposes
     if (publisher.id === 1) {
       return [
@@ -468,7 +469,7 @@ export class BookDetails implements OnInit {
         {
           id: 10,
           title: 'The Last Wish',
-          author: 'Andrzej Sapkowski', 
+          author: 'Andrzej Sapkowski',
           status: 'Completed'
         },
         {
@@ -485,12 +486,12 @@ export class BookDetails implements OnInit {
         }
       ];
     }
-    
+
     // Get books from this publisher (excluding current book)
     const publisherBooks = this.bookService.getBooksByPublisher(publisher.id)
       .filter(book => book.id !== this.book.id)
       .slice(0, 5); // Limit to 5 for better UI
-    
+
     return publisherBooks;
   }
 
@@ -516,7 +517,7 @@ export class BookDetails implements OnInit {
   onImageUploaded(imageUrl: string) {
     // Update the book's cover URL
     this.book.cover = imageUrl;
-    
+
     // Update the book in the service if you want persistence
     if (this.book.id) {
       const updateRequest = {
@@ -531,7 +532,7 @@ export class BookDetails implements OnInit {
   onImageRemoved() {
     // Remove the book's cover URL
     this.book.cover = undefined;
-    
+
     // Update the book in the service if you want persistence
     if (this.book.id) {
       const updateRequest = {

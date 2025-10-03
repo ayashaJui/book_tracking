@@ -14,6 +14,7 @@ export interface Series {
   genres?: string[];
   description?: string;
   books: SeriesBook[];
+  customTags?: string[];
 }
 
 export interface SeriesBook {

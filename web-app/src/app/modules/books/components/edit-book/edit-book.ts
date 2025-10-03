@@ -95,7 +95,7 @@ export class EditBook implements OnInit {
     private authorService: AuthorService,
     private publisherService: PublisherService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadData();
@@ -113,20 +113,20 @@ export class EditBook implements OnInit {
 
   private loadBook() {
     if (!this.bookId) return;
-    
+
     this.isLoading = true;
     const book = this.bookService.getBookById(this.bookId);
-    
+
     if (book) {
       this.book = { ...book };
       this.selectedPublisherId = book.publisherId || null;
       this.selectedSeriesId = book.seriesId || null;
       this.isPartOfSeries = !!book.seriesId;
-      
+
       // Load selected authors
       this.selectedAuthors = this.authorService.getAuthors()
         .filter(author => book.authorIds.includes(author.id || 0));
-      
+
       // Initialize authors with roles
       if (book.authors && book.authors.length > 0) {
         this.selectedAuthorsWithRoles = [...book.authors];
@@ -150,7 +150,7 @@ export class EditBook implements OnInit {
       });
       this.router.navigate(['/books/all-book']);
     }
-    
+
     this.isLoading = false;
   }
 
@@ -190,11 +190,11 @@ export class EditBook implements OnInit {
       const existingOrders = series.books
         ?.filter(book => book.orderInSeries !== this.book.seriesOrder)
         .map(book => book.orderInSeries || 0) || [];
-      
+
       // Generate available orders (1 to totalBooks + 1)
       const maxOrder = Math.max(series.totalBooks || 1, ...existingOrders);
       this.availableSeriesOrders = [];
-      
+
       for (let i = 1; i <= maxOrder + 1; i++) {
         if (!existingOrders.includes(i) || i === this.book.seriesOrder) {
           this.availableSeriesOrders.push(i);
@@ -207,7 +207,7 @@ export class EditBook implements OnInit {
     if (this.isPartOfSeries && this.selectedSeriesId) {
       this.book.seriesId = this.selectedSeriesId;
       this.loadAvailableSeriesOrders();
-      
+
       const series = this.seriesService.getSeriesById(this.selectedSeriesId);
       if (series) {
         this.book.seriesName = series.title;
@@ -232,10 +232,10 @@ export class EditBook implements OnInit {
   onAuthorSelectionChange(selectedAuthors: Author[]) {
     this.selectedAuthors = selectedAuthors;
     this.book.authorIds = selectedAuthors.map(author => author.id || 0);
-    
+
     // Update authors with roles - preserve existing roles if author was already selected
     const newAuthorsWithRoles: BookAuthor[] = [];
-    
+
     selectedAuthors.forEach(author => {
       const existingAuthor = this.selectedAuthorsWithRoles.find(a => a.authorId === author.id);
       if (existingAuthor) {
@@ -248,7 +248,7 @@ export class EditBook implements OnInit {
         });
       }
     });
-    
+
     this.selectedAuthorsWithRoles = newAuthorsWithRoles;
   }
 
@@ -272,7 +272,7 @@ export class EditBook implements OnInit {
       this.loadPublisherOptions();
       this.selectedPublisherId = addedPublisher.id || 0;
       this.onPublisherChange();
-      
+
       this.newPublisherData = { name: '', location: '', website: '', description: '' };
       this.showAddPublisherDialog = false;
 
@@ -305,7 +305,7 @@ export class EditBook implements OnInit {
 
     try {
       const updatedBook = this.bookService.updateBook(updateRequest);
-      
+
       if (updatedBook) {
         this.messageService.add({
           severity: 'success',
@@ -345,9 +345,15 @@ export class EditBook implements OnInit {
   }
 
   get seriesOrderOptions() {
-    return this.availableSeriesOrders.map(order => ({ 
-      label: `Book ${order}`, 
-      value: order 
+    return this.availableSeriesOrders.map(order => ({
+      label: `Book ${order}`,
+      value: order
     }));
+  }
+
+  onCustomTagCreated(tagName: string) {
+    // Handle custom tag creation
+    console.log('Custom tag created:', tagName);
+    // In a real app, this would save to the tagging service
   }
 }

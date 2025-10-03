@@ -74,7 +74,11 @@
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
-        <form (ngSubmit)="updateBook()" #bookForm="ngForm" class="p-8 space-y-8">
+        <form
+          (ngSubmit)="updateBook()"
+          #bookForm="ngForm"
+          class="p-8 space-y-8"
+        >
           <!-- Basic Information Section -->
           <div class="space-y-6">
             <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
@@ -213,7 +217,10 @@
               </div>
 
               <!-- Author Roles -->
-              <div *ngIf="selectedAuthorsWithRoles.length > 0" class="space-y-3">
+              <div
+                *ngIf="selectedAuthorsWithRoles.length > 0"
+                class="space-y-3"
+              >
                 <label
                   class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
                 >
@@ -234,7 +241,9 @@
                       [options]="roleOptions"
                       [(ngModel)]="author.role"
                       [ngModelOptions]="{ standalone: true }"
-                      (ngModelChange)="onAuthorRoleChange(author.authorId, $event)"
+                      (ngModelChange)="
+                        onAuthorRoleChange(author.authorId, $event)
+                      "
                       optionLabel="label"
                       optionValue="value"
                       class="w-32"
@@ -277,6 +286,28 @@
                 [style]="{ width: '100%' }"
               >
               </p-multiSelect>
+            </div>
+
+            <!-- Custom Tags Section -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+              >
+                <i class="pi pi-tags text-purple-500 mr-2"></i>
+                Personal Tags (Optional)
+              </label>
+              <app-tag-selector
+                [(ngModel)]="book.customTags"
+                name="customTags"
+                placeholder="Add personal tags like 'comfort-read', 'vacation-book'"
+                entityType="book"
+                (tagCreated)="onCustomTagCreated($event)"
+              ></app-tag-selector>
+              <small class="text-gray-500 dark:text-gray-400 text-xs">
+                <i class="pi pi-info-circle mr-1"></i>
+                Create personal tags to organize your books by reading mood or
+                context
+              </small>
             </div>
           </div>
 
@@ -355,7 +386,10 @@
                 </label>
               </div>
 
-              <div *ngIf="isPartOfSeries" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                *ngIf="isPartOfSeries"
+                class="grid grid-cols-1 md:grid-cols-2 gap-6"
+              >
                 <div class="space-y-2">
                   <label
                     class="block text-sm font-semibold text-gray-700 dark:text-gray-200"

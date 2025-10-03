@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ToastMsg } from './components/toast-msg/toast-msg';
 import { NotFoundComponent } from './components/not-found/not-found';
 import { GenreSelectorComponent } from './components/genre-selector.component';
+import { TagSelectorComponent } from './components/tag-selector.component';
 import { AuthorSelectorComponent } from './components/author-selector/author-selector';
 import { ImageUploadComponent } from './components/image-upload/image-upload';
 import { CatalogSearchComponent } from './components/catalog-search/catalog-search.component';
@@ -52,7 +53,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @NgModule({
-  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, AuthorSelectorComponent, ImageUploadComponent, CatalogSearchComponent, DuplicateDetectionDialogComponent],
+  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, TagSelectorComponent, AuthorSelectorComponent, ImageUploadComponent, CatalogSearchComponent, DuplicateDetectionDialogComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -135,6 +136,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ToolbarModule,
     DividerModule,
     GenreSelectorComponent,
+    TagSelectorComponent,
     AuthorSelectorComponent,
     ImageUploadComponent,
     CatalogSearchComponent,

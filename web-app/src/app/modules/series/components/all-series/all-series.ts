@@ -57,6 +57,7 @@ export class AllSeries implements OnInit {
       readBooks: 2,
       coverUrl: 'assets/images/product-not-found.png',
       genres: ['Fantasy', 'Adventure'],
+      customTags: ['classic', 'epic-fantasy', 'reread-worthy'],
       books: [
         {
           title: 'Fellowship',
@@ -84,6 +85,7 @@ export class AllSeries implements OnInit {
       readBooks: 4,
       coverUrl: 'assets/images/product-not-found.png',
       genres: ['Fantasy', 'Young Adult'],
+      customTags: ['nostalgic', 'comfort-read'],
       books: [
         {
           title: "Philosopher's Stone",
