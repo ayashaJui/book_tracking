@@ -7,6 +7,7 @@ CREATE TABLE user_genre_preferences (
     is_excluded BOOLEAN DEFAULT false,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, catalog_genre_id)
 );
 

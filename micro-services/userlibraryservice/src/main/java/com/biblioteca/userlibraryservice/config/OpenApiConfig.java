@@ -1,4 +1,4 @@
-package com.biblioteca.catalogservice.config;
+package com.biblioteca.userlibraryservice.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -26,8 +26,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title(serviceName)
                         .version("v1.0")
-                        .description("API Documentation for Catalog Service Version 1.0")
+                        .description("API Documentation for User Library Service Version 1.0")
                         .termsOfService(null));
     }
-
 }

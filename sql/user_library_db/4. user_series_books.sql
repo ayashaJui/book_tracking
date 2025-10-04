@@ -6,9 +6,10 @@ CREATE TABLE user_series_books (
     user_book_id BIGINT REFERENCES user_books(id),
     order_in_series INTEGER,
     is_read BOOLEAN DEFAULT false,
-    reading_priority INTEGER DEFAULT 3,
+    reading_priority INTEGER DEFAULT 0,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_series_id, catalog_book_id)
 );
 
