@@ -49,6 +49,11 @@ export class AppMenu {
             routerLink: ['/wishlist'],
           },
           {
+            label: 'Collections',
+            icon: 'pi pi-fw pi-folder',
+            routerLink: ['/collections'],
+          },
+          {
             label: 'Series Tracking',
             icon: 'pi pi-fw pi-list',
             routerLink: ['/series'],

@@ -38,6 +38,13 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'collections',
+    loadChildren: () =>
+      import('./modules/collections/collections-module').then(
+        (m) => m.CollectionsModule
+      ),
+  },
+  {
     path: 'series',
     loadChildren: () =>
       import('./modules/series/series-module').then((m) => m.SeriesModule),
@@ -102,4 +109,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

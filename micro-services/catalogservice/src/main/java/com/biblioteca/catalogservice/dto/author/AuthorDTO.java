@@ -28,6 +28,12 @@ public class AuthorDTO {
 
     private String imageId;
 
+    private String instagramUrl;
+
+    private String threadsUrl;
+
+    private String goodreadUrl;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

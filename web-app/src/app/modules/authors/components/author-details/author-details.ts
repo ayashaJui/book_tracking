@@ -19,13 +19,13 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   authorStats: AuthorStats | null = null;
   loading = false;
   authorId: number | null = null;
-  
+
   // Active tab
   activeTab = 'overview';
-  
+
   // Mock books data (would come from book service)
   authorBooks: any[] = [];
-  
+
   private routeSubscription: Subscription | null = null;
 
   constructor(
@@ -35,7 +35,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private imageService: ImageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.routeSubscription = this.route.params.subscribe(params => {
@@ -158,10 +158,10 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   // Utility methods
   getAuthorAge(): string {
     if (!this.author?.birthDate) return '';
-    
+
     const birthYear = this.author.birthDate.getFullYear();
     const currentYear = this.author.deathDate ? this.author.deathDate.getFullYear() : new Date().getFullYear();
-    
+
     const age = currentYear - birthYear;
     return this.author.deathDate ? `(${age} years)` : `(Age ${age})`;
   }
@@ -204,7 +204,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   getSocialIcon(platform: string): string {
     const icons: { [key: string]: string } = {
       twitter: 'pi-twitter',
-      instagram: 'pi-instagram', 
+      instagram: 'pi-instagram',
       facebook: 'pi-facebook',
       linkedin: 'pi-linkedin',
       goodreads: 'pi-book'
@@ -214,7 +214,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
 
   getSocialUrl(platform: string, handle: string): string {
     if (!handle) return '';
-    
+
     const baseUrls: { [key: string]: string } = {
       twitter: 'https://twitter.com/',
       instagram: 'https://instagram.com/',
@@ -222,11 +222,11 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
       linkedin: 'https://linkedin.com/in/',
       goodreads: ''
     };
-    
+
     if (platform === 'goodreads' || handle.startsWith('http')) {
       return handle;
     }
-    
+
     const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
     return baseUrls[platform] + cleanHandle;
   }
@@ -268,8 +268,8 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   }
 
   navigateToAddBook() {
-    this.router.navigate(['/books/add'], { 
-      queryParams: { authorId: this.authorId } 
+    this.router.navigate(['/books/add'], {
+      queryParams: { authorId: this.authorId }
     });
   }
 
@@ -291,7 +291,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     if (!this.author || !this.authorId) return;
 
     const success = this.authorService.removeAuthor(this.authorId);
-    
+
     if (success) {
       this.messageService.add({
         severity: 'success',
@@ -324,9 +324,9 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
         isActive: this.author.isActive,
         notes: this.author.notes
       };
-      
+
       const success = this.authorService.updateAuthor(updatedAuthor);
-      
+
       if (success) {
         this.author.photoUrl = imageUrl;
         this.messageService.add({
@@ -360,9 +360,9 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
         isActive: this.author.isActive,
         notes: this.author.notes
       };
-      
+
       const success = this.authorService.updateAuthor(updatedAuthor);
-      
+
       if (success) {
         this.author.photoUrl = undefined;
         this.messageService.add({
@@ -377,6 +377,34 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
           detail: 'Failed to remove author photo'
         });
       }
+    }
+  }
+
+  /**
+   * Get CSS class for preference level badge
+   */
+  getPreferenceLevelClass(level: number): string {
+    switch (level) {
+      case 1: return 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200';
+      case 2: return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+      case 3: return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+      case 4: return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+      case 5: return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+      default: return 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200';
+    }
+  }
+
+  /**
+   * Get label for preference level
+   */
+  getPreferenceLevelLabel(level: number): string {
+    switch (level) {
+      case 1: return 'Not Set';
+      case 2: return 'Like';
+      case 3: return 'Love';
+      case 4: return 'Favorite';
+      case 5: return 'Top Favorite';
+      default: return 'Unknown';
     }
   }
 }

@@ -3,9 +3,10 @@ CREATE TABLE reading_collection_books (
     id BIGSERIAL PRIMARY KEY,
     collection_id BIGINT REFERENCES reading_collections(id) ON DELETE CASCADE,
     user_book_id BIGINT REFERENCES user_books(id) ON DELETE CASCADE,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     display_order INTEGER DEFAULT 0,
     notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(collection_id, user_book_id)
 );
 

@@ -69,19 +69,28 @@
             >
               {{ book.title || "Untitled Book" }}
             </h1>
-            <button
-              class="flex items-center justify-center px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm text-sm font-medium"
-              [ngClass]="{
-                'text-red-500': isWishlisted,
-                'text-gray-400': !isWishlisted
-              }"
-              (click)="toggleWishlist()"
-            >
-              <i class="pi pi-heart mr-2"></i>
-              <span>{{
-                isWishlisted ? "In Wishlist" : "Add to Wishlist"
-              }}</span>
-            </button>
+            <div class="flex gap-2">
+              <button
+                class="flex items-center justify-center px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm text-sm font-medium"
+                [ngClass]="{
+                  'text-red-500': isWishlisted,
+                  'text-gray-400': !isWishlisted
+                }"
+                (click)="toggleWishlist()"
+              >
+                <i class="pi pi-heart mr-2"></i>
+                <span>{{
+                  isWishlisted ? "In Wishlist" : "Add to Wishlist"
+                }}</span>
+              </button>
+              <button
+                class="flex items-center justify-center px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white shadow-sm text-sm font-medium transition-colors"
+                (click)="openAddToCollectionDialog()"
+              >
+                <i class="pi pi-plus mr-2"></i>
+                <span>Add to Collection</span>
+              </button>
+            </div>
           </div>
 
           <p class="text-xl text-gray-600 dark:text-gray-300 mb-4">
@@ -1243,6 +1252,74 @@
         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200"
       >
         Save Changes
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Add to Collection Dialog -->
+<p-dialog
+  header="Add to Collection"
+  [(visible)]="showAddToCollectionDialog"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '400px' }"
+  styleClass="custom-dialog"
+>
+  <div class="space-y-4">
+    <!-- Collection Selection -->
+    <div>
+      <label
+        for="collection-select"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        Select Collection
+      </label>
+      <p-select
+        id="collection-select"
+        [(ngModel)]="selectedCollectionId"
+        [options]="availableCollections"
+        optionLabel="name"
+        optionValue="id"
+        placeholder="Choose a collection"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <label
+        for="collection-notes"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        Notes (Optional)
+      </label>
+      <textarea
+        id="collection-notes"
+        [(ngModel)]="collectionNotes"
+        placeholder="Add any notes about this book in the collection..."
+        rows="3"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        (click)="cancelAddToCollection()"
+        class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors duration-200"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="addToCollection()"
+        [disabled]="!selectedCollectionId"
+        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors duration-200"
+      >
+        Add to Collection
       </button>
     </div>
   </ng-template>

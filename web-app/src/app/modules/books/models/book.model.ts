@@ -26,6 +26,15 @@ export interface Book {
   publisherName?: string; // Computed field for display purposes
   editionCount?: number; // Computed field - number of editions available
   primaryEditionId?: number; // The main/preferred edition of this book
+
+  // Wishlist-specific fields
+  wishlistPriority?: 'High' | 'Medium' | 'Low'; // Priority when in wishlist
+  targetPrice?: number; // Price user is willing to pay
+  targetCurrency?: string; // Currency for target price
+  targetAcquisitionDate?: string; // When user plans to buy/get
+  wishlistNotes?: string; // Specific notes about why they want this book
+  priceAlertThreshold?: number; // Alert when price drops below this
+  isGiftIdea?: boolean; // Mark as potential gift
 }
 
 // For backward compatibility and API requests
@@ -45,6 +54,15 @@ export interface BookCreateRequest {
   seriesOrder?: number;
   rating?: number;
   publisherId?: number;
+
+  // Wishlist-specific fields for creation
+  wishlistPriority?: 'High' | 'Medium' | 'Low';
+  targetPrice?: number;
+  targetCurrency?: string;
+  targetAcquisitionDate?: string;
+  wishlistNotes?: string;
+  priceAlertThreshold?: number;
+  isGiftIdea?: boolean;
 }
 
 export interface BookUpdateRequest extends Partial<BookCreateRequest> {

@@ -31,7 +31,7 @@ public class UserBook {
     private Integer catalogBookId;
 
     @Column(name = "status", nullable = false)
-    private String status = BookStatus.WANT_TO_READ.name();
+    private String status ;
 
     @Column(name = "rating")
     private Integer rating;
@@ -77,4 +77,37 @@ public class UserBook {
 
     @Column(name = "updated_at")
     private LocalDateTime  updatedAt;
+
+    @Column(name = "wishlist_priority")
+    private Integer wishlistPriority;
+
+    @Column(name = "target_price")
+    private BigDecimal targetPrice;
+
+    @Column(name = "target_currency")
+    private String targetCurrency;
+
+    @Column(name = "price_alert_threshold")
+    private BigDecimal priceAlertThreshold;
+
+    @Column(name = "target_acquisition_date")
+    private LocalDate targetAcquisitionDate;
+
+    @Column(name = "wishlist_category")
+    private String wishlistCategory;
+
+    @Column(name = "wishlist_notes")
+    private String wishlistNotes;
+
+    @Column(name = "is_gift_idea")
+    private Boolean isGiftIdea =  Boolean.FALSE;
+
+    @Column(name = "gift_recipient")
+    private String giftRecipient;
+
+    @Column(name = "wishlist_added_date")
+    private LocalDate wishlistAddedDate;
+
+    @Column(name = "wishlist_reason")
+    private String wishlistReason;
 }

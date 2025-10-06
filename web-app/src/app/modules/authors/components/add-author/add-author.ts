@@ -55,6 +55,16 @@ export class AddAuthorComponent implements OnInit {
   showDuplicateDialog = false;
   duplicateResult?: DuplicateDetectionResult;
   searchTerm = '';
+  isFromCatalog = false; // Track if author is from catalog
+
+  // Preference level options
+  preferenceLevelOptions = [
+    { label: 'Not Set', value: 1 },
+    { label: 'Like', value: 2 },
+    { label: 'Love', value: 3 },
+    { label: 'Favorite', value: 4 },
+    { label: 'Top Favorite', value: 5 }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -95,8 +105,54 @@ export class AddAuthorComponent implements OnInit {
       }),
       genres: [[]],
       isActive: [true],
-      notes: ['', [Validators.maxLength(500)]]
+      notes: ['', [Validators.maxLength(500)]],
+      // User preference fields
+      preferenceLevel: [3, [Validators.min(1), Validators.max(5)]],
+      isFavorite: [false],
+      isExcluded: [false],
+      personalNotes: ['', [Validators.maxLength(1000)]]
     });
+  }
+
+  /**
+   * Enables or disables catalog fields based on whether author is from catalog
+   */
+  private updateFieldsEnabledState(): void {
+    const catalogFields = ['name', 'biography', 'birthDate', 'deathDate', 'nationality', 'website', 'genres', 'notes'];
+    
+    if (this.isFromCatalog) {
+      // Disable catalog fields if author is from catalog
+      catalogFields.forEach(field => {
+        const control = this.authorForm.get(field);
+        if (control) {
+          control.disable();
+        }
+      });
+      
+      // Also disable social links
+      const socialLinksGroup = this.authorForm.get('socialLinks') as FormGroup;
+      if (socialLinksGroup) {
+        Object.keys(socialLinksGroup.controls).forEach(key => {
+          socialLinksGroup.get(key)?.disable();
+        });
+      }
+    } else {
+      // Enable all fields if not from catalog
+      catalogFields.forEach(field => {
+        const control = this.authorForm.get(field);
+        if (control) {
+          control.enable();
+        }
+      });
+      
+      // Also enable social links
+      const socialLinksGroup = this.authorForm.get('socialLinks') as FormGroup;
+      if (socialLinksGroup) {
+        Object.keys(socialLinksGroup.controls).forEach(key => {
+          socialLinksGroup.get(key)?.enable();
+        });
+      }
+    }
   }
 
   loadAuthor() {
@@ -106,6 +162,9 @@ export class AddAuthorComponent implements OnInit {
     const author = this.authorService.getAuthorById(this.authorId);
 
     if (author) {
+      // Track if this author is from catalog
+      this.isFromCatalog = author.isFromCatalog || false;
+      
       this.authorForm.patchValue({
         name: author.name,
         biography: author.biography || '',
@@ -122,7 +181,12 @@ export class AddAuthorComponent implements OnInit {
         },
         genres: author.genres || [],
         isActive: author.isActive !== false,
-        notes: author.notes || ''
+        notes: author.notes || '',
+        // User preference fields
+        preferenceLevel: author.preferenceLevel || 1,
+        isFavorite: author.isFavorite || false,
+        isExcluded: author.isExcluded || false,
+        personalNotes: author.personalNotes || ''
       });
     } else {
       this.messageService.add({
@@ -131,6 +195,9 @@ export class AddAuthorComponent implements OnInit {
         detail: 'Author not found'
       });
       this.router.navigate(['/authors']);
+      
+      // Update field states based on catalog status
+      this.updateFieldsEnabledState();
     }
 
     this.loading = false;
@@ -173,7 +240,13 @@ export class AddAuthorComponent implements OnInit {
       socialLinks: this.cleanSocialLinks(formValue.socialLinks),
       genres: formValue.genres || [],
       isActive: formValue.isActive,
-      notes: formValue.notes?.trim()
+      notes: formValue.notes?.trim(),
+      // User preference fields
+      preferenceLevel: formValue.preferenceLevel || 1,
+      isFavorite: formValue.isFavorite || false,
+      isExcluded: formValue.isExcluded || false,
+      personalNotes: formValue.personalNotes?.trim() || '',
+      isFromCatalog: this.isFromCatalog
     };
 
     const newAuthor = this.authorService.addAuthor(authorData);
@@ -203,7 +276,13 @@ export class AddAuthorComponent implements OnInit {
       socialLinks: this.cleanSocialLinks(formValue.socialLinks),
       genres: formValue.genres || [],
       isActive: formValue.isActive,
-      notes: formValue.notes?.trim()
+      notes: formValue.notes?.trim(),
+      // User preference fields
+      preferenceLevel: formValue.preferenceLevel || 1,
+      isFavorite: formValue.isFavorite || false,
+      isExcluded: formValue.isExcluded || false,
+      personalNotes: formValue.personalNotes?.trim() || '',
+      isFromCatalog: this.isFromCatalog
     };
 
     const success = this.authorService.updateAuthor(authorData);
@@ -327,6 +406,7 @@ export class AddAuthorComponent implements OnInit {
   onCatalogAuthorSelected(author: CatalogSearchResult) {
     if (author.type === 'author') {
       this.selectedCatalogAuthor = author;
+      this.isFromCatalog = true; // Mark as from catalog
 
       // Pre-fill form with catalog data
       this.authorForm.patchValue({
@@ -334,6 +414,9 @@ export class AddAuthorComponent implements OnInit {
         biography: author.description || '',
         // Add other mappings as needed
       });
+
+      // Update field states - disable catalog fields since it's from catalog
+      this.updateFieldsEnabledState();
 
       this.messageService.add({
         severity: 'success',

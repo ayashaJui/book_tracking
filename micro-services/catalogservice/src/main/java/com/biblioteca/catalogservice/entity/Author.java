@@ -48,6 +48,15 @@ public class Author {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "instagram_url", columnDefinition = "VARCHAR(500)")
+    private String instagramUrl;
+
+    @Column(name = "threads_url", columnDefinition = "VARCHAR(500)")
+    private String threadsUrl;
+
+    @Column(name = "goodread_url", columnDefinition = "VARCHAR(500)")
+    private String goodreadUrl;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeriesAuthor> seriesAuthors = new ArrayList<>();
 

@@ -1125,7 +1125,7 @@
         {{ selectedBook.title }}
       </h3>
       <p class="text-gray-600 dark:text-gray-400">
-        by {{ selectedBook.author }}
+        by {{ selectedBook.authorNames?.join(", ") }}
       </p>
     </div>
 
@@ -1153,8 +1153,10 @@
         >
         <div>
           <p-badge
-            [value]="selectedBook.priority"
-            [severity]="getPrioritySeverity(selectedBook.priority)"
+            [value]="selectedBook.wishlistPriority || 'Medium'"
+            [severity]="
+              getPrioritySeverity(selectedBook.wishlistPriority || 'Medium')
+            "
           ></p-badge>
         </div>
       </div>
@@ -1164,21 +1166,21 @@
         >
         <div>
           <p-badge
-            [value]="selectedBook.status"
-            [severity]="getStatusSeverity(selectedBook.status)"
+            [value]="selectedBook.status || 'Planned'"
+            severity="info"
           ></p-badge>
         </div>
       </div>
     </div>
 
     <!-- Notes Section -->
-    <div *ngIf="selectedBook.notes" class="space-y-2">
+    <div *ngIf="selectedBook.wishlistNotes" class="space-y-2">
       <label class="text-xs font-medium text-gray-500 dark:text-gray-400"
         >Notes</label
       >
       <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
         <p class="text-sm text-gray-700 dark:text-gray-300">
-          {{ selectedBook.notes }}
+          {{ selectedBook.wishlistNotes }}
         </p>
       </div>
     </div>

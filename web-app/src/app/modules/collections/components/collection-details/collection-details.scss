@@ -1,0 +1,42 @@
+// Only essential PrimeNG overrides that can't be achieved with TailwindCSS alone
+
+:host ::ng-deep {
+  // PrimeNG Dialog header gradient (can't be done with TailwindCSS in template)
+  .custom-dialog .p-dialog-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    .p-dialog-title {
+      font-weight: 600;
+    }
+
+    .p-dialog-header-icon {
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .custom-dialog .p-dialog-content {
+    padding: 24px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  // Progress spinner color
+  .p-progress-spinner-circle {
+    stroke: #7c3aed;
+  }
+}
+
+// Responsive dialog
+@media (max-width: 768px) {
+  :host ::ng-deep .custom-dialog .p-dialog {
+    width: 95vw !important;
+    margin: 0;
+  }
+}

@@ -1174,3 +1174,193 @@ Notification Service: notification_db → mongodb
 }
 
 bookTracking123456!
+
+
+═══════════════════════════════════════════════════════════════════════════════════════
+🎯 WISHLIST BACKEND IMPLEMENTATION APPROACH
+═══════════════════════════════════════════════════════════════════════════════════════
+
+📊 DESIGN STRATEGY: Enhanced Status-Based Approach (RECOMMENDED)
+
+Instead of creating a separate wishlist service, enhance the existing User Library Service
+to handle wishlist functionality through extended status values and wishlist-specific fields.
+
+🏗️ DATABASE SCHEMA CHANGES:
+
+-- Enhanced user_books table for wishlist support
+-- Add new status values and wishlist-specific fields
+
+-- Update existing status enum to include wishlist statuses
+ALTER TABLE user_books 
+DROP CONSTRAINT IF EXISTS user_books_status_check;
+
+ALTER TABLE user_books 
+ADD CONSTRAINT user_books_status_check 
+CHECK (status IN (
+    -- Library statuses (books user owns/has read)
+    'currently_reading', 
+    'read', 
+    'did_not_finish', 
+    'on_hold',
+    
+    -- Wishlist statuses (books user wants)
+    'want_to_read',           -- General wishlist item
+    'wishlist_planned',       -- Planned to acquire
+    'wishlist_priority_high', -- High priority wishlist
+    'wishlist_gift_idea',     -- Gift idea
+    'wishlist_price_watch',   -- Watching for price drop
+    'wishlist_pre_order',     -- Pre-order/upcoming release
+    'wishlist_maybe',         -- Maybe/considering
+    'wishlist_seasonal'       -- Holiday/seasonal reading
+));
+
+-- Add wishlist-specific columns
+ALTER TABLE user_books ADD COLUMN wishlist_priority INTEGER DEFAULT 3 CHECK (wishlist_priority BETWEEN 1 AND 5); -- 1=highest, 5=lowest
+ALTER TABLE user_books ADD COLUMN target_price DECIMAL(10,2);
+ALTER TABLE user_books ADD COLUMN target_currency VARCHAR(10) DEFAULT 'USD';
+ALTER TABLE user_books ADD COLUMN price_alert_threshold DECIMAL(10,2);
+ALTER TABLE user_books ADD COLUMN target_acquisition_date DATE;
+ALTER TABLE user_books ADD COLUMN wishlist_category VARCHAR(100); -- 'gift', 'vacation', 'work', etc.
+ALTER TABLE user_books ADD COLUMN wishlist_notes TEXT;
+ALTER TABLE user_books ADD COLUMN is_gift_idea BOOLEAN DEFAULT false;
+ALTER TABLE user_books ADD COLUMN gift_recipient VARCHAR(255);
+ALTER TABLE user_books ADD COLUMN wishlist_added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE user_books ADD COLUMN wishlist_reason TEXT; -- Why they want to read it
+
+-- Add indexes for wishlist queries
+CREATE INDEX idx_user_books_wishlist_status ON user_books(user_id, status) 
+WHERE status LIKE 'wishlist_%' OR status = 'want_to_read';
+
+CREATE INDEX idx_user_books_wishlist_priority ON user_books(user_id, wishlist_priority) 
+WHERE status LIKE 'wishlist_%' OR status = 'want_to_read';
+
+CREATE INDEX idx_user_books_price_alerts ON user_books(user_id, price_alert_threshold) 
+WHERE price_alert_threshold IS NOT NULL;
+
+CREATE INDEX idx_user_books_gift_ideas ON user_books(user_id, is_gift_idea) 
+WHERE is_gift_idea = true;
+
+CREATE INDEX idx_user_books_wishlist_category ON user_books(user_id, wishlist_category) 
+WHERE wishlist_category IS NOT NULL;
+
+🎯 STATUS HIERARCHY:
+
+Library Statuses (books user owns/has read):
+- 'currently_reading'
+- 'read' 
+- 'did_not_finish'
+- 'on_hold'
+
+Wishlist Statuses (books user wants):
+- 'want_to_read'           -- General wishlist
+- 'wishlist_planned'       -- Planned to acquire
+- 'wishlist_priority_high' -- High priority
+- 'wishlist_gift_idea'     -- Gift idea
+- 'wishlist_price_watch'   -- Watching for price drop
+- 'wishlist_pre_order'     -- Pre-order/upcoming
+- 'wishlist_maybe'         -- Maybe/considering  
+- 'wishlist_seasonal'      -- Holiday/seasonal reading
+
+🔄 STATE TRANSITION EXAMPLES:
+
+-- Add to wishlist
+INSERT INTO user_books (user_id, catalog_book_id, status, wishlist_priority, target_price)
+VALUES (123, 456, 'wishlist_planned', 2, 15.99);
+
+-- Move from wishlist to library (purchased)
+UPDATE user_books 
+SET status = 'want_to_read', 
+    first_acquisition_date = CURRENT_DATE,
+    -- Clear wishlist fields
+    wishlist_priority = NULL,
+    target_price = NULL
+WHERE user_id = 123 AND catalog_book_id = 456;
+
+-- Start reading
+UPDATE user_books 
+SET status = 'currently_reading', start_date = CURRENT_DATE
+WHERE user_id = 123 AND catalog_book_id = 456;
+
+🏗️ MICROSERVICE ARCHITECTURE:
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Service  │    │ Catalog Service │    │Library Service  │
+│                 │    │                 │    │                 │
+│ - User mgmt     │    │ - Book metadata │    │ - User books    │
+│ - Auth/Auth     │    │ - Authors       │    │ - Reading progress│ 
+│ - Preferences   │    │ - Publishers    │    │ - Wishlists     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+
+🚀 API ENDPOINTS:
+
+# Wishlist Management
+GET    /api/library/users/{userId}/wishlist
+POST   /api/library/users/{userId}/wishlist
+PUT    /api/library/users/{userId}/wishlist/{bookId}
+DELETE /api/library/users/{userId}/wishlist/{bookId}
+
+# Status Transitions  
+PUT    /api/library/users/{userId}/books/{bookId}/status
+POST   /api/library/users/{userId}/books/{bookId}/move-to-library
+
+# Wishlist Queries
+GET    /api/library/users/{userId}/wishlist/by-priority/{priority}
+GET    /api/library/users/{userId}/wishlist/gift-ideas
+GET    /api/library/users/{userId}/wishlist/price-alerts
+GET    /api/library/users/{userId}/wishlist/stats
+
+# Collections (Optional)
+GET    /api/library/users/{userId}/collections/wishlist
+POST   /api/library/users/{userId}/collections/{collectionId}/books
+
+📈 SAMPLE QUERIES:
+
+-- Get user's high priority wishlist
+SELECT ub.*, cb.title, cb.authors 
+FROM user_books ub
+JOIN catalog_books cb ON ub.catalog_book_id = cb.id
+WHERE ub.user_id = ? 
+  AND ub.status LIKE 'wishlist_%'
+  AND ub.wishlist_priority <= 2
+ORDER BY ub.wishlist_priority, ub.wishlist_added_date;
+
+-- Get gift ideas under budget
+SELECT ub.*, cb.title, cb.authors, cb.current_price
+FROM user_books ub
+JOIN catalog_books cb ON ub.catalog_book_id = cb.id  
+WHERE ub.user_id = ?
+  AND ub.is_gift_idea = true
+  AND (ub.target_price IS NULL OR cb.current_price <= ub.target_price)
+ORDER BY ub.wishlist_priority;
+
+-- Price alert books
+SELECT ub.*, cb.title, cb.current_price
+FROM user_books ub
+JOIN catalog_books cb ON ub.catalog_book_id = cb.id
+WHERE ub.user_id = ?
+  AND ub.price_alert_threshold IS NOT NULL
+  AND cb.current_price <= ub.price_alert_threshold;
+
+-- Wishlist statistics
+SELECT 
+  COUNT(*) as total_items,
+  COUNT(*) FILTER (WHERE wishlist_priority = 1) as high_priority,
+  COUNT(*) FILTER (WHERE is_gift_idea = true) as gift_ideas,
+  AVG(target_price) as avg_target_price,
+  SUM(target_price) as total_target_value
+FROM user_books 
+WHERE user_id = ? AND status LIKE 'wishlist_%';
+
+✅ ADVANTAGES OF THIS APPROACH:
+
+1. Unified Data Model - Single table for all user-book relationships
+2. Simple State Transitions - Easy to move books between wishlist and library
+3. Existing Infrastructure - Leverages current user_books table and indexes
+4. Performance - No JOINs needed for basic operations
+5. Consistency - Single source of truth
+6. No UI Changes Required - Backend-only enhancement
+7. Flexible Status System - Easy to add new wishlist types
+8. Rich Metadata - Price tracking, priorities, categories
+9. Future-Proof - Can easily extend with collections later
+
+═══════════════════════════════════════════════════════════════════════════════════════

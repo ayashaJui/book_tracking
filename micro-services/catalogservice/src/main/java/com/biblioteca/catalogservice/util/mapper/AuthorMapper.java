@@ -20,6 +20,9 @@ public class AuthorMapper {
                 .nationality(author.getNationality())
                 .website(author.getWebsite())
                 .imageId(author.getImageId())
+                .instagramUrl(author.getInstagramUrl())
+                .threadsUrl(author.getThreadsUrl())
+                .goodreadUrl(author.getGoodreadUrl())
                 .createdAt(author.getCreatedAt())
                 .updatedAt(author.getUpdatedAt())
                 .build();
@@ -34,6 +37,9 @@ public class AuthorMapper {
                 .nationality(authorCreateDTO.getNationality())
                 .website(authorCreateDTO.getWebsite())
                 .imageId(authorCreateDTO.getImageId())
+                .instagramUrl(authorCreateDTO.getInstagramUrl())
+                .threadsUrl(authorCreateDTO.getThreadsUrl())
+                .goodreadUrl(authorCreateDTO.getGoodreadUrl())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -46,6 +52,9 @@ public class AuthorMapper {
         author.setNationality(authorUpdateDTO.getNationality());
         author.setWebsite(authorUpdateDTO.getWebsite());
         author.setImageId(authorUpdateDTO.getImageId());
+        author.setInstagramUrl(authorUpdateDTO.getInstagramUrl());
+        author.setThreadsUrl(authorUpdateDTO.getThreadsUrl());
+        author.setGoodreadUrl(authorUpdateDTO.getGoodreadUrl());
         author.setUpdatedAt(LocalDateTime.now());
 
         return author;

@@ -117,6 +117,24 @@
             </div>
           </div>
 
+          <!-- Catalog Author Info -->
+          <div
+            *ngIf="isFromCatalog"
+            class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4"
+          >
+            <div class="flex items-center gap-2">
+              <i class="pi pi-info-circle text-amber-600"></i>
+              <p class="text-amber-800 dark:text-amber-300 text-sm font-medium">
+                Catalog Author Selected
+              </p>
+            </div>
+            <p class="text-amber-700 dark:text-amber-400 text-sm mt-1">
+              This author's basic information comes from our catalog and cannot
+              be edited. You can still customize your personal preferences and
+              notes below.
+            </p>
+          </div>
+
           <!-- Basic Information Section -->
           <div class="space-y-6">
             <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
@@ -255,28 +273,6 @@
                 </small>
               </div>
 
-              <!-- Genres -->
-              <div class="md:col-span-2 space-y-2">
-                <label
-                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-                >
-                  <i class="pi pi-tags text-indigo-500 mr-2"></i>
-                  Genres
-                </label>
-                <p-multiSelect
-                  formControlName="genres"
-                  [options]="genreSelectOptions"
-                  placeholder="Select genres this author writes in"
-                  [filter]="true"
-                  [showToggleAll]="true"
-                  class="w-full"
-                >
-                </p-multiSelect>
-                <small class="text-gray-600 dark:text-gray-400 block">
-                  Select the main genres this author is known for writing in
-                </small>
-              </div>
-
               <!-- Notes -->
               <div class="md:col-span-2 space-y-2">
                 <label
@@ -299,6 +295,95 @@
                 >
                   {{ getFieldError("notes") }}
                 </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Preferences Section -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-gray-200">
+              <div class="p-2 bg-purple-100 rounded-lg">
+                <i class="pi pi-heart text-purple-600"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                User Preferences
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Preference Level -->
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-star text-purple-500 mr-2"></i>
+                  Preference Level
+                </label>
+                <select
+                  formControlName="preferenceLevel"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="1">Not Set</option>
+                  <option value="2">Like</option>
+                  <option value="3">Love</option>
+                  <option value="4">Favorite</option>
+                  <option value="5">Top Favorite</option>
+                </select>
+              </div>
+
+              <!-- Favorite Toggle -->
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3"
+                >
+                  <i class="pi pi-heart-fill text-red-500 mr-2"></i>
+                  Quick Actions
+                </label>
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-2">
+                    <p-inputSwitch
+                      formControlName="isFavorite"
+                      inputId="isFavorite"
+                    ></p-inputSwitch>
+                    <label
+                      for="isFavorite"
+                      class="text-sm text-gray-700 dark:text-gray-200 cursor-pointer"
+                    >
+                      Mark as Favorite
+                    </label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <p-inputSwitch
+                      formControlName="isExcluded"
+                      inputId="isExcluded"
+                    ></p-inputSwitch>
+                    <label
+                      for="isExcluded"
+                      class="text-sm text-gray-700 dark:text-gray-200 cursor-pointer"
+                    >
+                      Exclude from Recommendations
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Personal Notes -->
+              <div class="md:col-span-2 space-y-2">
+                <label
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+                >
+                  <i class="pi pi-file-edit text-purple-500 mr-2"></i>
+                  Personal Notes
+                </label>
+                <p-textarea
+                  formControlName="personalNotes"
+                  placeholder="Your personal thoughts, reading experiences, or notes about this author..."
+                  class="w-full border-0 bg-gray-50"
+                  rows="4"
+                >
+                </p-textarea>
               </div>
             </div>
           </div>
@@ -352,21 +437,6 @@
                 <div
                   class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
-                  <!-- Twitter -->
-                  <div class="space-y-2">
-                    <label
-                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
-                    >
-                      <i class="pi pi-twitter text-blue-400 mr-1"></i>
-                      Twitter
-                    </label>
-                    <input
-                      pInputText
-                      formControlName="twitter"
-                      placeholder="@username"
-                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
-                    />
-                  </div>
 
                   <!-- Instagram -->
                   <div class="space-y-2">
@@ -384,33 +454,17 @@
                     />
                   </div>
 
-                  <!-- Facebook -->
+                  <!-- Threads -->
                   <div class="space-y-2">
                     <label
                       class="block text-xs font-medium text-gray-600 dark:text-gray-400"
                     >
-                      <i class="pi pi-facebook text-blue-600 mr-1"></i>
-                      Facebook
+                      <i class="pi pi-threads text-blue-600 mr-1"></i>
+                      Threads
                     </label>
                     <input
                       pInputText
-                      formControlName="facebook"
-                      placeholder="@username or full URL"
-                      class="w-full h-10 rounded-lg border-0 bg-gray-50"
-                    />
-                  </div>
-
-                  <!-- LinkedIn -->
-                  <div class="space-y-2">
-                    <label
-                      class="block text-xs font-medium text-gray-600 dark:text-gray-400"
-                    >
-                      <i class="pi pi-linkedin text-blue-700 mr-1"></i>
-                      LinkedIn
-                    </label>
-                    <input
-                      pInputText
-                      formControlName="linkedin"
+                      formControlName="threads"
                       placeholder="@username or full URL"
                       class="w-full h-10 rounded-lg border-0 bg-gray-50"
                     />

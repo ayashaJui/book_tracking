@@ -1,0 +1,611 @@
+<!-- Collection Details Header -->
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-12">
+    <p-progressSpinner
+      strokeWidth="3"
+      animationDuration="1s"
+    ></p-progressSpinner>
+    <p class="text-gray-500 mt-4">Loading collection details...</p>
+  </div>
+
+  <!-- Collection Not Found -->
+  <div *ngIf="!loading && !collection" class="text-center py-12">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mx-4"
+    >
+      <div
+        class="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+      >
+        <i
+          class="pi pi-exclamation-triangle text-red-600 dark:text-red-400 text-2xl"
+        ></i>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        Collection Not Found
+      </h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-6">
+        The collection you're looking for doesn't exist or has been deleted.
+      </p>
+      <button
+        (click)="goBack()"
+        class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors inline-flex items-center gap-2"
+      >
+        <i class="pi pi-arrow-left"></i>
+        Back to Collections
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && collection">
+    <!-- Hero Section -->
+    <div
+      class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm"
+      ></div>
+      <div class="relative px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto">
+          <!-- Back Button -->
+          <button
+            (click)="goBack()"
+            class="mb-6 inline-flex items-center text-white/80 hover:text-white transition-colors"
+          >
+            <i class="pi pi-arrow-left mr-2"></i>
+            Back to Collections
+          </button>
+
+          <div
+            class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 lg:gap-8"
+          >
+            <!-- Left Side - Collection Info -->
+            <div class="flex-1">
+              <div class="flex items-center gap-4 mb-4">
+                <div
+                  class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg border border-white/30 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm"
+                >
+                  <i
+                    class="text-white text-2xl"
+                    [class]="'pi ' + getCollectionIcon()"
+                  ></i>
+                </div>
+                <div>
+                  <h1
+                    class="text-3xl lg:text-4xl font-bold text-white tracking-tight mb-2"
+                  >
+                    {{ collection.name }}
+                  </h1>
+                  <p class="text-white/80 text-sm lg:text-base">
+                    {{ collection.description || "No description provided" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Collection Meta -->
+              <div class="flex items-center gap-4 text-white/80">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm border border-white/30"
+                >
+                  <i
+                    class="mr-2"
+                    [class.pi-star]="collection.isDefault"
+                    [class.pi-user]="!collection.isDefault"
+                  ></i>
+                  {{
+                    collection.isDefault
+                      ? "Default Collection"
+                      : "Custom Collection"
+                  }}
+                </span>
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm border border-white/30"
+                >
+                  <i
+                    class="mr-2"
+                    [class.pi-globe]="collection.isPublic"
+                    [class.pi-lock]="!collection.isPublic"
+                  ></i>
+                  {{ collection.isPublic ? "Public" : "Private" }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Right Side - Stats and Actions -->
+            <div class="flex-shrink-0 w-full lg:w-auto">
+              <div class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6 mb-6">
+                <div class="text-center lg:text-right">
+                  <div
+                    class="w-14 h-14 lg:w-16 lg:h-16 bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg flex items-center justify-center mb-2 lg:mb-3 border border-white/30 mx-auto lg:ml-auto lg:mr-0"
+                  >
+                    <span class="text-xl lg:text-2xl font-bold text-white">
+                      {{ books.length }}
+                    </span>
+                  </div>
+                  <p class="text-xs lg:text-sm font-medium text-white/80">
+                    {{ books.length === 1 ? "Book" : "Books" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex gap-3">
+                <button
+                  (click)="editCollection()"
+                  class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors flex items-center gap-2 backdrop-blur-sm border border-white/30"
+                >
+                  <i class="pi pi-pencil text-sm"></i>
+                  <span class="hidden sm:inline">Edit</span>
+                </button>
+                <button
+                  (click)="addBooks()"
+                  class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors flex items-center gap-2 backdrop-blur-sm border border-white/30"
+                >
+                  <i class="pi pi-plus text-sm"></i>
+                  <span class="hidden sm:inline">Add Books</span>
+                </button>
+                <button
+                  (click)="deleteCollection()"
+                  [disabled]="collection.isDefault"
+                  class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-white rounded-lg transition-colors flex items-center gap-2 backdrop-blur-sm border border-red-400/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="pi pi-trash text-sm"></i>
+                  <span class="hidden sm:inline">Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <div class="max-w-7xl mx-auto">
+        <!-- Toolbar -->
+        <div
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6"
+        >
+          <div class="p-4 sm:p-6">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            >
+              <!-- Left Side - Search and Filters -->
+              <div class="flex flex-col sm:flex-row gap-3 flex-1">
+                <!-- Search -->
+                <div class="relative flex-1 sm:max-w-md">
+                  <i
+                    class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  ></i>
+                  <input
+                    type="text"
+                    placeholder="Search books in collection..."
+                    [(ngModel)]="globalFilter"
+                    (input)="onGlobalFilter($event)"
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+
+                <!-- Filters -->
+                <div class="flex gap-2">
+                  <p-select
+                    [options]="statusOptions"
+                    [(ngModel)]="selectedStatus"
+                    (onChange)="onFilterChange()"
+                    placeholder="All Status"
+                    class="min-w-[120px]"
+                  ></p-select>
+
+                  <p-select
+                    [options]="genreOptions"
+                    [(ngModel)]="selectedGenre"
+                    (onChange)="onFilterChange()"
+                    placeholder="All Genres"
+                    class="min-w-[120px]"
+                  ></p-select>
+                </div>
+              </div>
+
+              <!-- Right Side - Actions -->
+              <div class="flex items-center gap-2">
+                <!-- View Mode Toggle -->
+                <div
+                  class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 border border-gray-200 dark:border-gray-600"
+                >
+                  <button
+                    (click)="viewMode = 'grid'"
+                    [class.bg-white]="viewMode === 'grid'"
+                    [class.shadow-sm]="viewMode === 'grid'"
+                    [class.text-purple-600]="viewMode === 'grid'"
+                    class="p-2 rounded-md transition-all duration-200 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
+                    <i class="pi pi-th-large"></i>
+                  </button>
+                  <button
+                    (click)="viewMode = 'list'"
+                    [class.bg-white]="viewMode === 'list'"
+                    [class.shadow-sm]="viewMode === 'list'"
+                    [class.text-purple-600]="viewMode === 'list'"
+                    class="p-2 rounded-md transition-all duration-200 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
+                    <i class="pi pi-list"></i>
+                  </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <button
+                  (click)="clearFilters()"
+                  class="px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-2"
+                  title="Clear Filters"
+                >
+                  <i class="pi pi-filter-slash text-sm"></i>
+                  <span class="hidden sm:inline">Clear</span>
+                </button>
+
+                <button
+                  (click)="refreshData()"
+                  class="px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-2"
+                  title="Refresh"
+                >
+                  <i class="pi pi-refresh text-sm"></i>
+                  <span class="hidden sm:inline">Refresh</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredBooks.length === 0" class="text-center py-12">
+          <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8"
+          >
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <i
+                class="pi pi-book text-blue-600 dark:text-blue-400 text-2xl"
+              ></i>
+            </div>
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+            >
+              No Books in Collection
+            </h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">
+              {{
+                globalFilter
+                  ? "No books match your search criteria."
+                  : "This collection is empty. Add some books to get started!"
+              }}
+            </p>
+            <button
+              (click)="addBooks()"
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors inline-flex items-center gap-2"
+            >
+              <i class="pi pi-plus"></i>
+              Add Books to Collection
+            </button>
+          </div>
+        </div>
+
+        <!-- Books Grid -->
+        <div
+          *ngIf="filteredBooks.length > 0 && viewMode === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
+          <div
+            *ngFor="let book of filteredBooks"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group"
+          >
+            <!-- Book Cover -->
+            <div
+              class="aspect-[3/4] relative overflow-hidden rounded-t-xl bg-gray-100 dark:bg-gray-700"
+            >
+              <img
+                [src]="
+                  book.book?.cover || 'assets/images/product-not-found.png'
+                "
+                [alt]="book.book?.title"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <!-- Status Badge -->
+              <div class="absolute top-3 right-3">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                  [class]="getStatusColor(book.book?.status)"
+                >
+                  {{ book.book?.status }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Book Details -->
+            <div class="p-4">
+              <h3
+                class="text-lg font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                (click)="viewBook(book)"
+              >
+                {{ book.book?.title }}
+              </h3>
+              <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                by {{ book.book?.authorNames?.join(", ") }}
+              </p>
+
+              <!-- Rating -->
+              <div *ngIf="book.book?.rating" class="flex items-center mb-3">
+                <div class="flex items-center">
+                  <i
+                    *ngFor="let star of getRatingStars(book.book?.rating)"
+                    [class]="'pi ' + star + ' text-yellow-400 text-sm mr-1'"
+                  ></i>
+                </div>
+                <span class="text-gray-500 text-sm ml-2"
+                  >{{ book.book?.rating }}/5</span
+                >
+              </div>
+
+              <!-- Genres -->
+              <div
+                *ngIf="book.book?.genres?.length"
+                class="flex flex-wrap gap-1 mb-3"
+              >
+                <span
+                  *ngFor="let genre of book.book?.genres?.slice(0, 2)"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  {{ genre }}
+                </span>
+                <span
+                  *ngIf="(book.book?.genres?.length || 0) > 2"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  +{{ (book.book?.genres?.length || 0) - 2 }} more
+                </span>
+              </div>
+
+              <!-- Notes -->
+              <div *ngIf="book.notes" class="mb-3">
+                <p
+                  class="text-gray-600 dark:text-gray-400 text-sm italic line-clamp-2"
+                >
+                  "{{ book.notes }}"
+                </p>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  Added {{ book.addedAt | date : "MMM d, y" }}
+                </span>
+                <button
+                  (click)="removeBookFromCollection(book)"
+                  class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  title="Remove from Collection"
+                >
+                  <i class="pi pi-times text-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Books List View -->
+        <div
+          *ngIf="filteredBooks.length > 0 && viewMode === 'list'"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th
+                    class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Book
+                  </th>
+                  <th
+                    class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Author(s)
+                  </th>
+                  <th
+                    class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Rating
+                  </th>
+                  <th
+                    class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Added
+                  </th>
+                  <th
+                    class="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                <tr
+                  *ngFor="let book of filteredBooks"
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img
+                        [src]="
+                          book.book?.cover ||
+                          'assets/images/product-not-found.png'
+                        "
+                        [alt]="book.book?.title"
+                        class="w-12 h-16 object-cover rounded-lg shadow-sm"
+                      />
+                      <div>
+                        <button
+                          (click)="viewBook(book)"
+                          class="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors text-left"
+                        >
+                          {{ book.book?.title }}
+                        </button>
+                        <p
+                          *ngIf="book.notes"
+                          class="text-gray-500 dark:text-gray-400 text-sm mt-1 italic"
+                        >
+                          "{{ book.notes }}"
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-gray-600 dark:text-gray-400">
+                      {{ book.book?.authorNames?.join(", ") }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      [class]="getStatusColor(book.book?.status)"
+                    >
+                      {{ book.book?.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <div
+                      *ngIf="book.book?.rating"
+                      class="flex items-center justify-center"
+                    >
+                      <div class="flex items-center">
+                        <i
+                          *ngFor="let star of getRatingStars(book.book?.rating)"
+                          [class]="'pi ' + star + ' text-yellow-400 text-sm'"
+                        ></i>
+                      </div>
+                      <span class="text-gray-500 text-sm ml-2">{{
+                        book.book?.rating
+                      }}</span>
+                    </div>
+                    <span *ngIf="!book.book?.rating" class="text-gray-400"
+                      >-</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">
+                      {{ book.addedAt | date : "MMM d, y" }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                      <button
+                        (click)="viewBook(book)"
+                        class="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="View Book"
+                      >
+                        <i class="pi pi-eye text-sm"></i>
+                      </button>
+                      <button
+                        (click)="removeBookFromCollection(book)"
+                        class="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Remove from Collection"
+                      >
+                        <i class="pi pi-times text-sm"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Collection Dialog -->
+<p-dialog
+  [(visible)]="showEditDialog"
+  [header]="'Edit Collection'"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="custom-dialog"
+>
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <label
+        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+      >
+        <i class="pi pi-tag text-purple-500 mr-2"></i>
+        Collection Name *
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="collectionForm.name"
+        placeholder="Enter collection name"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        maxlength="255"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label
+        class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+      >
+        <i class="pi pi-info-circle text-purple-500 mr-2"></i>
+        Description
+      </label>
+      <textarea
+        [(ngModel)]="collectionForm.description"
+        placeholder="Describe your collection (optional)"
+        rows="3"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+      ></textarea>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <p-checkbox
+        [(ngModel)]="collectionForm.isPublic"
+        [binary]="true"
+        inputId="isPublicEdit"
+      ></p-checkbox>
+      <label
+        for="isPublicEdit"
+        class="text-sm text-gray-700 dark:text-gray-200 cursor-pointer"
+      >
+        <i class="pi pi-globe text-blue-500 mr-2"></i>
+        Make this collection public
+      </label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <button
+        (click)="showEditDialog = false"
+        class="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="saveCollection()"
+        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+      >
+        Update Collection
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

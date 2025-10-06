@@ -21,6 +21,13 @@ export interface Author {
   notes?: string; // Personal notes about the author
   createdAt: Date;
   updatedAt: Date;
+
+  // User preference fields (from user_author_preferences table)
+  preferenceLevel?: number; // 1-5 scale
+  isFavorite?: boolean;
+  isExcluded?: boolean;
+  personalNotes?: string;
+  isFromCatalog?: boolean; // Whether this author is from catalog or user-created
 }
 
 export interface AuthorStats {
@@ -56,6 +63,12 @@ export interface AuthorCreateRequest {
   genres?: string[];
   isActive?: boolean;
   notes?: string;
+  // User preference fields
+  preferenceLevel?: number;
+  isFavorite?: boolean;
+  isExcluded?: boolean;
+  personalNotes?: string;
+  isFromCatalog?: boolean;
 }
 
 export interface AuthorUpdateRequest extends AuthorCreateRequest {

@@ -1,17 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-
-interface ReadingLog {
-  id: number;
-  title: string;
-  author: string;
-  startDate: Date | null;
-  finishDate: Date | null;
-  status: 'Want to Read' | 'Reading' | 'Finished' | 'On Hold';
-  estimatedTimeHrs?: number;
-  actualTimeHrs?: number;
-}
+import { Subject, takeUntil } from 'rxjs';
+import { ReadingLogService } from '../../services/reading-log.service';
+import { ReadingLog, ReadingLogFilters, ReadingStats } from '../../models/reading-log.model';
 
 @Component({
   selector: 'app-all-logs',
@@ -19,57 +11,122 @@ interface ReadingLog {
   templateUrl: './all-logs.html',
   styleUrl: './all-logs.scss',
 })
-export class AllLogs implements OnInit {
+export class AllLogs implements OnInit, OnDestroy {
   @ViewChild('dt') table!: Table;
+  private destroy$ = new Subject<void>();
 
   authorOptions!: any[];
-
   bookReadingLogs: ReadingLog[] = [];
   filteredLogs: ReadingLog[] = [];
+  stats: ReadingStats | null = null;
+  loading = false;
 
   globalFilter: string = '';
   selectedStatus: string | null = null;
   selectedAuthors: string[] = [];
 
-  ngOnInit(): void {
-    this.authorOptions = this.authors.map((a) => ({ label: a, value: a }));
+  constructor(
+    private router: Router,
+    private readingLogService: ReadingLogService
+  ) { }
 
+  ngOnInit(): void {
+    this.loadReadingLogs();
+    this.loadStats();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadReadingLogs(): void {
+    this.loading = true;
+    this.readingLogService.getReadingLogs()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (logs) => {
+          this.bookReadingLogs = logs;
+          this.filteredLogs = [...logs];
+          this.authorOptions = this.authors.map((a) => ({ label: a, value: a }));
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading reading logs:', error);
+          this.loading = false;
+          // Fallback to mock data for development
+          this.loadMockData();
+        }
+      });
+  }
+
+  loadStats(): void {
+    this.readingLogService.getReadingStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (stats) => {
+          this.stats = stats;
+        },
+        error: (error) => {
+          console.error('Error loading reading stats:', error);
+        }
+      });
+  }
+
+  private loadMockData(): void {
+    // Fallback mock data for development
     this.bookReadingLogs = [
       {
         id: 1,
+        userId: 1,
+        catalogBookId: 1,
         title: 'Atomic Habits',
         author: 'James Clear',
+        authorNames: ['James Clear'],
         startDate: new Date('2024-02-11'),
         finishDate: new Date('2024-02-25'),
-        status: 'Finished',
+        status: 'read',
         estimatedTimeHrs: 15,
         actualTimeHrs: 13,
+        rating: 5,
+        progressPercentage: 100,
+        totalPages: 320,
+        currentPage: 320
       },
       {
         id: 2,
+        userId: 1,
+        catalogBookId: 2,
         title: 'The Hobbit',
         author: 'J.R.R. Tolkien',
+        authorNames: ['J.R.R. Tolkien'],
         startDate: new Date('2024-05-02'),
         finishDate: null,
-        status: 'Reading',
+        status: 'currently_reading',
         estimatedTimeHrs: 12,
+        progressPercentage: 45,
+        totalPages: 310,
+        currentPage: 140
       },
       {
         id: 3,
+        userId: 1,
+        catalogBookId: 3,
         title: 'Sapiens',
         author: 'Yuval Noah Harari',
+        authorNames: ['Yuval Noah Harari'],
         startDate: null,
         finishDate: null,
-        status: 'Want to Read',
+        status: 'want_to_read',
+        totalPages: 443
       },
     ];
     this.filteredLogs = [...this.bookReadingLogs];
+    this.authorOptions = this.authors.map((a) => ({ label: a, value: a }));
   }
 
-  constructor(private router: Router) {}
-
   get readingLogs() {
-    return this.filteredLogs.filter((log) => log.status === 'Reading');
+    return this.filteredLogs.filter((log) => log.status === 'currently_reading');
   }
 
   get authors(): string[] {
@@ -78,13 +135,41 @@ export class AllLogs implements OnInit {
   }
 
   statusOptions = [
-    { label: 'Want to Read', value: 'Want to Read' },
-    { label: 'Reading', value: 'Reading' },
-    { label: 'Finished', value: 'Finished' },
-    { label: 'On Hold', value: 'On Hold' },
+    { label: 'Want to Read', value: 'want_to_read' },
+    { label: 'Currently Reading', value: 'currently_reading' },
+    { label: 'Finished', value: 'read' },
+    { label: 'On Hold', value: 'on_hold' },
+    { label: 'Did Not Finish', value: 'did_not_finish' },
   ];
 
   applyFilters() {
+    const filters: ReadingLogFilters = {
+      searchQuery: this.globalFilter?.trim(),
+      status: this.selectedStatus || undefined,
+      authors: this.selectedAuthors.length > 0 ? this.selectedAuthors : undefined
+    };
+
+    if (this.globalFilter || this.selectedStatus || this.selectedAuthors.length > 0) {
+      // Use service for filtering when backend is available
+      this.readingLogService.getReadingLogs(filters)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (logs) => {
+            this.filteredLogs = logs;
+          },
+          error: (error) => {
+            console.error('Error filtering logs:', error);
+            // Fallback to client-side filtering
+            this.clientSideFilter();
+          }
+        });
+    } else {
+      // No filters, show all
+      this.filteredLogs = [...this.bookReadingLogs];
+    }
+  }
+
+  private clientSideFilter() {
     this.filteredLogs = this.bookReadingLogs.filter((log) => {
       const matchesGlobalFilter =
         !this.globalFilter ||
@@ -100,6 +185,18 @@ export class AllLogs implements OnInit {
 
       return matchesGlobalFilter && matchesStatus && matchesAuthors;
     });
+  }
+
+  onGlobalFilter() {
+    this.applyFilters();
+  }
+
+  onStatusFilter() {
+    this.applyFilters();
+  }
+
+  onAuthorFilter() {
+    this.applyFilters();
   }
 
   clearFilters() {

@@ -2,16 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { ConfirmationService, MessageService } from 'primeng/api';
-
-interface WishlistBook {
-  title: string;
-  author: string;
-  price: number;
-  dateAdded: Date;
-  priority: 'High' | 'Medium' | 'Low';
-  status: 'Planned' | 'Purchased' | 'Reading' | 'On Hold';
-  notes?: string;
-}
+import { WishlistService, WishlistStats, WishlistFilters } from '../../services/wishlist.service';
+import { Book } from '../../../books/models/book.model';
 
 type Priority = 'High' | 'Medium' | 'Low';
 type WishStatus = 'Planned' | 'Purchased' | 'Reading' | 'On Hold';
@@ -28,8 +20,17 @@ export class AllWishes {
   monthlyBudget = 100;
   budgetProgress = 0;
 
-  wishlist: WishlistBook[] = [];
-  filteredWishlist: WishlistBook[] = [];
+  wishlist: Book[] = [];
+  filteredWishlist: Book[] = [];
+
+  stats: WishlistStats = {
+    totalItems: 0,
+    totalValue: 0,
+    averagePrice: 0,
+    highPriorityCount: 0,
+    mediumPriorityCount: 0,
+    lowPriorityCount: 0
+  };
 
   totalPrice = 0;
 
@@ -39,7 +40,7 @@ export class AllWishes {
   selectedPriceRange: string | null = null;
   selectedDateRange: string | null = null;
   sortOrder: 'asc' | 'desc' = 'desc';
-  selectedBooks: WishlistBook[] = [];
+  selectedBooks: Book[] = [];
 
   // Budget-related properties
   showBudgetDialog = false;
@@ -49,13 +50,31 @@ export class AllWishes {
   // Import and view dialog properties
   showImportDialog = false;
   showViewDialog = false;
-  selectedBook: WishlistBook | null = null;
+  selectedBook: Book | null = null;
 
   // Import properties
   importFile: File | null = null;
   importBooks: any[] = [];
   importPreview = false;
   importErrors: string[] = [];
+
+  constructor(
+    private router: Router,
+    private wishlistService: WishlistService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
+  ) { }
+
+  ngOnInit() {
+    this.loadWishlist();
+    this.loadBudgetSettings();
+  }
+
+  loadWishlist() {
+    this.wishlist = this.wishlistService.getWishlistBooks();
+    this.stats = this.wishlistService.getWishlistStats();
+    this.applyFilters();
+  }
 
   budgetSuggestions = [
     { label: '$50', value: 50 },
@@ -71,12 +90,12 @@ export class AllWishes {
     date: Date;
     reason: string;
   }> = [
-    {
-      amount: 100,
-      date: new Date('2025-08-01'),
-      reason: 'Initial budget setup',
-    },
-  ];
+      {
+        amount: 100,
+        date: new Date('2025-08-01'),
+        reason: 'Initial budget setup',
+      },
+    ];
 
   priorityOptions = [
     { label: 'High', value: 'High' },
@@ -106,13 +125,7 @@ export class AllWishes {
     { label: 'This year', value: '1y' },
   ];
 
-  constructor(
-    private router: Router,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {}
-
-  ngOnInit(): void {
+  loadBudgetSettings(): void {
     // Load saved budget from localStorage
     const savedBudget = localStorage.getItem('monthlyBudget');
     if (savedBudget) {
@@ -135,51 +148,66 @@ export class AllWishes {
 
     this.wishlist = [
       {
+        id: 1,
         title: 'Deep Work',
-        author: 'Cal Newport',
+        authorIds: [1],
+        authorNames: ['Cal Newport'],
+        genres: ['Productivity', 'Self-Help'],
+        status: 'Want to Read',
         price: 20,
-        dateAdded: new Date('2025-08-01'),
-        priority: 'High',
-        status: 'Planned',
-        notes: 'Productivity classic for focus improvement',
+        dateAdded: '2025-08-01',
+        wishlistPriority: 'High',
+        wishlistNotes: 'Productivity classic for focus improvement',
       },
       {
+        id: 2,
         title: 'Clean Code',
-        author: 'Robert C. Martin',
+        authorIds: [2],
+        authorNames: ['Robert C. Martin'],
+        genres: ['Programming', 'Software Engineering'],
+        status: 'Want to Read',
         price: 30,
-        dateAdded: new Date('2025-08-05'),
-        priority: 'Medium',
-        status: 'Purchased',
-        notes: 'Essential for software development best practices',
+        dateAdded: '2025-08-05',
+        wishlistPriority: 'Medium',
+        wishlistNotes: 'Essential for software development best practices',
       },
       {
+        id: 3,
         title: 'The Psychology of Money',
-        author: 'Morgan Housel',
+        authorIds: [3],
+        authorNames: ['Morgan Housel'],
+        genres: ['Finance', 'Psychology'],
+        status: 'Want to Read',
         price: 25,
-        dateAdded: new Date('2025-07-20'),
-        priority: 'High',
-        status: 'Reading',
-        notes: 'Understanding financial decision making',
+        dateAdded: '2025-07-20',
+        wishlistPriority: 'High',
+        wishlistNotes: 'Understanding financial decision making',
       },
       {
+        id: 4,
         title: 'Atomic Habits',
-        author: 'James Clear',
+        authorIds: [4],
+        authorNames: ['James Clear'],
+        genres: ['Self-Help', 'Psychology'],
+        status: 'Want to Read',
         price: 18,
-        dateAdded: new Date('2025-07-15'),
-        priority: 'Low',
-        status: 'On Hold',
-        notes: 'Building better habits and breaking bad ones',
+        dateAdded: '2025-07-15',
+        wishlistPriority: 'Low',
+        wishlistNotes: 'Building better habits and breaking bad ones',
       },
       {
+        id: 5,
         title: 'Sapiens',
-        author: 'Yuval Noah Harari',
+        authorIds: [5],
+        authorNames: ['Yuval Noah Harari'],
+        genres: ['History', 'Anthropology'],
+        status: 'Want to Read',
         price: 22,
-        dateAdded: new Date('2025-08-10'),
-        priority: 'Medium',
-        status: 'Planned',
-        notes: 'A brief history of humankind',
+        dateAdded: '2025-08-10',
+        wishlistPriority: 'Medium',
+        wishlistNotes: 'A brief history of humankind',
       },
-    ];
+    ] as Book[];
 
     this.applyFilters();
 
@@ -201,22 +229,22 @@ export class AllWishes {
       const matchesSearch =
         !q ||
         book.title.toLowerCase().includes(q) ||
-        book.author.toLowerCase().includes(q) ||
-        (book.notes && book.notes.toLowerCase().includes(q));
+        book.authorNames?.some(author => author.toLowerCase().includes(q)) ||
+        (book.wishlistNotes && book.wishlistNotes.toLowerCase().includes(q));
 
       // Priority filter
       const matchesPriority =
-        !this.selectedPriority || book.priority === this.selectedPriority;
+        !this.selectedPriority || book.wishlistPriority === this.selectedPriority;
 
       // Status filter
       const matchesStatus =
         !this.selectedStatus || book.status === this.selectedStatus;
 
       // Price range filter
-      const matchesPriceRange = this.matchesPriceRange(book.price);
+      const matchesPriceRange = this.matchesPriceRange(book.price || 0);
 
       // Date range filter
-      const matchesDateRange = this.matchesDateRange(book.dateAdded);
+      const matchesDateRange = this.matchesDateRange(book.dateAdded ? new Date(book.dateAdded) : new Date());
 
       return (
         matchesSearch &&
@@ -233,7 +261,7 @@ export class AllWishes {
     // Update totals
     // Calculate total for all books in current filtered view
     this.totalPrice = this.filteredWishlist.reduce(
-      (sum, b) => sum + b.price,
+      (sum, b) => sum + (b.price || 0),
       0
     );
 
@@ -285,8 +313,8 @@ export class AllWishes {
 
   private applySorting() {
     this.filteredWishlist.sort((a, b) => {
-      const dateA = new Date(a.dateAdded).getTime();
-      const dateB = new Date(b.dateAdded).getTime();
+      const dateA = new Date(a.dateAdded || Date.now()).getTime();
+      const dateB = new Date(b.dateAdded || Date.now()).getTime();
 
       if (this.sortOrder === 'desc') {
         return dateB - dateA;
@@ -297,12 +325,12 @@ export class AllWishes {
   }
 
   // New methods for enhanced functionality
-  getBooksByStatus(status: WishStatus): WishlistBook[] {
+  getBooksByStatus(status: WishStatus): Book[] {
     return this.wishlist.filter((book) => book.status === status);
   }
 
-  getBooksByPriority(priority: Priority): WishlistBook[] {
-    return this.wishlist.filter((book) => book.priority === priority);
+  getBooksByPriority(priority: Priority): Book[] {
+    return this.wishlist.filter((book) => book.wishlistPriority === priority);
   }
 
   getRemainingBudget(): number {
@@ -468,10 +496,10 @@ export class AllWishes {
     this.applyFilters();
   }
 
-  getRecentBooks(days: number): WishlistBook[] {
+  getRecentBooks(days: number): Book[] {
     const now = new Date();
     return this.wishlist.filter((book) => {
-      const bookDate = new Date(book.dateAdded);
+      const bookDate = new Date(book.dateAdded || Date.now());
       const diffInDays = Math.floor(
         (now.getTime() - bookDate.getTime()) / (1000 * 60 * 60 * 24)
       );
@@ -481,7 +509,7 @@ export class AllWishes {
 
   getAveragePrice(): number {
     if (this.wishlist.length === 0) return 0;
-    const total = this.wishlist.reduce((sum, book) => sum + book.price, 0);
+    const total = this.wishlist.reduce((sum, book) => sum + (book.price || 0), 0);
     return total / this.wishlist.length;
   }
 
@@ -520,8 +548,8 @@ export class AllWishes {
           oldBudget === this.newBudgetAmount
             ? 'Budget unchanged'
             : oldBudget < this.newBudgetAmount
-            ? 'Budget increased'
-            : 'Budget decreased',
+              ? 'Budget increased'
+              : 'Budget decreased',
       });
 
       // Keep only last 10 entries
@@ -555,8 +583,8 @@ export class AllWishes {
     return priority === 'High'
       ? 'danger'
       : priority === 'Medium'
-      ? 'warn'
-      : 'success';
+        ? 'warn'
+        : 'success';
   }
 
   getStatusSeverity(
@@ -576,17 +604,17 @@ export class AllWishes {
     }
   }
 
-  viewBook(book: WishlistBook) {
+  viewBook(book: Book) {
     this.selectedBook = { ...book };
     this.showViewDialog = true;
   }
 
-  editBook(book: WishlistBook) {
+  editBook(book: Book) {
     // Navigate to edit page with book data
     this.router.navigate(['/wishlist/edit'], {
       queryParams: {
         title: book.title,
-        author: book.author,
+        author: book.authorNames?.[0] || '',
       },
     });
   }
@@ -605,7 +633,7 @@ export class AllWishes {
     }
   }
 
-  deleteBook(book: WishlistBook) {
+  deleteBook(book: Book) {
     this.confirmationService.confirm({
       message: `Are you sure you want to delete "${book.title}" from your wishlist?`,
       header: 'Delete Book',
@@ -653,12 +681,12 @@ export class AllWishes {
     ];
     const rows = this.filteredWishlist.map((b) => [
       this.escapeCsv(b.title),
-      this.escapeCsv(b.author),
-      b.price.toString(),
-      b.dateAdded.toISOString(),
-      b.priority,
+      this.escapeCsv(b.authorNames?.join(', ') || ''),
+      (b.price || 0).toString(),
+      b.dateAdded || '',
+      b.wishlistPriority || '',
       b.status,
-      this.escapeCsv(b.notes || ''),
+      this.escapeCsv(b.wishlistNotes || ''),
     ]);
 
     const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');

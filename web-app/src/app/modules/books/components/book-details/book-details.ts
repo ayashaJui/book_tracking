@@ -5,9 +5,11 @@ import { BookService } from '../../services/book.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { PublisherService } from '../../../publishers/services/publisher.service';
 import { GenreService } from '../../../shared/services/genre.service';
+import { CollectionService } from '../../../collections/services/collection.service';
 import { Book, BookAuthor } from '../../models/book.model';
 import { Author } from '../../../authors/models/author.model';
 import { Publisher } from '../../../publishers/models/publisher.model';
+import { ReadingCollection } from '../../../collections/models/collection.model';
 
 interface Quote {
   id: number;
@@ -118,6 +120,12 @@ export class BookDetails implements OnInit {
   mockSeriesBooks: SeriesBook[] = [];
   isWishlisted = false;
 
+  // Collection properties
+  availableCollections: ReadingCollection[] = [];
+  showAddToCollectionDialog = false;
+  selectedCollectionId: number | null = null;
+  collectionNotes = '';
+
   // Publisher expansion state
   showPublisherDetails = false;
 
@@ -146,13 +154,15 @@ export class BookDetails implements OnInit {
     private bookService: BookService,
     private authorService: AuthorService,
     private publisherService: PublisherService,
-    private genreService: GenreService
+    private genreService: GenreService,
+    private collectionService: CollectionService
   ) { }
 
   ngOnInit() {
     this.loadGenreOptions();
     this.loadPublisherOptions();
     this.loadAuthorOptions();
+    this.loadCollections();
 
     // Enhanced mock data for demonstration
     this.book = {
@@ -328,6 +338,12 @@ export class BookDetails implements OnInit {
     ];
   }
 
+  loadCollections() {
+    this.collectionService.getCollections().subscribe(collections => {
+      this.availableCollections = collections;
+    });
+  }
+
   setActiveTab(tab: string) {
     this.activeTab = tab;
   }
@@ -338,6 +354,44 @@ export class BookDetails implements OnInit {
 
   toggleWishlist() {
     this.isWishlisted = !this.isWishlisted;
+  }
+
+  // Collection functionality
+  openAddToCollectionDialog() {
+    this.showAddToCollectionDialog = true;
+    this.selectedCollectionId = null;
+    this.collectionNotes = '';
+  }
+
+  addToCollection() {
+    if (this.selectedCollectionId && this.book.id) {
+      const result = this.collectionService.addBookToCollection(
+        this.selectedCollectionId,
+        this.book.id,
+        this.collectionNotes || undefined
+      );
+
+      if (result) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Book added to collection successfully'
+        });
+        this.showAddToCollectionDialog = false;
+      } else {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: 'Book is already in this collection'
+        });
+      }
+    }
+  }
+
+  cancelAddToCollection() {
+    this.showAddToCollectionDialog = false;
+    this.selectedCollectionId = null;
+    this.collectionNotes = '';
   }
 
   // Edit Book functionality

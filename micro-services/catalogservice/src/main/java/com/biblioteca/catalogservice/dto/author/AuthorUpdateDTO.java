@@ -29,4 +29,10 @@ public class AuthorUpdateDTO {
     private String website;
 
     private String imageId;
+
+    private String instagramUrl;
+
+    private String threadsUrl;
+
+    private String goodreadUrl;
 }
