@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Author, AuthorStats, AuthorCreateRequest, AuthorUpdateRequest } from '../models/author.model';
+import { Author, AuthorStats, AuthorCreateRequestDTO, AuthorCreateRequest, AuthorUpdateRequest, CatalogAuthorCreateRequestDTO } from '../models/author.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CatalogAuthorHttpResponse, UserAuthorPreferenceHttpPagedResponse, UserAuthorPreferenceHttpResponse } from '../models/response.model';
+import { environment } from '../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthorService {
+  authorForm!: FormGroup
+
   private authorsSubject = new BehaviorSubject<Author[]>([
     // Some default authors
     {
@@ -16,11 +22,9 @@ export class AuthorService {
       birthDate: new Date('1965-07-31'),
       nationality: 'British',
       website: 'https://www.jkrowling.com',
-      socialLinks: {
-        twitter: '@jk_rowling',
-        goodreads: 'https://www.goodreads.com/author/show/1077326.J_K_Rowling'
-      },
-      genres: ['Fantasy', 'Young Adult', 'Children'],
+      threadsUrl: '@jk_rowling',
+      goodreadUrl: 'https://www.goodreads.com/author/show/1077326.J_K_Rowling',
+      // genres: ['Fantasy', 'Young Adult', 'Children'],
       isActive: true,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
@@ -33,11 +37,9 @@ export class AuthorService {
       birthDate: new Date('1973-06-06'),
       nationality: 'American',
       website: 'https://www.patrickrothfuss.com',
-      socialLinks: {
-        twitter: '@PatrickRothfuss',
-        goodreads: 'https://www.goodreads.com/author/show/108424.Patrick_Rothfuss'
-      },
-      genres: ['Fantasy', 'Epic Fantasy'],
+      threadsUrl: '@PatrickRothfuss',
+      goodreadUrl: 'https://www.goodreads.com/author/show/108424.Patrick_Rothfuss',
+      // genres: ['Fantasy', 'Epic Fantasy'],
       isActive: true,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
@@ -50,7 +52,7 @@ export class AuthorService {
       birthDate: new Date('1920-10-08'),
       deathDate: new Date('1986-02-11'),
       nationality: 'American',
-      genres: ['Science Fiction', 'Space Opera'],
+      // genres: ['Science Fiction', 'Space Opera'],
       isActive: false,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
@@ -63,21 +65,35 @@ export class AuthorService {
       birthDate: new Date('1986-01-01'),
       nationality: 'American',
       website: 'https://jamesclear.com',
-      socialLinks: {
-        twitter: '@JamesClear',
-        goodreads: 'https://www.goodreads.com/author/show/7327369.James_Clear'
-      },
-      genres: ['Self-help', 'Non-Fiction', 'Psychology'],
+      // socialLinks: {
+      //   twitter: '@JamesClear',
+      //   goodreads: 'https://www.goodreads.com/author/show/7327369.James_Clear'
+      // },
+      // genres: ['Self-help', 'Non-Fiction', 'Psychology'],
       isActive: true,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
     },
   ]);
 
-  private storageKey = 'bookTracking_authors';
 
-  constructor() {
-    this.loadFromStorage();
+  constructor(private fb: FormBuilder, private http: HttpClient) {
+    this.authorForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      bio: [''],
+      birthDate: [null],
+      deathDate: [null],
+      nationality: [''],
+      website: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+      instagramUrl: ['', [Validators.pattern(/^@?[\w.]+$/)]],
+      goodreadUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+      threadsUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+
+      preferenceLevel: [3, [Validators.min(1), Validators.max(5)]],
+      isFavorite: [false],
+      isExcluded: [false],
+      personalNotes: ['']
+    });
   }
 
   // Observable for components to subscribe to
@@ -117,8 +133,8 @@ export class AuthorService {
       (author) =>
         author.name.toLowerCase().includes(searchTerm) ||
         author.biography?.toLowerCase().includes(searchTerm) ||
-        author.nationality?.toLowerCase().includes(searchTerm) ||
-        author.genres?.some(genre => genre.toLowerCase().includes(searchTerm))
+        author.nationality?.toLowerCase().includes(searchTerm)
+      // author.genres?.some(genre => genre.toLowerCase().includes(searchTerm))
     );
   }
 
@@ -144,7 +160,7 @@ export class AuthorService {
 
     const updatedAuthors = [...currentAuthors, newAuthor];
     this.authorsSubject.next(updatedAuthors);
-    this.saveToStorage();
+
 
     return newAuthor;
   }
@@ -161,7 +177,7 @@ export class AuthorService {
     // Check if new name already exists (excluding current author)
     const existingAuthor = currentAuthors.find(
       (author) =>
-        author.id !== authorData.id && 
+        author.id !== authorData.id &&
         author.name.toLowerCase() === authorData.name.toLowerCase()
     );
 
@@ -178,7 +194,7 @@ export class AuthorService {
     };
 
     this.authorsSubject.next(updatedAuthors);
-    this.saveToStorage();
+
     return true;
   }
 
@@ -189,7 +205,7 @@ export class AuthorService {
 
     if (updatedAuthors.length !== currentAuthors.length) {
       this.authorsSubject.next(updatedAuthors);
-      this.saveToStorage();
+
       return true;
     }
 
@@ -199,18 +215,18 @@ export class AuthorService {
   // Check if author exists
   authorExists(name: string, excludeId?: number): boolean {
     return this.authorsSubject.value.some(
-      (author) => 
-        author.name.toLowerCase() === name.toLowerCase() && 
+      (author) =>
+        author.name.toLowerCase() === name.toLowerCase() &&
         (!excludeId || author.id !== excludeId)
     );
   }
 
   // Get authors by genre
-  getAuthorsByGenre(genre: string): Author[] {
-    return this.authorsSubject.value.filter(
-      (author) => author.genres?.includes(genre)
-    );
-  }
+  // getAuthorsByGenre(genre: string): Author[] {
+  //   return this.authorsSubject.value.filter(
+  //     (author) => author.genres?.includes(genre)
+  //   );
+  // }
 
   // Get active/inactive authors
   getActiveAuthors(): Author[] {
@@ -256,14 +272,14 @@ export class AuthorService {
       };
 
       this.authorsSubject.next(updatedAuthors);
-      this.saveToStorage();
+
     }
   }
 
   // Get authors sorted by various criteria
   getAuthorsSorted(sortBy: 'name' | 'totalBooks' | 'averageRating' | 'createdAt' = 'name'): Author[] {
     const authors = [...this.authorsSubject.value];
-    
+
     return authors.sort((a, b) => {
       switch (sortBy) {
         case 'name':
@@ -280,36 +296,17 @@ export class AuthorService {
     });
   }
 
-  // Private methods for persistence
-  private saveToStorage(): void {
-    try {
-      localStorage.setItem(
-        this.storageKey,
-        JSON.stringify(this.authorsSubject.value)
-      );
-    } catch (error) {
-      console.error('Failed to save authors to localStorage:', error);
-    }
+
+  // api integration methods
+  createUserAuthorPreference(authorData: AuthorCreateRequestDTO): Observable<UserAuthorPreferenceHttpResponse> {
+    let url = `${environment.user_library_service_url}/user_author_preferences`;
+
+    return this.http.post<UserAuthorPreferenceHttpResponse>(url, authorData);
   }
 
-  private loadFromStorage(): void {
-    try {
-      const stored = localStorage.getItem(this.storageKey);
-      if (stored) {
-        const parsedAuthors = JSON.parse(stored);
-        // Ensure dates are properly parsed
-        const authorsWithDates = parsedAuthors.map((author: any) => ({
-          ...author,
-          birthDate: author.birthDate ? new Date(author.birthDate) : undefined,
-          deathDate: author.deathDate ? new Date(author.deathDate) : undefined,
-          createdAt: new Date(author.createdAt),
-          updatedAt: new Date(author.updatedAt),
-        }));
-        this.authorsSubject.next(authorsWithDates);
-      }
-    } catch (error) {
-      console.error('Failed to load authors from localStorage:', error);
-      // Keep default authors if loading fails
-    }
+  getUserAuthorPreferences(userId: number, page: number = 1, size: number = 10): Observable<UserAuthorPreferenceHttpPagedResponse> {
+    let url = `${environment.user_library_service_url}/user_author_preferences/user/${userId}?page=${page}&size=${size}`;
+
+    return this.http.get<UserAuthorPreferenceHttpPagedResponse>(url);
   }
 }

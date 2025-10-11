@@ -277,7 +277,11 @@
 
         <!-- Social Links -->
         <div
-          *ngIf="author.socialLinks || author.website"
+          *ngIf="
+            author.website ||
+            author.threadsUrl ||
+            author.instagramUrl ||
+            author.goodreadUrl "
           class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
         >
           <h2
@@ -299,29 +303,29 @@
             ></button>
 
             <button
-              *ngIf="author.socialLinks?.twitter"
+              *ngIf="author.threadsUrl"
               pButton
               type="button"
               label="Twitter"
               icon="pi pi-twitter"
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
               (click)="
-                openLink('https://twitter.com/' + author.socialLinks!.twitter!)
+                openLink('https://twitter.com/' + author.threadsUrl!)
               "
             ></button>
 
             <button
-              *ngIf="author.socialLinks?.goodreads"
+              *ngIf="author.goodreadUrl"
               pButton
               type="button"
               label="Goodreads"
               icon="pi pi-book"
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
-              (click)="openLink(author.socialLinks!.goodreads!)"
+              (click)="openLink(author.goodreadUrl!)"
             ></button>
 
             <button
-              *ngIf="author.socialLinks?.instagram"
+              *ngIf="author.instagramUrl"
               pButton
               type="button"
               label="Instagram"
@@ -329,30 +333,12 @@
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
               (click)="
                 openLink(
-                  'https://instagram.com/' + author.socialLinks!.instagram!
+                  'https://instagram.com/' + author.instagramUrl!
                 )
               "
             ></button>
 
-            <button
-              *ngIf="author.socialLinks?.facebook"
-              pButton
-              type="button"
-              label="Facebook"
-              icon="pi pi-facebook"
-              class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
-              (click)="openLink(author.socialLinks!.facebook!)"
-            ></button>
-
-            <button
-              *ngIf="author.socialLinks?.linkedin"
-              pButton
-              type="button"
-              label="LinkedIn"
-              icon="pi pi-linkedin"
-              class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
-              (click)="openLink(author.socialLinks!.linkedin!)"
-            ></button>
+            
           </div>
         </div>
 

@@ -22,4 +22,8 @@ public interface AuthorService {
     AuthorDTO updateAuthor(AuthorUpdateDTO updateDTO, HttpServletRequest request, Jwt jwt);
 
     String deleteAuthor(Integer id, HttpServletRequest request, Jwt jwt);
+
+    List<AuthorDTO> searchAuthor(String authorName, HttpServletRequest request, Jwt jwt);
+
+    List<AuthorDTO> getAuthorsByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt);
 }

@@ -1,0 +1,17 @@
+package com.biblioteca.userlibraryservice.service;
+
+import com.biblioteca.userlibraryservice.dto.pagination.PageRequestDTO;
+import com.biblioteca.userlibraryservice.dto.userAuthorPreferences.UserAuthorPreferenceCreateDTO;
+import com.biblioteca.userlibraryservice.dto.userAuthorPreferences.UserAuthorPreferenceDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+public interface UserAuthorPreferenceService {
+    UserAuthorPreferenceDTO createUserAuthorPreference(UserAuthorPreferenceCreateDTO createDTO, HttpServletRequest request, Jwt jwt);
+
+    Page<UserAuthorPreferenceDTO> getUserAuthorsWithPagination(PageRequestDTO pageRequestDTO, Integer userId, HttpServletRequest request, Jwt jwt);
+
+
+
+}

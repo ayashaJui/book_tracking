@@ -4,6 +4,8 @@ import com.biblioteca.userservice.dto.authUser.AuthUserDTO;
 import com.biblioteca.userservice.dto.authentication.AuthUserRegistrationRequestDTO;
 import com.biblioteca.userservice.dto.authentication.ResendOTPRequestDTO;
 import com.biblioteca.userservice.dto.authentication.VerifyOTPDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 public interface AuthenticationService {
     AuthUserDTO registerUser(AuthUserRegistrationRequestDTO registrationRequestDTO);

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 import { CatalogService } from '../../services/catalog.service';
-import { CatalogSearchResult, CatalogSearchQuery } from '../../models/catalog.model';
+import { CatalogSearchResult, CatalogSearchQuery, CatalogAuthor, CatalogBook, CatalogSeries, CatalogPublisher, CatalogGenre } from '../../models/catalog.model';
 
 @Component({
     selector: 'app-catalog-search',
@@ -33,15 +33,9 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.setupSearch();
 
-        // Set default placeholder if none provided
         if (this.placeholder === 'Search catalog...') {
             this.placeholder = this.getDefaultPlaceholder();
         }
-    }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     private getDefaultPlaceholder(): string {
@@ -80,12 +74,42 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                         limit: 10
                     };
 
-                    return this.catalogService.search(searchQuery);
+                    // route to correct search call based on type
+                    switch (this.searchType) {
+                        case 'book':
+                            return this.catalogService.searchBooks(query);
+
+                        case 'author':
+                            return this.catalogService.searchAuthors(query);
+
+                        case 'publisher':
+                            return this.catalogService.searchPublishers(query);
+
+                        case 'series':
+                            return this.catalogService.searchSeries(query);
+
+
+                        case 'genre':
+                            return this.catalogService.search({ query, type: 'genre', limit: 10 });
+
+                        default:
+
+                            return this.catalogService.search({ query, type: 'all', limit: 10 });
+                    }
                 })
             )
             .subscribe({
-                next: (results) => {
-                    this.searchResults = results;
+                next: (results: any) => {
+                    const rawResults = results.data || [];
+                    
+                    this.searchResults = rawResults.map((item: any) => {
+                        
+                        if (!item.type && this.searchType !== 'all') {
+                            item.type = this.searchType;
+                        }
+                        return item as CatalogSearchResult;
+                    });
+
                     this.isSearching = false;
                     this.showResults = true;
                     this.hasSearched = true;
@@ -168,5 +192,10 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
         return this.showCreateNew &&
             this.searchQuery.length >= this.minCharacters &&
             this.showNoResults;
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

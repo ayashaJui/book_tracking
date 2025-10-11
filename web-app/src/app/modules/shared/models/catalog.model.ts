@@ -28,6 +28,9 @@ export interface CatalogAuthor {
     imageUrl?: string;
     createdAt?: string;
     updatedAt?: string;
+    instagramUrl?: string;
+    goodreadUrl?: string;
+    threadsUrl?: string;
 }
 
 export interface CatalogPublisher {
@@ -91,10 +94,12 @@ export interface CatalogSearchResult {
     title?: string; // For books
     name?: string; // For authors, publishers, series, genres
     description?: string;
-    additionalInfo?: string;
-    coverUrl?: string;
-    imageUrl?: string;
-    relevanceScore?: number;
+}
+
+export interface CatalogSearchHttpResponse {
+    data: any[];
+    status: string;
+    code: number;
 }
 
 export interface CatalogSearchQuery {

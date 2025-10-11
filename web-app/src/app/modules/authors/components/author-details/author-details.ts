@@ -319,7 +319,9 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
         deathDate: this.author.deathDate,
         nationality: this.author.nationality,
         website: this.author.website,
-        socialLinks: this.author.socialLinks,
+        threadsUrl: this.author.threadsUrl,
+        instagramUrl: this.author.instagramUrl,
+        goodreadUrl: this.author.goodreadUrl,
         genres: this.author.genres,
         isActive: this.author.isActive,
         notes: this.author.notes
@@ -355,7 +357,9 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
         deathDate: this.author.deathDate,
         nationality: this.author.nationality,
         website: this.author.website,
-        socialLinks: this.author.socialLinks,
+        threadsUrl: this.author.threadsUrl,
+        instagramUrl: this.author.instagramUrl,
+        goodreadUrl: this.author.goodreadUrl,
         genres: this.author.genres,
         isActive: this.author.isActive,
         notes: this.author.notes

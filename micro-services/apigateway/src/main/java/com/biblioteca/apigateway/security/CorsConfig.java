@@ -19,6 +19,7 @@ public class CorsConfig {
     @Bean
     public CorsWebFilter corsFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
+
         corsConfig.setAllowedOriginPatterns(List.of("*"));
         corsConfig.setAllowedMethods(ALLOWED_METHODS);
         corsConfig.setMaxAge(Long.parseLong(MAX_AGE));

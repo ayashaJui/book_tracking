@@ -1,9 +1,12 @@
 package com.biblioteca.catalogservice.dto.author;
 
+import com.biblioteca.catalogservice.dto.book.BookDTO;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,4 +40,12 @@ public class AuthorDTO {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Set<String> genres;
+
+    private List<BookDTO> books;
+
+    private Long totalBooks;
+
+    private Double averageRating;
 }

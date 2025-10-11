@@ -91,4 +91,27 @@ public class AuthorController {
 
         return new ResponseEntity<>(new ResponseDTO<>(authorDTOs, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
+
+    @Operation(summary = "APT ID: Author007")
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<AuthorDTO>>> searchAuthor(@RequestParam(value = "authorName", required = false) String authorName,
+                                                                                   HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ) {
+        log.info("searchAuthor in AuthorController is called  by user: {}", jwt.getSubject());
+
+        List<AuthorDTO> authorDTOs = authorService.searchAuthor(authorName,  request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(authorDTOs, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "API ID: Author008")
+    @GetMapping("/author_ids")
+    public ResponseEntity<ResponseDTO<List<AuthorDTO>>> getAuthorsByIds(@RequestParam("ids") List<Integer> ids,
+                                                                        HttpServletRequest request,
+                                                                        @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
+        log.info("getAuthorsByIds in AuthorController is called  by user: {}", jwt.getSubject());
+
+        List<AuthorDTO> dtos = authorService.getAuthorsByIds(ids, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(dtos, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
 }

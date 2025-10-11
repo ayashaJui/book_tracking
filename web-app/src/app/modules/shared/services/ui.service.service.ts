@@ -44,6 +44,33 @@ export class UiService {
     this.setNewMessage(toast);
   }
 
+  setCustomSuccess(summary: string, message: string) {
+    let toast: ToastMessage = {
+      message: message,
+      summary: summary,
+      type: 'success',
+    };
+    this.setNewMessage(toast);
+  }
+
+  setCustomWarning(summary: string, message: string) {
+    let toast: ToastMessage = {
+      message: message,
+      summary: summary,
+      type: 'warn',
+    };
+    this.setNewMessage(toast);
+  }
+
+  setCustomInfo(summary: string, message: string) {
+    let toast: ToastMessage = {
+      message: message,
+      summary: summary,
+      type: 'info',
+    };
+    this.setNewMessage(toast);
+  }
+
   private setNewMessage(toast: ToastMessage) {
     this.toastMessageQueue.next(toast);
   }

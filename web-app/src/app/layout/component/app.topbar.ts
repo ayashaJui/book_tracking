@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { ColorScheme, LayoutService } from '../service/layout.service';
 import { UiService } from '../../modules/shared/services/ui.service.service';
@@ -10,8 +7,7 @@ import { AuthenticationService } from '../../modules/shared/services/authenticat
 
 @Component({
   selector: 'app-topbar',
-  standalone: true,
-  imports: [RouterModule, CommonModule, StyleClassModule],
+  standalone: false,
   templateUrl: `./app.topbar.html`,
 })
 export class AppTopbar {

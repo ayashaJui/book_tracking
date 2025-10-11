@@ -7,14 +7,10 @@ export interface Author {
   deathDate?: Date;
   nationality?: string;
   website?: string;
-  socialLinks?: {
-    twitter?: string;
-    instagram?: string;
-    goodreads?: string;
-    facebook?: string;
-    linkedin?: string;
-  };
-  genres?: string[]; // Primary genres this author writes in
+  instagramUrl?: string;
+  goodreadUrl?: string;
+  threadsUrl?: string;
+  genres?: string[]; // Genres the author typically writes in
   totalBooks?: number; // Number of books by this author in user's collection
   averageRating?: number; // Average rating of books by this author
   isActive?: boolean; // Whether author is still writing/alive
@@ -71,6 +67,60 @@ export interface AuthorCreateRequest {
   isFromCatalog?: boolean;
 }
 
+export interface AuthorCreateRequestDTO {
+  userId: number;
+  catalogAuthorId?: number;
+  preferenceLevel: number;
+  isFavorite: boolean;
+  isExcluded: boolean;
+  personalNotes: string;
+}
+
+export interface CatalogAuthorCreateRequestDTO {
+  name: string;
+  bio: string;
+  birthDate: string;
+  deathDate: string;
+  nationality: string;
+  website: string;
+  instagramUrl: string;
+  threadsUrl: string;
+  goodreadUrl: string;
+}
+
 export interface AuthorUpdateRequest extends AuthorCreateRequest {
   id: number;
+}
+
+export interface UserAuthorPreferenceDTO {
+  id: number;
+  userId: number;
+  catalogAuthorId: number;
+  preferenceLevel: number;
+  isFavorite: boolean;
+  isExcluded: boolean;
+  personalNotes: string;
+  createdAt: string;
+  updatedAt: string;
+  catalogAuthor?: CatalogAuthorDTO;
+}
+
+export interface CatalogAuthorDTO {
+  id: number;
+  name: string;
+  bio: string;
+  birthDate: string;
+  deathDate: string;
+  nationality: string;
+  website: string;
+  imageId: string;
+  instagramUrl: string;
+  threadsUrl: string;
+  goodreadUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  totalBooks: number;
+  averageRating: number;
+  genres: string[];
+  books?: any[]
 }

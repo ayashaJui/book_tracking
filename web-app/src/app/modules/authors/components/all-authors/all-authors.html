@@ -95,7 +95,7 @@
     </div>
 
     <!-- Main Content Container -->
-    <div class=" py-6 lg:py-8">
+    <div class="py-6 lg:py-8">
       <!-- Action Buttons -->
       <div class="mb-8">
         <div
@@ -173,7 +173,6 @@
 
             <!-- Filters -->
             <div class="space-y-4">
-              <!-- Mobile: Stack filters vertically, Desktop: Show in grid -->
               <div
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
               >
@@ -200,10 +199,10 @@
                   >
                   <p-select
                     [options]="[
-                      {label: 'Name', value: 'name'},
-                      {label: 'Total Books', value: 'totalBooks'},
-                      {label: 'Average Rating', value: 'averageRating'},
-                      {label: 'Recently Added', value: 'createdAt'}
+                      { label: 'Name', value: 'name' },
+                      { label: 'Total Books', value: 'totalBooks' },
+                      { label: 'Average Rating', value: 'averageRating' },
+                      { label: 'Recently Added', value: 'createdAt' }
                     ]"
                     [(ngModel)]="sortBy"
                     (onChange)="onSortChange()"
@@ -248,30 +247,50 @@
         <!-- Results Summary -->
         <div class="mb-6">
           <div class="text-sm text-gray-600 dark:text-gray-400">
-            Showing <span class="font-semibold text-gray-900 dark:text-white">{{ filteredAuthors.length }}</span> of 
-            <span class="font-semibold text-gray-900 dark:text-white">{{ authors.length }}</span> authors
+            Showing
+            <span class="font-semibold text-gray-900 dark:text-white">{{
+              filteredAuthors.length
+            }}</span>
+            of
+            <span class="font-semibold text-gray-900 dark:text-white">{{
+              authors.length
+            }}</span>
+            authors
           </div>
         </div>
 
         <!-- Loading State -->
         <div *ngIf="loading" class="flex items-center justify-center py-12">
           <div class="text-center">
-            <i class="pi pi-spin pi-spinner text-4xl text-green-600 mb-4 block"></i>
+            <i
+              class="pi pi-spin pi-spinner text-4xl text-green-600 mb-4 block"
+            ></i>
             <p class="text-gray-600 dark:text-gray-400">Loading authors...</p>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!loading && isEmpty" class="flex items-center justify-center py-12">
+        <div
+          *ngIf="!loading && isEmpty"
+          class="flex items-center justify-center py-12"
+        >
           <div class="text-center">
-            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+            <div
+              class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4 mx-auto"
+            >
               <i class="pi pi-users text-2xl text-gray-400"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
+            >
               No authors found
             </h3>
             <p class="text-gray-600 dark:text-gray-400 mb-4">
-              {{ hasFilters ? 'Try adjusting your filters or search terms' : 'Get started by adding your first author' }}
+              {{
+                hasFilters
+                  ? "Try adjusting your filters or search terms"
+                  : "Get started by adding your first author"
+              }}
             </p>
             <button
               *ngIf="!hasFilters"
@@ -280,39 +299,47 @@
               label="Add First Author"
               icon="pi pi-plus"
               class="p-button-success"
-              (click)="navigateToAdd()">
-            </button>
+              (click)="navigateToAdd()"
+            ></button>
           </div>
         </div>
 
         <!-- Authors Grid View -->
-        <div *ngIf="!loading && !isEmpty && viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-          <div 
+        <div
+          *ngIf="!loading && !isEmpty && viewMode === 'grid'"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"
+        >
+          <div
             *ngFor="let author of paginatedAuthors"
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:-translate-y-1"
-            (click)="navigateToDetails(author.id!)">
-            
+            (click)="navigateToDetails(author.id!)"
+          >
             <!-- Author Image/Avatar -->
-            <div class="relative h-48 bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-              <img 
-                *ngIf="author.photoUrl" 
-                [src]="author.photoUrl" 
-                [alt]="author.name"
+            <div
+              class="relative h-48 bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center"
+            >
+              <img
+                *ngIf="author.catalogAuthor?.imageId"
+                [src]="author.catalogAuthor?.imageId"
+                [alt]="author.catalogAuthor?.name"
                 class="w-full h-full object-cover"
               />
-              <div *ngIf="!author.photoUrl" class="text-white text-4xl font-bold">
-                {{ getAuthorInitials(author.name) }}
+              <div
+                *ngIf="!author.catalogAuthor?.imageId"
+                class="text-white text-4xl font-bold"
+              >
+                {{ getAuthorInitials(author.catalogAuthor?.name || "") }}
               </div>
-              
+
               <!-- Status indicator -->
               <div class="absolute top-3 right-3">
-                <span 
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-md"
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-md pi"
                   [ngClass]="{
-                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': author.isActive !== false,
-                    'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200': author.isActive === false
-                  }">
-                  {{ author.isActive !== false ? 'Active' : 'Inactive' }}
+                    'pi-heart-fill': author.isFavorite === true,
+                    'pi-heart': author.isFavorite === false
+                  }"
+                >
                 </span>
               </div>
             </div>
@@ -320,164 +347,258 @@
             <!-- Author Info -->
             <div class="p-6">
               <div class="flex items-start justify-between mb-3">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate pr-2">
-                  {{ author.name }}
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white truncate pr-2"
+                >
+                  {{ author.catalogAuthor?.name }}
                 </h3>
               </div>
 
               <!-- Metadata -->
               <div class="space-y-2 mb-4">
-                <p *ngIf="author.nationality" class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                <p
+                  *ngIf="author.catalogAuthor?.nationality"
+                  class="text-sm text-gray-600 dark:text-gray-400 flex items-center"
+                >
                   <i class="pi pi-globe mr-2 text-gray-400"></i>
-                  {{ author.nationality }} {{ getAuthorAge(author) }}
+                  {{ author.catalogAuthor?.nationality }}
+                  {{ getAuthorAge(author.catalogAuthor) }}
                 </p>
-                
-                <div *ngIf="author.totalBooks" class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+
+                <div
+                  *ngIf="author.catalogAuthor?.totalBooks"
+                  class="flex items-center text-sm text-gray-600 dark:text-gray-400"
+                >
                   <i class="pi pi-book mr-2 text-gray-400"></i>
-                  {{ author.totalBooks }} {{ author.totalBooks === 1 ? 'book' : 'books' }}
-                  <span *ngIf="author.averageRating" class="ml-3 flex items-center">
+                  {{ author.catalogAuthor?.totalBooks }}
+                  {{
+                    author.catalogAuthor?.totalBooks === 1 ? "book" : "books"
+                  }}
+                  <span
+                    *ngIf="author.catalogAuthor?.averageRating"
+                    class="ml-3 flex items-center"
+                  >
                     <i class="pi pi-star-fill text-yellow-500 mr-1"></i>
-                    {{ author.averageRating.toFixed(1) }}
+                    {{ author.catalogAuthor?.averageRating?.toFixed(1) }}
                   </span>
                 </div>
               </div>
 
               <!-- Genres -->
-              <div *ngIf="author.genres && author.genres.length > 0" class="mb-4">
+              <div
+                *ngIf="
+                  author.catalogAuthor?.genres &&
+                  (author.catalogAuthor?.genres)!.length > 0
+                "
+                class="mb-4"
+              >
                 <div class="flex flex-wrap gap-2">
-                  <span 
-                    *ngFor="let genre of author.genres.slice(0, 2)" 
-                    class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                  <span
+                    *ngFor="
+                      let genre of author.catalogAuthor?.genres!.slice(0, 2)
+                    "
+                    class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                  >
                     {{ genre }}
                   </span>
-                  <span 
-                    *ngIf="author.genres.length > 2"
-                    class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                    +{{ author.genres.length - 2 }}
+                  <span
+                    *ngIf="(author.catalogAuthor?.genres)!.length > 2"
+                    class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                  >
+                    +{{ (author.catalogAuthor?.genres)!.length - 2 }}
                   </span>
                 </div>
               </div>
 
               <!-- Biography snippet -->
-              <p *ngIf="author.biography" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
-                {{ author.biography }}
+              <p
+                *ngIf="author.catalogAuthor"
+                class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4"
+              >
+                {{ author.catalogAuthor.bio }}
               </p>
 
               <!-- Action Buttons -->
-              <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <div
+                class="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700"
+              >
                 <button
                   pButton
                   type="button"
                   icon="pi pi-eye"
                   class="p-button-rounded p-button-text p-button-info p-button-sm hover:scale-110 transition-all duration-200"
-                  (click)="navigateToDetails(author.id!); $event.stopPropagation()"
-                  pTooltip="View Details">
-                </button>
+                  (click)="navigateToDetails(author.id!)"
+                  pTooltip="View Details"
+                ></button>
                 <button
                   pButton
                   type="button"
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-text p-button-warning p-button-sm hover:scale-110 transition-all duration-200"
                   (click)="navigateToEdit(author.id!); $event.stopPropagation()"
-                  pTooltip="Edit Author">
-                </button>
+                  pTooltip="Edit Author"
+                ></button>
                 <button
                   pButton
                   type="button"
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-text p-button-danger p-button-sm hover:scale-110 transition-all duration-200"
-                  (click)="confirmDeleteAuthor(author); $event.stopPropagation()"
-                  pTooltip="Delete Author">
-                </button>
+                  (click)="
+                    confirmDeleteAuthor(author); $event.stopPropagation()
+                  "
+                  pTooltip="Delete Author"
+                ></button>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Authors List View -->
-        <div *ngIf="!loading && !isEmpty && viewMode === 'list'" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
-          <p-table 
-            [value]="paginatedAuthors" 
-            [paginator]="false"
-            styleClass="p-datatable-gridlines">
-            
+        <div
+          *ngIf="!loading && !isEmpty && viewMode === 'list'"
+          class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8"
+        >
+          <p-table [value]="paginatedAuthors" [paginator]="false" showGridlines>
             <ng-template pTemplate="header">
               <tr>
-                <th class="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Author</th>
-                <th class="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Nationality</th>
-                <th class="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Genres</th>
-                <th class="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Books</th>
-                <th class="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Rating</th>
-                <th class="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Status</th>
-                <th class="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Actions</th>
+                <th
+                  class="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                >
+                  Author
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Nationality
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Genres
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Total Books
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Average Rating
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Favorite
+                </th>
+                <th
+                  class="!text-center py-4 px-6 font-semibold text-gray-900 dark:text-white"
+                  style="text-align: center !important"
+                >
+                  Actions
+                </th>
               </tr>
             </ng-template>
-            
+
             <ng-template pTemplate="body" let-author>
-              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <td class="py-4 px-6">
+              <tr
+                class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <td class="py-4 px-6 text-left">
                   <div class="flex items-center gap-3">
-                    <div 
-                      *ngIf="!author.photoUrl"
-                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                    <div
+                      *ngIf="!author.catalogAuthor?.imageId"
+                      class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md"
+                    >
                       <span class="text-white text-sm font-bold">
-                        {{ getAuthorInitials(author.name) }}
+                        {{ getAuthorInitials(author.catalogAuthor?.name) }}
                       </span>
                     </div>
-                    <img 
-                      *ngIf="author.photoUrl"
-                      [src]="author.photoUrl" 
-                      [alt]="author.name"
-                      class="w-12 h-12 rounded-xl object-cover shadow-md">
+                    <img
+                      *ngIf="author.catalogAuthor?.photoUrl"
+                      [src]="author.catalogAuthor?.photoUrl"
+                      [alt]="author.catalogAuthor?.name"
+                      class="w-12 h-12 rounded-xl object-cover shadow-md"
+                    />
                     <div>
-                      <div class="font-semibold text-gray-900 dark:text-white">{{ author.name }}</div>
-                      <div *ngIf="author.biography" class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-xs">
-                        {{ author.biography }}
+                      <div class="font-semibold text-gray-900 dark:text-white">
+                        {{ author.catalogAuthor?.name }}
+                      </div>
+                      <div
+                        *ngIf="author.biography"
+                        class="text-sm text-gray-600 dark:text-gray-400 truncate max-w-xs"
+                      >
+                        {{ author.catalogAuthor?.bio }}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-6">
-                  <span class="text-gray-900 dark:text-white">
-                    {{ author.nationality || '-' }}
-                  </span>
+                <td
+                  class="py-4 px-6 !text-center text-gray-900 dark:text-white"
+                >
+                  {{ author.catalogAuthor?.nationality || "-" }}
                 </td>
-                <td class="py-4 px-6">
-                  <div class="flex flex-wrap gap-2">
-                    <span 
-                      *ngFor="let genre of author.genres?.slice(0, 2)" 
-                      class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                <td class="py-4 px-6 text-center">
+                  <div class="flex flex-wrap gap-2 justify-center">
+                    <span
+                      *ngFor="
+                        let genre of author.catalogAuthor?.genres?.slice(0, 2)
+                      "
+                      class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                    >
                       {{ genre }}
                     </span>
-                    <span 
-                      *ngIf="author.genres && author.genres.length > 2"
-                      class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                      +{{ author.genres.length - 2 }}
+                    <span
+                      *ngIf="
+                        author.catalogAuthor?.genres &&
+                        author.catalogAuthor?.genres.length > 2
+                      "
+                      class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                    >
+                      +{{ author.catalogAuthor?.genres.length - 2 }}
                     </span>
                   </div>
                 </td>
-                <td class="py-4 px-6 text-center">
+                <td class="py-4 px-6 !text-center">
                   <span class="font-semibold text-gray-900 dark:text-white">
-                    {{ author.totalBooks || 0 }}
+                    {{ author.catalogAuthor?.totalBooks || 0 }}
                   </span>
                 </td>
-                <td class="py-4 px-6 text-center">
-                  <div *ngIf="author.averageRating" class="flex items-center justify-center gap-1">
+                <td class="py-4 px-6 !text-center">
+                  <div
+                    *ngIf="author.catalogAuthor?.averageRating"
+                    class="flex items-center justify-center gap-1"
+                  >
                     <i class="pi pi-star-fill text-yellow-500"></i>
                     <span class="font-semibold text-gray-900 dark:text-white">
-                      {{ author.averageRating.toFixed(1) }}
+                      {{ author.catalogAuthor?.averageRating.toFixed(1) }}
                     </span>
                   </div>
-                  <span *ngIf="!author.averageRating" class="text-gray-500">-</span>
+                  <span
+                    *ngIf="!author.catalogAuthor?.averageRating"
+                    class="text-gray-500"
+                    >-</span
+                  >
                 </td>
-                <td class="py-4 px-6 text-center">
-                  <span 
+                <td class="py-4 px-6 !text-center">
+                  <span
                     class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
-                    [class]="author.isActive !== false ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'">
-                    {{ author.isActive !== false ? 'Active' : 'Inactive' }}
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="{
+                        'pi-heart-fill': author.isFavorite !== false,
+                        'pi-heart': author.isFavorite === false
+                      }"
+                    ></i>
                   </span>
                 </td>
-                <td class="py-4 px-6">
+                <td class="py-4 px-6 text-center">
                   <div class="flex items-center justify-center gap-2">
                     <button
                       pButton
@@ -485,24 +606,24 @@
                       icon="pi pi-eye"
                       class="p-button-rounded p-button-text p-button-info p-button-sm hover:scale-110 transition-all duration-200"
                       (click)="navigateToDetails(author.id!)"
-                      pTooltip="View Details">
-                    </button>
+                      pTooltip="View Details"
+                    ></button>
                     <button
                       pButton
                       type="button"
                       icon="pi pi-pencil"
                       class="p-button-rounded p-button-text p-button-warning p-button-sm hover:scale-110 transition-all duration-200"
                       (click)="navigateToEdit(author.id!)"
-                      pTooltip="Edit Author">
-                    </button>
+                      pTooltip="Edit Author"
+                    ></button>
                     <button
                       pButton
                       type="button"
                       icon="pi pi-trash"
                       class="p-button-rounded p-button-text p-button-danger p-button-sm hover:scale-110 transition-all duration-200"
                       (click)="confirmDeleteAuthor(author)"
-                      pTooltip="Delete Author">
-                    </button>
+                      pTooltip="Delete Author"
+                    ></button>
                   </div>
                 </td>
               </tr>
@@ -513,14 +634,15 @@
         <!-- Pagination -->
         <div *ngIf="!loading && !isEmpty" class="flex justify-center">
           <p-paginator
-            [rows]="rows"
+            [rows]="size"
             [totalRecords]="filteredAuthors.length"
-            [first]="first"
+            [first]="(page - 1) * size"
             [showCurrentPageReport]="true"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} authors"
-            [rowsPerPageOptions]="[12, 24, 36]"
+            [rowsPerPageOptions]="[10, 20, 30]"
             (onPageChange)="onPageChange($event)"
-            styleClass="border-0 bg-transparent">
+            styleClass="border-0 bg-transparent"
+          >
           </p-paginator>
         </div>
       </div>
@@ -534,6 +656,3 @@
   [baseZIndex]="10000"
   rejectButtonStyleClass="p-button-text"
 ></p-confirmDialog>
-
-<!-- Toast Messages -->
-<p-toast></p-toast>

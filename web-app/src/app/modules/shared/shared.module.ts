@@ -46,8 +46,10 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Select } from 'primeng/select';
-import { Textarea } from 'primeng/textarea';
+// import { Textarea } from 'primeng/textarea';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { TextareaModule } from 'primeng/textarea';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -94,8 +96,10 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DividerModule,
     ProgressSpinnerModule,
     Select,
-    Textarea,
+    // Textarea,
     CheckboxModule,
+    ToggleSwitchModule,
+    TextareaModule
   ],
   providers: [MessageService, ConfirmationService],
   exports: [
@@ -135,6 +139,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     SelectButtonModule,
     ToolbarModule,
     DividerModule,
+    ToastMsg,
     GenreSelectorComponent,
     TagSelectorComponent,
     AuthorSelectorComponent,
@@ -143,8 +148,10 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     DuplicateDetectionDialogComponent,
     ProgressSpinnerModule,
     Select,
-    Textarea,
+    // Textarea,
     CheckboxModule,
+    ToggleSwitchModule,
+    TextareaModule
   ],
 })
 export class SharedModule { }

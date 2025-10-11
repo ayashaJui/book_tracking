@@ -12,7 +12,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { SharedModule } from './modules/shared/shared.module';
-import { AppLayout } from './layout/component/app.layout';
+import { LayoutModule } from './layout/layout.module';
 import { CommonModule } from '@angular/common';
 import {
   provideHttpClient,
@@ -37,7 +37,7 @@ import { httpInterceptorProviders } from './configurations';
     BrowserModule,
     AppRoutingModule,
     SharedModule,
-    AppLayout,
+    LayoutModule,
     OAuthModule.forRoot(),
     StoreModule.forRoot(),
   ],

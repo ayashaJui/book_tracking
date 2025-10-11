@@ -14,6 +14,7 @@ import {
     BookCreateNewRequest,
     UserLibraryBook
 } from '../models/catalog.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -60,15 +61,11 @@ export class CatalogService {
 
     // Search for authors
     searchAuthors(name: string): Observable<CatalogAuthor[]> {
-        const params = new HttpParams().set('name', name);
+        const params = new HttpParams().set('authorName', name);
 
-        return this.http.get<CatalogAuthor[]>(`${this.catalogApiUrl}/authors/search`, { params })
-            .pipe(
-                catchError(error => {
-                    console.error('Error searching authors:', error);
-                    return of([]);
-                })
-            );
+        let url = `${environment.catalog_service_url}/authors/search`;
+
+        return this.http.get(url, { params }) as Observable<CatalogAuthor[]>
     }
 
     // Search for publishers

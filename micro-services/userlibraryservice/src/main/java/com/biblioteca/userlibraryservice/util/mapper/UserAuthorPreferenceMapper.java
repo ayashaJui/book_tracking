@@ -22,8 +22,11 @@ public class UserAuthorPreferenceMapper {
                 .build();
     }
 
-    public static UserAuthorPreference fromCreateDTO(UserAuthorPreferenceCreateDTO  userAuthorPreferenceCreateDTO) {
+//    TODO: change to User & CatalogAuthor after propagation
+    public static UserAuthorPreference fromCreateDTO(UserAuthorPreferenceCreateDTO  userAuthorPreferenceCreateDTO, Integer userId, Integer catalogAuthorId) {
         return UserAuthorPreference.builder()
+                .userId(userId)
+                .catalogAuthorId(catalogAuthorId)
                 .preferenceLevel(userAuthorPreferenceCreateDTO.getPreferenceLevel())
                 .isFavorite(userAuthorPreferenceCreateDTO.getIsFavorite())
                 .isExcluded(userAuthorPreferenceCreateDTO.getIsExcluded())

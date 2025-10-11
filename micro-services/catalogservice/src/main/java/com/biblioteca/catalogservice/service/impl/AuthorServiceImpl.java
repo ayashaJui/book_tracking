@@ -3,13 +3,18 @@ package com.biblioteca.catalogservice.service.impl;
 import com.biblioteca.catalogservice.dto.author.AuthorCreateDTO;
 import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.author.AuthorUpdateDTO;
+import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.pagination.PaginationUtil;
 import com.biblioteca.catalogservice.entity.Author;
+import com.biblioteca.catalogservice.entity.Book;
+import com.biblioteca.catalogservice.entity.BookAuthor;
 import com.biblioteca.catalogservice.repository.AuthorRepository;
 import com.biblioteca.catalogservice.service.AuthorService;
+import com.biblioteca.catalogservice.service.BookService;
 import com.biblioteca.catalogservice.util.exception.CustomException;
 import com.biblioteca.catalogservice.util.mapper.AuthorMapper;
+import com.biblioteca.catalogservice.util.mapper.BookMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -30,6 +38,7 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
+    private final BookService bookService;
 
     @Override
     @Transactional
@@ -74,7 +83,30 @@ public class AuthorServiceImpl implements AuthorService {
 
         Author author = findById(id);
 
-        return convertToDTO(author);
+        AuthorDTO authorDTO = convertToDTO(author);
+
+        List<Book> books = author.getBookAuthors()
+                .stream()
+                .map(BookAuthor::getBook)
+                .toList();
+
+        Set<String> genres = books.stream()
+                .flatMap(book -> book.getBookGenres().stream())
+                .map(bg -> bg.getGenre().getName())
+                .collect(Collectors.toSet());
+
+        double avgRating = books.stream()
+                .filter(b -> b.getAverageRating() != null)
+                .mapToDouble(Book::getAverageRating)
+                .average()
+                .orElse(0.0);
+
+        authorDTO.setTotalBooks((long) books.size());
+        authorDTO.setGenres(genres);
+        authorDTO.setAverageRating(avgRating);
+        authorDTO.setBooks(books.stream().map(this::convertToBookDTO).toList());
+
+        return authorDTO;
     }
 
     @Override
@@ -137,6 +169,63 @@ public class AuthorServiceImpl implements AuthorService {
         }
     }
 
+    @Override
+    public List<AuthorDTO> searchAuthor(String authorName, HttpServletRequest request, Jwt jwt) {
+        log.info("searchAuthor in AuthorServiceImpl is called with data: {} by user: {}", authorName, jwt.getSubject());
+
+        List<Author>  authors = authorRepository.findByNameContaining(authorName);
+        List<AuthorDTO> authorDTOS = authors.stream().map(this::convertToDTO).toList();
+
+        return authorDTOS;
+    }
+
+    @Override
+    public List<AuthorDTO> getAuthorsByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt) {
+        log.info("getAuthorsByIds method is called with data: {}", ids);
+
+        if (ids == null || ids.isEmpty()) {
+            throw new CustomException("Author ID list cannot be empty", HttpStatus.BAD_REQUEST.value());
+        }
+
+        List<Author> authors = authorRepository.findAllById(ids);
+        if (authors.isEmpty()) {
+            throw new CustomException("No authors found for given IDs", HttpStatus.NOT_FOUND.value());
+        }
+
+        List<AuthorDTO> authorDTOS = authors.stream().map((author) -> {
+            List<Book> books = author.getBookAuthors().stream().map(BookAuthor::getBook).distinct().toList();
+
+            Set<String> genres = books.stream()
+                    .flatMap(book -> book.getBookGenres().stream())
+                    .map(bg -> bg.getGenre().getName())
+                    .collect(Collectors.toSet());
+
+            double avgRating = books.stream()
+                    .filter(book -> book.getAverageRating() != null)
+                    .mapToDouble(Book::getAverageRating)
+                    .average()
+                    .orElse(0.0);
+
+            return AuthorDTO.builder()
+                    .id(author.getId())
+                    .name(author.getName())
+                    .nationality(author.getNationality())
+                    .bio(author.getBio())
+                    .birthDate(author.getBirthDate())
+                    .deathDate(author.getDeathDate())
+                    .website(author.getWebsite())
+                    .instagramUrl(author.getInstagramUrl())
+                    .threadsUrl(author.getThreadsUrl())
+                    .goodreadUrl(author.getGoodreadUrl())
+                    .totalBooks((long) books.size())
+                    .genres(genres)
+                    .averageRating(avgRating)
+                    .build();
+        }).toList();
+
+        return authorDTOS;
+    }
+
     private Author findById(Integer id) {
         return authorRepository.findById(id)
                 .orElseThrow(() -> {
@@ -156,4 +245,9 @@ public class AuthorServiceImpl implements AuthorService {
     public Author fromUpdateDTO(AuthorUpdateDTO authorUpdateDTO, Author author){
         return AuthorMapper.fromUpdateDTO(authorUpdateDTO, author);
     }
+
+    private BookDTO convertToBookDTO(Book book) {
+        return BookMapper.toDTO(book);
+    }
+
 }

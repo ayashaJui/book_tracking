@@ -38,12 +38,16 @@
                 <h1
                   class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
                 >
-                  Add New Author
+                  {{ isEditMode ? "Edit Author" : "Add New Author" }}
                 </h1>
                 <p
                   class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1"
                 >
-                  Add a new author to your personal library collection
+                  {{
+                    isEditMode
+                      ? "Update the author details"
+                      : "Add a new author to your personal library collection"
+                  }}
                 </p>
               </div>
             </div>
@@ -77,11 +81,7 @@
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
-        <form
-          [formGroup]="authorForm"
-          (ngSubmit)="onSubmit()"
-          class="p-8 space-y-8"
-        >
+        <form [formGroup]="authorService.authorForm" class="p-8 space-y-8">
           <!-- Catalog Search Section -->
           <div class="space-y-6">
             <div
@@ -162,14 +162,15 @@
                   formControlName="name"
                   placeholder="Enter author's full name"
                   class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-                  [class.ng-invalid]="isFieldInvalid('name')"
                 />
                 <small
-                  *ngIf="isFieldInvalid('name')"
-                  class="text-red-500 block"
+                  class="p-error"
+                  *ngIf="
+                    !authorService.authorForm.get('name')?.valid &&
+                    authorService.authorForm.get('name')?.touched
+                  "
+                  >Name is required</small
                 >
-                  {{ getFieldError("name") }}
-                </small>
               </div>
 
               <!-- Nationality -->
@@ -180,21 +181,12 @@
                   <i class="pi pi-globe text-indigo-500 mr-2"></i>
                   Nationality
                 </label>
-                <p-select
+                <input
+                  pInputText
                   formControlName="nationality"
-                  [options]="nationalitySelectOptions"
-                  placeholder="Select nationality"
-                  [filter]="true"
-                  [showClear]="true"
-                  class="w-full"
-                >
-                </p-select>
-                <small
-                  *ngIf="isFieldInvalid('nationality')"
-                  class="text-red-500 block"
-                >
-                  {{ getFieldError("nationality") }}
-                </small>
+                  placeholder="Enter author's nationality"
+                  class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
+                />
               </div>
 
               <!-- Biography -->
@@ -207,18 +199,12 @@
                 </label>
                 <textarea
                   pInputTextarea
-                  formControlName="biography"
-                  placeholder="Enter author's biography"
+                  formControlName="bio"
+                  maxlength="1000"
+                  placeholder="Enter author's bio"
                   class="w-full rounded-xl border-0 bg-gray-50 transition-all duration-200"
                   rows="4"
-                  [class.ng-invalid]="isFieldInvalid('biography')"
                 ></textarea>
-                <small
-                  *ngIf="isFieldInvalid('biography')"
-                  class="text-red-500 block"
-                >
-                  {{ getFieldError("biography") }}
-                </small>
               </div>
 
               <!-- Birth Date -->
@@ -240,12 +226,6 @@
                   [maxDate]="today"
                 >
                 </p-datePicker>
-                <small
-                  *ngIf="isFieldInvalid('birthDate')"
-                  class="text-red-500 block"
-                >
-                  {{ getFieldError("birthDate") }}
-                </small>
               </div>
 
               <!-- Death Date -->
@@ -265,35 +245,11 @@
                   inputId="deathDate"
                   dateFormat="mm/dd/yy"
                   [maxDate]="today"
-                  [minDate]="authorForm.get('birthDate')?.value"
+                  [minDate]="minDeathDate"
                 >
                 </p-datePicker>
                 <small class="text-gray-600 dark:text-gray-400 block">
                   Leave empty if author is still alive
-                </small>
-              </div>
-
-              <!-- Notes -->
-              <div class="md:col-span-2 space-y-2">
-                <label
-                  class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-                >
-                  <i class="pi pi-book text-indigo-500 mr-2"></i>
-                  Notes
-                </label>
-                <p-textarea
-                  formControlName="notes"
-                  placeholder="Any additional notes about this author"
-                  class="w-full border-0 bg-gray-50"
-                  rows="3"
-                  [class.ng-invalid]="isFieldInvalid('notes')"
-                >
-                </p-textarea>
-                <small
-                  *ngIf="isFieldInvalid('notes')"
-                  class="text-red-500 block"
-                >
-                  {{ getFieldError("notes") }}
                 </small>
               </div>
             </div>
@@ -321,16 +277,13 @@
                   <i class="pi pi-star text-purple-500 mr-2"></i>
                   Preference Level
                 </label>
-                <select
+                <p-select
+                  [options]="preferenceLevelOptions"
                   formControlName="preferenceLevel"
-                  class="w-full h-12 rounded-xl border-0 bg-gray-50 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="1">Not Set</option>
-                  <option value="2">Like</option>
-                  <option value="3">Love</option>
-                  <option value="4">Favorite</option>
-                  <option value="5">Top Favorite</option>
-                </select>
+                  optionLabel="label"
+                  placeholder="Select a Preference Level"
+                  class="w-full"
+                />
               </div>
 
               <!-- Favorite Toggle -->
@@ -343,10 +296,10 @@
                 </label>
                 <div class="flex items-center gap-4">
                   <div class="flex items-center gap-2">
-                    <p-inputSwitch
+                    <p-toggleswitch
                       formControlName="isFavorite"
                       inputId="isFavorite"
-                    ></p-inputSwitch>
+                    ></p-toggleswitch>
                     <label
                       for="isFavorite"
                       class="text-sm text-gray-700 dark:text-gray-200 cursor-pointer"
@@ -355,10 +308,10 @@
                     </label>
                   </div>
                   <div class="flex items-center gap-2">
-                    <p-inputSwitch
+                    <p-toggleswitch
                       formControlName="isExcluded"
                       inputId="isExcluded"
-                    ></p-inputSwitch>
+                    ></p-toggleswitch>
                     <label
                       for="isExcluded"
                       class="text-sm text-gray-700 dark:text-gray-200 cursor-pointer"
@@ -377,13 +330,16 @@
                   <i class="pi pi-file-edit text-purple-500 mr-2"></i>
                   Personal Notes
                 </label>
-                <p-textarea
+                <textarea
+                  pTextarea
                   formControlName="personalNotes"
                   placeholder="Your personal thoughts, reading experiences, or notes about this author..."
                   class="w-full border-0 bg-gray-50"
                   rows="4"
+                  [autoResize]="true"
+                  maxlength="2000"
                 >
-                </p-textarea>
+                </textarea>
               </div>
             </div>
           </div>
@@ -415,18 +371,11 @@
                   formControlName="website"
                   placeholder="https://authorwebsite.com"
                   class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-                  [class.ng-invalid]="isFieldInvalid('website')"
                 />
-                <small
-                  *ngIf="isFieldInvalid('website')"
-                  class="text-red-500 block"
-                >
-                  {{ getFieldError("website") }}
-                </small>
               </div>
 
               <!-- Social Links -->
-              <div formGroupName="socialLinks" class="space-y-4">
+              <div class="space-y-4">
                 <label
                   class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4"
                 >
@@ -437,7 +386,6 @@
                 <div
                   class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                 >
-
                   <!-- Instagram -->
                   <div class="space-y-2">
                     <label
@@ -448,7 +396,7 @@
                     </label>
                     <input
                       pInputText
-                      formControlName="instagram"
+                      formControlName="instagramUrl"
                       placeholder="@username"
                       class="w-full h-10 rounded-lg border-0 bg-gray-50"
                     />
@@ -459,12 +407,12 @@
                     <label
                       class="block text-xs font-medium text-gray-600 dark:text-gray-400"
                     >
-                      <i class="pi pi-threads text-blue-600 mr-1"></i>
+                      <i class="pi pi-facebook text-blue-600 mr-1"></i>
                       Threads
                     </label>
                     <input
                       pInputText
-                      formControlName="threads"
+                      formControlName="threadsUrl"
                       placeholder="@username or full URL"
                       class="w-full h-10 rounded-lg border-0 bg-gray-50"
                     />
@@ -480,7 +428,7 @@
                     </label>
                     <input
                       pInputText
-                      formControlName="goodreads"
+                      formControlName="goodreadUrl"
                       placeholder="Profile URL"
                       class="w-full h-10 rounded-lg border-0 bg-gray-50"
                     />
@@ -512,11 +460,12 @@
             ></button>
             <button
               type="submit"
+              (click)="onSubmit()"
               pButton
               label="Save Author"
               icon="pi pi-check"
               class="p-button-success w-full sm:w-auto"
-              [disabled]="authorForm.invalid"
+              [disabled]="authorService.authorForm.invalid || submitting"
               [loading]="loading"
               loadingIcon="pi pi-spinner pi-spin"
             ></button>
@@ -526,14 +475,3 @@
     </div>
   </div>
 </div>
-
-<!-- Duplicate Detection Dialog -->
-<app-duplicate-detection-dialog
-  [visible]="showDuplicateDialog"
-  [duplicateResult]="duplicateResult!"
-  [searchTerm]="searchTerm"
-  entityType="author"
-  (actionSelected)="onDuplicateAction($event)"
-  (dialogClosed)="showDuplicateDialog = false"
->
-</app-duplicate-detection-dialog>
