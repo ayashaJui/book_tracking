@@ -12,6 +12,6 @@ public interface UserAuthorPreferenceService {
 
     Page<UserAuthorPreferenceDTO> getUserAuthorsWithPagination(PageRequestDTO pageRequestDTO, Integer userId, HttpServletRequest request, Jwt jwt);
 
-
+    UserAuthorPreferenceDTO getUserAuthorPreferenceById(Integer id, HttpServletRequest request, Jwt jwt);
 
 }

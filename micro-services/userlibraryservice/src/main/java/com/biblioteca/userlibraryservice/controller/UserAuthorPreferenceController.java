@@ -51,4 +51,14 @@ public class UserAuthorPreferenceController {
 
         return new ResponseEntity<>(new ResponseDTO<>(dtos, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "API ID: UserAuhtorPreferences003")
+    public ResponseEntity<ResponseDTO<UserAuthorPreferenceDTO>> getAuthorById(@PathVariable Integer id, HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
+        log.info("getAuthorById in UserAuthorPreferenceController is called by user: {}", jwt.getSubject());
+
+        UserAuthorPreferenceDTO dto = userAuthorPreferenceService.getUserAuthorPreferenceById(id, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
 }

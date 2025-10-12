@@ -3,9 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
-import { Author, AuthorStats } from '../../models/author.model';
+import { Author, AuthorStats, UserAuthorPreferenceDTO } from '../../models/author.model';
 import { AuthorService } from '../../services/author.service';
 import { ImageService } from '../../../shared/services/image.service';
+import { UiService } from '../../../shared/services/ui.service.service';
+import { CatalogApiService } from '../../../shared/services/catalog.api.service';
 
 @Component({
   selector: 'app-author-details',
@@ -14,19 +16,13 @@ import { ImageService } from '../../../shared/services/image.service';
   styleUrl: './author-details.scss',
   providers: [MessageService, ConfirmationService]
 })
-export class AuthorDetailsComponent implements OnInit, OnDestroy {
-  author: Author | null = null;
-  authorStats: AuthorStats | null = null;
+export class AuthorDetailsComponent implements OnInit {
+  author: UserAuthorPreferenceDTO | null = null;
   loading = false;
   authorId: number | null = null;
 
-  // Active tab
-  activeTab = 'overview';
-
-  // Mock books data (would come from book service)
   authorBooks: any[] = [];
 
-  private routeSubscription: Subscription | null = null;
 
   constructor(
     private authorService: AuthorService,
@@ -34,105 +30,60 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private uiService: UiService, private catalogApiService: CatalogApiService
   ) { }
 
   ngOnInit() {
-    this.routeSubscription = this.route.params.subscribe(params => {
+    this.route.params.subscribe(params => {
       if (params['id']) {
         this.authorId = +params['id'];
-        this.loadAuthor();
-        this.loadAuthorStats();
-        this.loadAuthorBooks();
+        this.loadAuthor(this.authorId);
       }
     });
   }
 
-  ngOnDestroy() {
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
-  }
 
-  loadAuthor() {
-    if (!this.authorId) return;
+
+  loadAuthor(authorId: number) {
+    if (!authorId) return;
 
     this.loading = true;
-    const foundAuthor = this.authorService.getAuthorById(this.authorId);
-    this.author = foundAuthor || null;
 
-    if (!this.author) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Author not found'
-      });
-      this.router.navigate(['/authors']);
-      return;
-    }
+    this.authorService.getUserAuhtorPreferenceById(authorId).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.author = response.data;
+          let catalogAuthorId = this.author?.catalogAuthorId;
 
-    this.loading = false;
-  }
+          if (catalogAuthorId) {
+            this.catalogApiService.getCatalogAuthorDetailsById(catalogAuthorId).subscribe({
+              next: (catalogResponse) => {
+                if (catalogResponse.data) {
+                  this.author!.catalogAuthor = catalogResponse.data;
+                  this.authorBooks = this.author?.catalogAuthor?.books || [];
 
-  loadAuthorStats() {
-    if (!this.authorId) return;
+                  const bookIds = this.authorBooks.map(book => book.id);
 
-    // In a real implementation, this would calculate actual stats from books
-    this.authorStats = this.authorService.calculateAuthorStats(this.authorId);
-  }
+                  console.log('Book IDs:', bookIds);
+                }
+              },
+              error: (error) => {
+                console.error('Error fetching catalog author details:', error);
+                this.uiService.setCustomError('Error', error.message || 'Failed to load author details');
+              }
+            });
+          }
 
-  loadAuthorBooks() {
-    if (!this.authorId || !this.author) return;
-
-    // Mock data - in real implementation, would query book service by author
-    // Generate sample books based on the author name for demonstration
-    this.authorBooks = this.generateSampleBooks(this.author.name);
-  }
-
-  private generateSampleBooks(authorName: string): any[] {
-    // Sample book titles that could be associated with any author
-    const sampleTitles = [
-      'The Journey Begins',
-      'Whispers in the Dark',
-      'Beyond the Horizon',
-      'Tales of Wonder',
-      'The Last Chapter',
-      'Echoes of Time',
-      'Shadows and Light',
-      'The Hidden Truth',
-      'Mysteries Unfold',
-      'The Final Quest'
-    ];
-
-    const statuses = ['Read', 'Currently Reading', 'Want to Read', 'On Hold'];
-    const genres = ['Fantasy', 'Science Fiction', 'Mystery', 'Romance', 'Thriller'];
-
-    // Generate 2-5 books per author
-    const bookCount = Math.floor(Math.random() * 4) + 2;
-    const books = [];
-
-    for (let i = 0; i < bookCount; i++) {
-      const title = sampleTitles[Math.floor(Math.random() * sampleTitles.length)];
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const genre = genres[Math.floor(Math.random() * genres.length)];
-      const rating = Math.floor(Math.random() * 5) + 1;
-      const pages = Math.floor(Math.random() * 400) + 200;
-
-      books.push({
-        id: Date.now() + i,
-        title: `${title} ${i + 1}`,
-        author: authorName,
-        status: status,
-        genre: genre,
-        rating: status === 'Read' ? rating : null,
-        pages: pages,
-        coverUrl: null,
-        publishedDate: new Date(2020 + Math.floor(Math.random() * 4), Math.floor(Math.random() * 12), 1),
-        description: `A captivating ${genre.toLowerCase()} novel by ${authorName}.`
-      });
-    }
-
-    return books;
+          this.loading = false;
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching catalog author details:', error);
+        this.uiService.setCustomError('Error', error.message || 'Failed to load author preferences');
+        this.loading = false;
+      }
+    })
   }
 
   // Navigation methods
@@ -150,25 +101,23 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/books', bookId]);
   }
 
-  // Tab navigation
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-  }
+
 
   // Utility methods
   getAuthorAge(): string {
-    if (!this.author?.birthDate) return '';
+    if (!this.author?.catalogAuthor?.birthDate) return '';
 
-    const birthYear = this.author.birthDate.getFullYear();
-    const currentYear = this.author.deathDate ? this.author.deathDate.getFullYear() : new Date().getFullYear();
+    const birthYear = new Date(this.author.catalogAuthor.birthDate).getFullYear();
+    const currentYear = this.author.catalogAuthor.deathDate ? new Date(this.author.catalogAuthor.deathDate).getFullYear() : new Date().getFullYear();
 
     const age = currentYear - birthYear;
-    return this.author.deathDate ? `(${age} years)` : `(Age ${age})`;
+    return this.author.catalogAuthor.deathDate ? `(${age} years)` : `(Age ${age})`;
   }
 
   getAuthorInitials(): string {
-    if (!this.author) return '';
-    return this.getInitials(this.author.name);
+    if (!this.author?.catalogAuthor) return '';
+
+    return this.getInitials(this.author?.catalogAuthor?.name);
   }
 
   getInitials(name: string): string {
@@ -180,55 +129,25 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
       .substring(0, 2);
   }
 
-  formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
-  }
+  // formatDate(date: Date): string {
+  //   return new Intl.DateTimeFormat('en-US', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   }).format(date);
+  // }
 
-  formatShortDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short'
-    }).format(date);
-  }
+  // formatShortDate(date: Date): string {
+  //   return new Intl.DateTimeFormat('en-US', {
+  //     year: 'numeric',
+  //     month: 'short'
+  //   }).format(date);
+  // }
 
   openLink(url: string) {
     if (url) {
       window.open(url, '_blank');
     }
-  }
-
-  getSocialIcon(platform: string): string {
-    const icons: { [key: string]: string } = {
-      twitter: 'pi-twitter',
-      instagram: 'pi-instagram',
-      facebook: 'pi-facebook',
-      linkedin: 'pi-linkedin',
-      goodreads: 'pi-book'
-    };
-    return icons[platform] || 'pi-link';
-  }
-
-  getSocialUrl(platform: string, handle: string): string {
-    if (!handle) return '';
-
-    const baseUrls: { [key: string]: string } = {
-      twitter: 'https://twitter.com/',
-      instagram: 'https://instagram.com/',
-      facebook: 'https://facebook.com/',
-      linkedin: 'https://linkedin.com/in/',
-      goodreads: ''
-    };
-
-    if (platform === 'goodreads' || handle.startsWith('http')) {
-      return handle;
-    }
-
-    const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
-    return baseUrls[platform] + cleanHandle;
   }
 
   getGenreColor(genre: string): string {
@@ -264,20 +183,18 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   }
 
   navigateToEditBook(bookId: number) {
-    this.router.navigate(['/books/edit', bookId]);
+    this.router.navigate(['/books/edit-book', bookId]);
   }
 
   navigateToAddBook() {
-    this.router.navigate(['/books/add'], {
-      queryParams: { authorId: this.authorId }
-    });
+    this.router.navigate(['/books/add-book']);
   }
 
   confirmDeleteAuthor() {
-    if (!this.author) return;
+    if (!this.author?.catalogAuthor) return;
 
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${this.author.name}"? This action cannot be undone.`,
+      message: `Are you sure you want to delete "${this.author.catalogAuthor.name}"? This action cannot be undone.`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
@@ -288,7 +205,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
   }
 
   deleteAuthor() {
-    if (!this.author || !this.authorId) return;
+    if (!this.author?.catalogAuthor || !this.authorId) return;
 
     const success = this.authorService.removeAuthor(this.authorId);
 
@@ -296,7 +213,7 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'success',
         summary: 'Success',
-        detail: `Author "${this.author.name}" deleted successfully`
+        detail: `Author "${this.author.catalogAuthor.name}" deleted successfully`
       });
       this.router.navigate(['/authors']);
     } else {
@@ -308,81 +225,83 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onImageUploaded(imageUrl: string) {
-    if (this.author && this.author.id) {
-      const updatedAuthor = {
-        id: this.author.id,
-        name: this.author.name,
-        biography: this.author.biography,
-        photoUrl: imageUrl,
-        birthDate: this.author.birthDate,
-        deathDate: this.author.deathDate,
-        nationality: this.author.nationality,
-        website: this.author.website,
-        threadsUrl: this.author.threadsUrl,
-        instagramUrl: this.author.instagramUrl,
-        goodreadUrl: this.author.goodreadUrl,
-        genres: this.author.genres,
-        isActive: this.author.isActive,
-        notes: this.author.notes
-      };
+  // @TODO: Re-enable image upload when backend supports it
+  // onImageUploaded(imageUrl: string) {
+  //   if (this.author && this.author.id) {
+  //     const updatedAuthor = {
+  //       id: this.author.id,
+  //       name: this.author.name,
+  //       biography: this.author.biography,
+  //       photoUrl: imageUrl,
+  //       birthDate: this.author.birthDate,
+  //       deathDate: this.author.deathDate,
+  //       nationality: this.author.nationality,
+  //       website: this.author.website,
+  //       threadsUrl: this.author.threadsUrl,
+  //       instagramUrl: this.author.instagramUrl,
+  //       goodreadUrl: this.author.goodreadUrl,
+  //       genres: this.author.genres,
+  //       isActive: this.author.isActive,
+  //       notes: this.author.notes
+  //     };
 
-      const success = this.authorService.updateAuthor(updatedAuthor);
+  //     const success = this.authorService.updateAuthor(updatedAuthor);
 
-      if (success) {
-        this.author.photoUrl = imageUrl;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Photo Updated',
-          detail: 'Author photo has been updated successfully'
-        });
-      } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update author photo'
-        });
-      }
-    }
-  }
+  //     if (success) {
+  //       this.author.photoUrl = imageUrl;
+  //       this.messageService.add({
+  //         severity: 'success',
+  //         summary: 'Photo Updated',
+  //         detail: 'Author photo has been updated successfully'
+  //       });
+  //     } else {
+  //       this.messageService.add({
+  //         severity: 'error',
+  //         summary: 'Error',
+  //         detail: 'Failed to update author photo'
+  //       });
+  //     }
+  //   }
+  // }
 
-  onImageRemoved() {
-    if (this.author && this.author.id) {
-      const updatedAuthor = {
-        id: this.author.id,
-        name: this.author.name,
-        biography: this.author.biography,
-        photoUrl: undefined,
-        birthDate: this.author.birthDate,
-        deathDate: this.author.deathDate,
-        nationality: this.author.nationality,
-        website: this.author.website,
-        threadsUrl: this.author.threadsUrl,
-        instagramUrl: this.author.instagramUrl,
-        goodreadUrl: this.author.goodreadUrl,
-        genres: this.author.genres,
-        isActive: this.author.isActive,
-        notes: this.author.notes
-      };
+  // @TODO: Re-enable image upload when backend supports it
+  // onImageRemoved() {
+  //   if (this.author && this.author.id) {
+  //     const updatedAuthor = {
+  //       id: this.author.id,
+  //       name: this.author.name,
+  //       biography: this.author.biography,
+  //       photoUrl: undefined,
+  //       birthDate: this.author.birthDate,
+  //       deathDate: this.author.deathDate,
+  //       nationality: this.author.nationality,
+  //       website: this.author.website,
+  //       threadsUrl: this.author.threadsUrl,
+  //       instagramUrl: this.author.instagramUrl,
+  //       goodreadUrl: this.author.goodreadUrl,
+  //       genres: this.author.genres,
+  //       isActive: this.author.isActive,
+  //       notes: this.author.notes
+  //     };
 
-      const success = this.authorService.updateAuthor(updatedAuthor);
+  //     const success = this.authorService.updateAuthor(updatedAuthor);
 
-      if (success) {
-        this.author.photoUrl = undefined;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Photo Removed',
-          detail: 'Author photo has been removed successfully'
-        });
-      } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to remove author photo'
-        });
-      }
-    }
-  }
+  //     if (success) {
+  //       this.author.photoUrl = undefined;
+  //       this.messageService.add({
+  //         severity: 'success',
+  //         summary: 'Photo Removed',
+  //         detail: 'Author photo has been removed successfully'
+  //       });
+  //     } else {
+  //       this.messageService.add({
+  //         severity: 'error',
+  //         summary: 'Error',
+  //         detail: 'Failed to remove author photo'
+  //       });
+  //     }
+  //   }
+  // }
 
   /**
    * Get CSS class for preference level badge
@@ -398,17 +317,14 @@ export class AuthorDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get label for preference level
-   */
   getPreferenceLevelLabel(level: number): string {
     switch (level) {
-      case 1: return 'Not Set';
-      case 2: return 'Like';
-      case 3: return 'Love';
-      case 4: return 'Favorite';
-      case 5: return 'Top Favorite';
-      default: return 'Unknown';
+      case 1: return '💤 Not for Me';
+      case 2: return '⚖️ Neutral';
+      case 3: return '🙂 Interested';
+      case 4: return '❤️ Favorite';
+      case 5: return '💎 Top Favorite';
+      default: return '💀 Unknown';
     }
   }
 }

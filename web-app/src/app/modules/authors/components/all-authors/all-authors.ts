@@ -100,7 +100,7 @@ export class AllAuthorsComponent implements OnInit {
           this.filteredAuthors = [...this.authors];
           this.applyFilters();
           this.totalRecords = pagedData.totalElements;
-          console.log('User author preferences:', this.authors);
+          // console.log('User author preferences:', this.authors);
           this.loading = false;
         }
       },

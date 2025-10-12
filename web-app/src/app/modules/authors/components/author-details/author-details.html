@@ -52,7 +52,7 @@
                 Authors
               </button>
               <i class="pi pi-chevron-right mx-3 text-gray-400"></i>
-              <span>{{ author.name }}</span>
+              <span>{{ author.catalogAuthor?.name }}</span>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -83,11 +83,11 @@
               <app-image-upload
                 [entityType]="'author'"
                 [entityId]="author.id || 0"
-                [entityName]="author.name || ''"
-                [currentImageUrl]="author.photoUrl || null"
-                (imageUploaded)="onImageUploaded($event)"
-                (imageRemoved)="onImageRemoved()"
+                [entityName]="author.catalogAuthor?.name || 'author'"
+                [currentImageUrl]="author.catalogAuthor?.imageId || ''"
               ></app-image-upload>
+              <!-- (imageUploaded)="onImageUploaded($event)"
+                (imageRemoved)="onImageRemoved()" -->
             </div>
 
             <!-- Author Info -->
@@ -95,34 +95,36 @@
               <h1
                 class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight mb-2"
               >
-                {{ author.name }}
+                {{ author.catalogAuthor?.name }}
               </h1>
 
               <div class="flex flex-wrap items-center gap-4 mb-4">
                 <span
-                  *ngIf="author.nationality"
+                  *ngIf="author.catalogAuthor?.nationality"
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
                 >
                   <i class="pi pi-map-marker mr-2"></i>
-                  {{ author.nationality }}
+                  {{ author.catalogAuthor?.nationality }}
                 </span>
 
                 <!-- Birth Date -->
                 <span
-                  *ngIf="author.birthDate"
+                  *ngIf="author.catalogAuthor?.birthDate"
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200"
                 >
                   <i class="pi pi-calendar mr-2"></i>
-                  Born {{ author.birthDate | date : "mediumDate" }}
+                  Born
+                  {{ author.catalogAuthor?.birthDate | date : "mediumDate" }}
                 </span>
 
                 <!-- Death Date -->
                 <span
-                  *ngIf="author.deathDate"
+                  *ngIf="author.catalogAuthor?.deathDate"
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200"
                 >
                   <i class="pi pi-times-circle mr-2"></i>
-                  Died {{ author.deathDate | date : "mediumDate" }}
+                  Died
+                  {{ author.catalogAuthor?.deathDate | date : "mediumDate" }}
                 </span>
 
                 <!-- User Preference Level -->
@@ -131,7 +133,7 @@
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm"
                   [class]="getPreferenceLevelClass(author.preferenceLevel)"
                 >
-                  <i class="pi pi-star-fill mr-2"></i>
+                  
                   {{ getPreferenceLevelLabel(author.preferenceLevel) }}
                 </span>
 
@@ -153,7 +155,7 @@
                   Excluded
                 </span>
 
-                <span
+                <!-- <span
                   *ngIf="author.isActive !== undefined"
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm"
                   [class]="
@@ -170,34 +172,14 @@
                     "
                   ></i>
                   {{ author.isActive ? "Active" : "Inactive" }}
-                </span>
-              </div>
-
-              <!-- Genres -->
-              <div
-                *ngIf="author.genres && author.genres.length > 0"
-                class="mb-4"
-              >
-                <h3
-                  class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Genres:
-                </h3>
-                <div class="flex flex-wrap gap-2">
-                  <span
-                    *ngFor="let genre of author.genres"
-                    class="inline-flex items-center px-2 py-1 rounded-md text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200"
-                  >
-                    {{ genre }}
-                  </span>
-                </div>
+                </span> -->
               </div>
 
               <p
-                *ngIf="author.biography"
+                *ngIf="author.catalogAuthor?.bio"
                 class="text-gray-600 dark:text-gray-300 text-base leading-relaxed"
               >
-                {{ author.biography }}
+                {{ author.catalogAuthor?.bio }}
               </p>
             </div>
           </div>
@@ -224,7 +206,7 @@
               <div
                 class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2"
               >
-                {{ author.totalBooks || 0 }}
+                {{ author.catalogAuthor?.totalBooks || 0 }}
               </div>
               <div class="text-sm text-gray-600 dark:text-gray-400">
                 Books in Collection
@@ -235,7 +217,7 @@
               <div
                 class="text-3xl font-bold text-green-600 dark:text-green-400 mb-2"
               >
-                {{ author.averageRating?.toFixed(1) || "N/A" }}
+                {{ author.catalogAuthor?.averageRating?.toFixed(2) || "N/A" }}
               </div>
               <div class="text-sm text-gray-600 dark:text-gray-400">
                 Average Rating
@@ -246,7 +228,7 @@
               <div
                 class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2"
               >
-                {{ author.genres?.length || 0 }}
+                {{ author.catalogAuthor?.genres?.length || 0 }}
               </div>
               <div class="text-sm text-gray-600 dark:text-gray-400">Genres</div>
             </div>
@@ -255,7 +237,7 @@
 
         <!-- Genres -->
         <div
-          *ngIf="author.genres?.length"
+          *ngIf="author.catalogAuthor?.genres?.length"
           class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
         >
           <h2
@@ -267,7 +249,7 @@
 
           <div class="flex flex-wrap gap-2">
             <span
-              *ngFor="let genre of author.genres"
+              *ngFor="let genre of author.catalogAuthor?.genres"
               class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200"
             >
               {{ genre }}
@@ -278,10 +260,11 @@
         <!-- Social Links -->
         <div
           *ngIf="
-            author.website ||
-            author.threadsUrl ||
-            author.instagramUrl ||
-            author.goodreadUrl "
+            author.catalogAuthor?.website ||
+            author.catalogAuthor?.threadsUrl ||
+            author.catalogAuthor?.instagramUrl ||
+            author.catalogAuthor?.goodreadUrl
+          "
           class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
         >
           <h2
@@ -293,39 +276,41 @@
 
           <div class="flex flex-wrap gap-4">
             <button
-              *ngIf="author.website"
+              *ngIf="author.catalogAuthor?.website"
               pButton
               type="button"
               label="Website"
               icon="pi pi-external-link"
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
-              (click)="openLink(author.website!)"
+              (click)="openLink(author.catalogAuthor?.website!)"
             ></button>
 
             <button
-              *ngIf="author.threadsUrl"
+              *ngIf="author.catalogAuthor?.threadsUrl"
               pButton
               type="button"
-              label="Twitter"
-              icon="pi pi-twitter"
+              label="Threads"
+              icon="pi pi-facebook"
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
               (click)="
-                openLink('https://twitter.com/' + author.threadsUrl!)
+                openLink(
+                  'https://threads.net/' + author.catalogAuthor?.threadsUrl!
+                )
               "
             ></button>
 
             <button
-              *ngIf="author.goodreadUrl"
+              *ngIf="author.catalogAuthor?.goodreadUrl"
               pButton
               type="button"
               label="Goodreads"
               icon="pi pi-book"
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
-              (click)="openLink(author.goodreadUrl!)"
+              (click)="openLink(author.catalogAuthor?.goodreadUrl!)"
             ></button>
 
             <button
-              *ngIf="author.instagramUrl"
+              *ngIf="author.catalogAuthor?.instagramUrl"
               pButton
               type="button"
               label="Instagram"
@@ -333,12 +318,10 @@
               class="p-button-outlined p-button-sm hover:shadow-lg transition-all duration-200"
               (click)="
                 openLink(
-                  'https://instagram.com/' + author.instagramUrl!
+                  'https://instagram.com/' + author.catalogAuthor?.instagramUrl!
                 )
               "
             ></button>
-
-            
           </div>
         </div>
 
@@ -349,21 +332,23 @@
               class="text-xl font-semibold text-gray-900 dark:text-white flex items-center"
             >
               <i class="pi pi-book mr-3 text-green-600"></i>
-              Books by {{ author.name }}
+              Books by {{ author.catalogAuthor?.name }}
             </h2>
             <span class="text-sm text-gray-600 dark:text-gray-400">
-              {{ authorBooks.length }} book{{
-                authorBooks.length !== 1 ? "s" : ""
+              {{ author.catalogAuthor?.books?.length }} book{{
+                author.catalogAuthor?.books?.length !== 1 ? "s" : ""
               }}
               in your collection
             </span>
           </div>
 
           <!-- Books Grid -->
+          <!-- TODO: Replace mock data with real data from backend when available -->
           <div
             *ngIf="authorBooks.length > 0"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
+            static
             <div
               *ngFor="let book of authorBooks"
               class="group bg-white dark:bg-gray-700 rounded-xl shadow-md border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -464,6 +449,7 @@
               </div>
             </div>
           </div>
+          <!-- TODO: Replace mock data with real data from backend when available -->
 
           <!-- Empty State for Books -->
           <div *ngIf="authorBooks.length === 0" class="text-center py-12">
@@ -478,8 +464,8 @@
               No books by this author yet
             </h3>
             <p class="text-gray-600 dark:text-gray-400 mb-4">
-              You haven't added any books by {{ author.name }} to your
-              collection yet.
+              You haven't added any books by {{ author.catalogAuthor?.name }} to
+              your collection yet.
             </p>
             <button
               pButton
@@ -494,7 +480,7 @@
 
         <!-- Notes Section -->
         <div
-          *ngIf="author.notes || author.personalNotes"
+          *ngIf="author.personalNotes || author.personalNotes"
           class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6"
         >
           <h2
@@ -503,23 +489,6 @@
             <i class="pi pi-file-edit mr-3 text-green-600"></i>
             Notes
           </h2>
-
-          <!-- General Notes (from catalog or basic info) -->
-          <div *ngIf="author.notes" class="mb-6">
-            <h3
-              class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center"
-            >
-              <i class="pi pi-info-circle mr-2 text-blue-500"></i>
-              General Information
-            </h3>
-            <div
-              class="prose dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-900 rounded-lg p-4"
-            >
-              <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                {{ author.notes }}
-              </p>
-            </div>
-          </div>
 
           <!-- Personal Notes (user's own notes) -->
           <div *ngIf="author.personalNotes">

@@ -309,4 +309,10 @@ export class AuthorService {
 
     return this.http.get<UserAuthorPreferenceHttpPagedResponse>(url);
   }
+
+  getUserAuhtorPreferenceById(id: number): Observable<UserAuthorPreferenceHttpResponse> {
+    let url = `${environment.user_library_service_url}/user_author_preferences/${id}`;
+
+    return this.http.get<UserAuthorPreferenceHttpResponse>(url);
+  }
 }

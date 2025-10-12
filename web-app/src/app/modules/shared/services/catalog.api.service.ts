@@ -23,4 +23,9 @@ export class CatalogApiService {
 
     return this.http.get<CatalogAuthorHttpResponse>(url);
   }
+
+  getCatalogAuthorDetailsById(catalogAuthorId: number): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors/${catalogAuthorId}`;
+    return this.http.get<CatalogAuthorHttpResponse>(url);
+  }
 }

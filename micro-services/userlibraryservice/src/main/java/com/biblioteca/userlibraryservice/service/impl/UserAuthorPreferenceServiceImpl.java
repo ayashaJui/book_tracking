@@ -73,6 +73,24 @@ public class UserAuthorPreferenceServiceImpl implements UserAuthorPreferenceServ
         return dtos;
     }
 
+    @Override
+    public UserAuthorPreferenceDTO getUserAuthorPreferenceById(Integer id, HttpServletRequest request, Jwt jwt) {
+        log.info("getUserAuthorPreferenceById in UserAuthorPreferenceServiceImpl is called with userId: {}", id);
+
+        UserAuthorPreference authorPreference = findById(id);
+
+        return convertToDTO(authorPreference);
+    }
+
+    private UserAuthorPreference findById(Integer id){
+        log.info("getUserAuthorPreferenceById in UserAuthorPreferenceServiceImpl is called with id: {}", id);
+
+        return userAuthorPreferenceRepository.findById(id).orElseThrow(() -> {
+            log.error("Author not found with id: {}", id);
+            throw new CustomException("Author not found", INTERNAL_SERVER_ERROR.value());
+        });
+    }
+
 
     private UserAuthorPreferenceDTO convertToDTO(UserAuthorPreference userAuthorPreference) {
         return UserAuthorPreferenceMapper.toDTO(userAuthorPreference);

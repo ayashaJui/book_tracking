@@ -1364,3 +1364,9 @@ WHERE user_id = ? AND status LIKE 'wishlist_%';
 9. Future-Proof - Can easily extend with collections later
 
 ═══════════════════════════════════════════════════════════════════════════════════════
+
+
+
+Data propagation to user library db
+
+author -> authorId, name, nationality, genre, totalBooks, Average rating, bio 
