@@ -4,6 +4,7 @@ import com.biblioteca.userlibraryservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.userlibraryservice.dto.response.ResponseDTO;
 import com.biblioteca.userlibraryservice.dto.userAuthorPreferences.UserAuthorPreferenceCreateDTO;
 import com.biblioteca.userlibraryservice.dto.userAuthorPreferences.UserAuthorPreferenceDTO;
+import com.biblioteca.userlibraryservice.dto.userAuthorPreferences.UserAuthorPreferenceUpdateDTO;
 import com.biblioteca.userlibraryservice.service.UserAuthorPreferenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,12 +54,34 @@ public class UserAuthorPreferenceController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "API ID: UserAuhtorPreferences003")
+    @Operation(summary = "API ID: UserAuthorPreferences003")
     public ResponseEntity<ResponseDTO<UserAuthorPreferenceDTO>> getAuthorById(@PathVariable Integer id, HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
         log.info("getAuthorById in UserAuthorPreferenceController is called by user: {}", jwt.getSubject());
 
         UserAuthorPreferenceDTO dto = userAuthorPreferenceService.getUserAuthorPreferenceById(id, request, jwt);
 
         return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @PutMapping
+    @Operation(summary = "API ID: UserAuthorPreferences004")
+    public ResponseEntity<ResponseDTO<UserAuthorPreferenceDTO>> updateUserAuthor(@RequestBody @Valid UserAuthorPreferenceUpdateDTO updateDTO,
+                                                                                 HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
+        log.info("updateUserAuthor in UserAuthorPreferenceController is called by user: {}", jwt.getSubject());
+
+        UserAuthorPreferenceDTO dto = userAuthorPreferenceService.updateUserAuthor(updateDTO, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(dto, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "API ID: UserAuthorPreferences005")
+    public ResponseEntity<ResponseDTO<String>> deleteUserAuthor(@PathVariable Integer id, HttpServletRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt){
+        log.info("deleteUserAuthor in UserAuthorPreferenceController is called by user: {}", jwt.getSubject());
+
+        String message = userAuthorPreferenceService.deleteUserAuthorPreference(id, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(message, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
 }

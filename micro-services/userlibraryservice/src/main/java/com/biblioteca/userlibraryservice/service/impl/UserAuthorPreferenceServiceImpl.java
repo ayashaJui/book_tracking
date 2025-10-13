@@ -82,12 +82,55 @@ public class UserAuthorPreferenceServiceImpl implements UserAuthorPreferenceServ
         return convertToDTO(authorPreference);
     }
 
+    @Override
+    @Transactional
+    public UserAuthorPreferenceDTO updateUserAuthor(UserAuthorPreferenceUpdateDTO updateDTO, HttpServletRequest request, Jwt jwt) {
+        log.info("updateUserAuthor in UserAuthorPreferenceServiceImpl is called with data: {}", updateDTO.toString());
+
+        UserAuthorPreference userAuthorPreference = findById(updateDTO.getId());
+
+        UserAuthorPreference newUserAuthorPreference = fromUpdateDTO(updateDTO, userAuthorPreference);
+
+//        TODO: after propagation set catalog author
+        newUserAuthorPreference.setCatalogAuthorId(userAuthorPreference.getCatalogAuthorId());
+
+        try{
+            userAuthorPreferenceRepository.save(newUserAuthorPreference);
+            log.info("userAuthorPreference updated successfully");
+            return convertToDTO(newUserAuthorPreference);
+
+        }catch (Exception e){
+            log.error("updateUserAuthor in UserAuthorPreferenceServiceImpl exception: {}", e.getMessage());
+            throw new CustomException("Error saving user author preference", INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
+    @Override
+    @Transactional
+    public String deleteUserAuthorPreference(Integer id, HttpServletRequest request, Jwt jwt) {
+        log.info("deleteUserAuthorPreference in UserAuthorPreferenceServiceImpl is called with userId: {}", id);
+
+        UserAuthorPreference userAuthorPreference = findById(id);
+
+        try {
+            userAuthorPreferenceRepository.delete(userAuthorPreference);
+
+            log.info("userAuthorPreference delete successfully");
+
+            return "deleted successfully";
+
+        }catch (Exception e){
+            log.error("deleteUserAuthorPreference in UserAuthorPreferenceServiceImpl exception: {}", e.getMessage());
+            throw new CustomException("Error saving user author preference", INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
     private UserAuthorPreference findById(Integer id){
         log.info("getUserAuthorPreferenceById in UserAuthorPreferenceServiceImpl is called with id: {}", id);
 
         return userAuthorPreferenceRepository.findById(id).orElseThrow(() -> {
             log.error("Author not found with id: {}", id);
-            throw new CustomException("Author not found", INTERNAL_SERVER_ERROR.value());
+            return new CustomException("Author not found", INTERNAL_SERVER_ERROR.value());
         });
     }
 
