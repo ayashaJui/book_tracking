@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CatalogAuthorCreateRequestDTO } from '../../authors/models/author.model';
+import { CatalogAuthorCreateRequestDTO, CatalogAuthorUpdateRequestDTO } from '../../authors/models/author.model';
 import { Observable } from 'rxjs';
 import { CatalogAuthorHttpResponse } from '../../authors/models/response.model';
 import { environment } from '../../../../environments/environment';
@@ -27,5 +27,11 @@ export class CatalogApiService {
   getCatalogAuthorDetailsById(catalogAuthorId: number): Observable<CatalogAuthorHttpResponse> {
     let url = `${environment.catalog_service_url}/authors/${catalogAuthorId}`;
     return this.http.get<CatalogAuthorHttpResponse>(url);
+  }
+
+  updateCatalogAuthor(catalogAuthorData: CatalogAuthorUpdateRequestDTO): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors`;
+
+    return this.http.put<CatalogAuthorHttpResponse>(url, catalogAuthorData);
   }
 }

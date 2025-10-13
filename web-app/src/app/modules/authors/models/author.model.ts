@@ -76,6 +76,16 @@ export interface AuthorCreateRequestDTO {
   personalNotes: string;
 }
 
+export interface AuthorUpdateRequestDTO {
+  id: number;
+  userId: number;
+  catalogAuthorId?: number;
+  preferenceLevel: number;
+  isFavorite: boolean;
+  isExcluded: boolean;
+  personalNotes: string;
+}
+
 export interface CatalogAuthorCreateRequestDTO {
   name: string;
   bio: string;
@@ -88,8 +98,17 @@ export interface CatalogAuthorCreateRequestDTO {
   goodreadUrl: string;
 }
 
-export interface AuthorUpdateRequest extends AuthorCreateRequest {
+export interface CatalogAuthorUpdateRequestDTO {
   id: number;
+  name: string;
+  bio: string;
+  birthDate: string;
+  deathDate: string;
+  nationality: string;
+  website: string;
+  instagramUrl: string;
+  threadsUrl: string;
+  goodreadUrl: string;
 }
 
 export interface UserAuthorPreferenceDTO {

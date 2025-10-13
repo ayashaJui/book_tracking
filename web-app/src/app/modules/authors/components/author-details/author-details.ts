@@ -28,7 +28,6 @@ export class AuthorDetailsComponent implements OnInit {
     private authorService: AuthorService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private imageService: ImageService,
     private uiService: UiService, private catalogApiService: CatalogApiService
@@ -207,22 +206,20 @@ export class AuthorDetailsComponent implements OnInit {
   deleteAuthor() {
     if (!this.author?.catalogAuthor || !this.authorId) return;
 
-    const success = this.authorService.removeAuthor(this.authorId);
+    console.log(this.author, this.authorId);
 
-    if (success) {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: `Author "${this.author.catalogAuthor.name}" deleted successfully`
-      });
-      this.router.navigate(['/authors']);
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete author'
-      });
-    }
+    this.authorService.deleteUserAuthorPreference(this.authorId).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.uiService.setCustomSuccess('Success', `Author "${this.author?.catalogAuthor?.name}" deleted successfully`);
+          this.router.navigate(['/authors']);
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting author:', error);
+        this.uiService.setCustomError('Error', error.message || 'Failed to delete author');
+      }
+    });
   }
 
   // @TODO: Re-enable image upload when backend supports it
@@ -303,9 +300,6 @@ export class AuthorDetailsComponent implements OnInit {
   //   }
   // }
 
-  /**
-   * Get CSS class for preference level badge
-   */
   getPreferenceLevelClass(level: number): string {
     switch (level) {
       case 1: return 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200';

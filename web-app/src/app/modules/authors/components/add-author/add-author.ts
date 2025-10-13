@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Author, AuthorCreateRequestDTO, CatalogAuthorCreateRequestDTO } from '../../models/author.model';
+import { AuthorCreateRequestDTO, AuthorUpdateRequestDTO, CatalogAuthorCreateRequestDTO, CatalogAuthorUpdateRequestDTO } from '../../models/author.model';
 import { AuthorService } from '../../services/author.service';
-import { CatalogService } from '../../../shared/services/catalog.service';
 import {
   CatalogSearchResult
 } from '../../../shared/models/catalog.model';
@@ -22,16 +21,16 @@ export class AddAuthorComponent implements OnInit {
   authorId: number | null = null;
   loading = false;
   submitting = false;
+  userAuthorPreference: any = null;
+  catalogAuthor: any = null;
 
-  // Date constraints
   today = new Date();
 
-  // Catalog search properties
   catalogSearchPerformed = false;
   selectedCatalogAuthor: CatalogSearchResult | null = null;
-  isFromCatalog = false; // Track if author is from catalog
+  isFromCatalog = false;
 
-  // Preference level options
+
   preferenceLevelOptions = [
     { label: '💤 Not for Me', value: 1 },
     { label: '⚖️ Neutral', value: 2 },
@@ -50,7 +49,6 @@ export class AddAuthorComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Check if we're in edit mode
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -64,37 +62,49 @@ export class AddAuthorComponent implements OnInit {
     if (!this.authorId) return;
 
     this.loading = true;
-    const author = this.authorService.getAuthorById(this.authorId);
 
-    if (author) {
-      // Track if this author is from catalog
-      this.isFromCatalog = author.isFromCatalog || false;
+    this.authorService.getUserAuhtorPreferenceById(this.authorId).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.userAuthorPreference = response.data;
 
-      this.authorService.authorForm.patchValue({
-        name: author.name,
-        biography: author.biography || '',
-        birthDate: author.birthDate || null,
-        deathDate: author.deathDate || null,
-        nationality: author.nationality || '',
-        website: author.website || '',
-        threadsUrl: author.threadsUrl || '',
-        instagramUrl: author.instagramUrl || '',
-        goodreadUrl: author.goodreadUrl || '',
-        isActive: author.isActive !== false,
-        notes: author.notes || '',
-        // User preference fields
-        preferenceLevel: author.preferenceLevel || 1,
-        isFavorite: author.isFavorite || false,
-        isExcluded: author.isExcluded || false,
-        personalNotes: author.personalNotes || ''
-      });
-    } else {
-      this.uiService.setCustomError('Error', 'Author not found');
-      this.router.navigate(['/authors']);
+          this.catalogApiService.getCatalogAuthorDetailsById(this.userAuthorPreference.catalogAuthorId).subscribe({
+            next: (catalogResponse) => {
+              if (catalogResponse.data) {
+                this.catalogAuthor = catalogResponse.data;
+                console.log('Catalog Author:', this.catalogAuthor);
 
-      // Update field states based on catalog status
-      this.updateFieldsEnabledState();
-    }
+                this.authorService.authorForm.patchValue({
+                  name: this.catalogAuthor.name,
+                  nationality: this.catalogAuthor.nationality || '',
+                  bio: this.catalogAuthor.bio || '',
+                  birthDate: this.catalogAuthor.birthDate ? new Date(this.catalogAuthor.birthDate) : null,
+                  deathDate: this.catalogAuthor.deathDate ? new Date(this.catalogAuthor.deathDate) : null,
+                  website: this.catalogAuthor.website || '',
+                  instagramUrl: this.catalogAuthor.instagramUrl || '',
+                  threadsUrl: this.catalogAuthor.threadsUrl || '',
+                  goodreadUrl: this.catalogAuthor.goodreadUrl || '',
+
+
+                  preferenceLevel: this.userAuthorPreference.preferenceLevel || 1,
+                  isFavorite: this.userAuthorPreference.isFavorite || false,
+                  isExcluded: this.userAuthorPreference.isExcluded || false,
+                  personalNotes: this.userAuthorPreference.personalNotes || ''
+                });
+              }
+            },
+            error: (error) => {
+              console.error('Error fetching catalog author:', error);
+            }
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching author:', error);
+        this.uiService.setCustomError('Error', 'Failed to load author details');
+        this.router.navigate(['/authors']);
+      }
+    })
 
     this.loading = false;
   }
@@ -110,7 +120,7 @@ export class AddAuthorComponent implements OnInit {
 
     try {
       if (this.isEditMode) {
-        // this.updateAuthor(formValue);
+        this.updateAuthor(formValue);
       } else {
         this.createAuthor(formValue, this.isFromCatalog);
       }
@@ -145,7 +155,7 @@ export class AddAuthorComponent implements OnInit {
         goodreadUrl: formValue.goodreadUrl?.trim() || '',
         threadsUrl: formValue.threadsUrl?.trim() || ''
       }
-      
+
       this.catalogApiService.createCatalogAuthor(catalogAuthorData).subscribe({
         next: (response) => {
           if (response.data) {
@@ -190,45 +200,59 @@ export class AddAuthorComponent implements OnInit {
     });
   }
 
-  // updateAuthor(formValue: any) {
-  //   if (!this.authorId) return;
+  updateAuthor(formValue: any) {
+    if (!this.authorId) return;
 
-  //   const authorData: AuthorUpdateRequest = {
-  //     id: this.authorId,
-  //     name: formValue.name.trim(),
-  //     biography: formValue.biography?.trim(),
-  //     photoUrl: formValue.photoUrl?.trim(),
-  //     birthDate: formValue.birthDate,
-  //     deathDate: formValue.deathDate,
-  //     nationality: formValue.nationality,
-  //     website: formValue.website?.trim(),
-  //     // socialLinks: this.cleanSocialLinks(formValue.socialLinks),
-  //     genres: formValue.genres || [],
-  //     isActive: formValue.isActive,
-  //     notes: formValue.notes?.trim(),
-  //     // User preference fields
-  //     preferenceLevel: formValue.preferenceLevel || 1,
-  //     isFavorite: formValue.isFavorite || false,
-  //     isExcluded: formValue.isExcluded || false,
-  //     personalNotes: formValue.personalNotes?.trim() || '',
-  //     isFromCatalog: this.isFromCatalog
-  //   };
+    let catalogAuthorData: CatalogAuthorUpdateRequestDTO = {
+      id: this.catalogAuthor ? this.catalogAuthor.id : 0,
+      name: formValue.name.trim(),
+      bio: formValue.bio?.trim() || '',
+      birthDate: formValue.birthDate ? formValue.birthDate.toISOString().split('T')[0] : '',
+      deathDate: formValue.deathDate ? formValue.deathDate.toISOString().split('T')[0] : '',
+      nationality: formValue.nationality?.trim() || '',
+      website: formValue.website?.trim() || '',
+      instagramUrl: formValue.instagramUrl?.trim() || '',
+      goodreadUrl: formValue.goodreadUrl?.trim() || '',
+      threadsUrl: formValue.threadsUrl?.trim() || ''
+    }
 
-  //   const success = this.authorService.updateAuthor(authorData);
+    const authorData: AuthorUpdateRequestDTO = {
+      id: this.authorId,
+      userId: localStorage.getItem('userId') ? +localStorage.getItem('userId')! : 0,
+      catalogAuthorId: this.catalogAuthor ? this.catalogAuthor.id : 0,
+      preferenceLevel: formValue.preferenceLevel.value || 1,
+      isFavorite: formValue.isFavorite || false,
+      isExcluded: formValue.isExcluded || false,
+      personalNotes: formValue.personalNotes?.trim() || '',
+    };
 
-  //   if (success) {
-  //     this.messageService.add({
-  //       severity: 'success',
-  //       summary: 'Success',
-  //       detail: `Author "${authorData.name}" updated successfully`
-  //     });
+    this.catalogApiService.updateCatalogAuthor(catalogAuthorData).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.uiService.setCustomSuccess('Success', 'Catalog Author updated successfully');
+          this.router.navigate(['/authors']);
+        }
+      },
+      error: (error) => {
+        console.error('Error updating catalog author:', error);
+        this.uiService.setCustomError('Error', 'Failed to update catalog author');
+      }
+    });
 
-  //     this.submitting = false;
-  //     this.router.navigate(['/authors']);
-  //   } else {
-  //     throw new Error('Failed to update author');
-  //   }
-  // }
+    this.authorService.updateUserAuthorPreference(authorData).subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.uiService.setCustomSuccess('Success', 'Author preferences updated successfully');
+          this.submitting = false;
+          this.router.navigate(['/authors']);
+        }
+      },
+      error: (error) => {
+        console.error('Error updating user author preferences:', error);
+        this.uiService.setCustomError('Error', 'Failed to update author preferences');
+      }
+    });
+  }
 
 
 
@@ -275,9 +299,8 @@ export class AddAuthorComponent implements OnInit {
     console.log('Catalog Author Selected:', author);
     if (author.type === 'author') {
       this.selectedCatalogAuthor = author;
-      this.isFromCatalog = true; // Mark as from catalog
+      this.isFromCatalog = true;
 
-      // Pre-fill form with catalog data
       this.authorService.authorForm.patchValue({
         ...author,
         birthDate: author.birthDate ? new Date(author.birthDate) : null,
@@ -292,7 +315,7 @@ export class AddAuthorComponent implements OnInit {
   }
 
   onCreateNewFromCatalog(searchTerm: string) {
-    this.isFromCatalog = false; // Mark as not from catalog
+    this.isFromCatalog = false;
     this.updateFieldsEnabledState();
     this.proceedWithNewAuthor(searchTerm);
   }
@@ -310,7 +333,6 @@ export class AddAuthorComponent implements OnInit {
     const catalogFields = ['name', 'bio', 'birthDate', 'deathDate', 'nationality', 'website', 'instagramUrl', 'goodreadUrl', 'threadsUrl'];
 
     if (this.isFromCatalog) {
-      // Disable catalog fields if author is from catalog
       catalogFields.forEach(field => {
         const control = this.authorService.authorForm.get(field);
         if (control) {
@@ -318,7 +340,6 @@ export class AddAuthorComponent implements OnInit {
         }
       });
     } else {
-      // Enable all fields if not from catalog
       catalogFields.forEach(field => {
         const control = this.authorService.authorForm.get(field);
         if (control) {

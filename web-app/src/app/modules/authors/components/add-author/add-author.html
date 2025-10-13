@@ -83,7 +83,7 @@
       >
         <form [formGroup]="authorService.authorForm" class="p-8 space-y-8">
           <!-- Catalog Search Section -->
-          <div class="space-y-6">
+          <div class="space-y-6" *ngIf="!isEditMode">
             <div
               class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
             >
@@ -155,7 +155,7 @@
                   class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
                 >
                   <i class="pi pi-user text-indigo-500 mr-2"></i>
-                  Author Name *
+                  Author Name <span class="text-red-500">*</span>
                 </label>
                 <input
                   pInputText
@@ -275,12 +275,12 @@
                   class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
                 >
                   <i class="pi pi-star text-purple-500 mr-2"></i>
-                  Preference Level
+                  Preference Level <span class="text-red-500">*</span>
                 </label>
                 <p-select
                   [options]="preferenceLevelOptions"
                   formControlName="preferenceLevel"
-                  optionLabel="label"
+                  optionLabel="label" optionValue="value"
                   placeholder="Select a Preference Level"
                   class="w-full"
                 />

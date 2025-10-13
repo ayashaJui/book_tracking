@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Author, AuthorStats, AuthorCreateRequestDTO, AuthorCreateRequest, AuthorUpdateRequest, CatalogAuthorCreateRequestDTO } from '../models/author.model';
+import { Author, AuthorStats, AuthorCreateRequestDTO, AuthorCreateRequest, CatalogAuthorCreateRequestDTO, AuthorUpdateRequestDTO } from '../models/author.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CatalogAuthorHttpResponse, UserAuthorPreferenceHttpPagedResponse, UserAuthorPreferenceHttpResponse } from '../models/response.model';
 import { environment } from '../../../../environments/environment';
@@ -166,37 +166,37 @@ export class AuthorService {
   }
 
   // Update author
-  updateAuthor(authorData: AuthorUpdateRequest): boolean {
-    const currentAuthors = this.authorsSubject.value;
-    const authorIndex = currentAuthors.findIndex((author) => author.id === authorData.id);
+  // updateAuthor(authorData: AuthorUpdateRequest): boolean {
+  //   const currentAuthors = this.authorsSubject.value;
+  //   const authorIndex = currentAuthors.findIndex((author) => author.id === authorData.id);
 
-    if (authorIndex === -1) {
-      return false;
-    }
+  //   if (authorIndex === -1) {
+  //     return false;
+  //   }
 
-    // Check if new name already exists (excluding current author)
-    const existingAuthor = currentAuthors.find(
-      (author) =>
-        author.id !== authorData.id &&
-        author.name.toLowerCase() === authorData.name.toLowerCase()
-    );
+  //   // Check if new name already exists (excluding current author)
+  //   const existingAuthor = currentAuthors.find(
+  //     (author) =>
+  //       author.id !== authorData.id &&
+  //       author.name.toLowerCase() === authorData.name.toLowerCase()
+  //   );
 
-    if (existingAuthor) {
-      throw new Error(`Author "${authorData.name}" already exists`);
-    }
+  //   if (existingAuthor) {
+  //     throw new Error(`Author "${authorData.name}" already exists`);
+  //   }
 
-    const updatedAuthors = [...currentAuthors];
-    updatedAuthors[authorIndex] = {
-      ...updatedAuthors[authorIndex],
-      ...authorData,
-      name: authorData.name.trim(),
-      updatedAt: new Date(),
-    };
+  //   const updatedAuthors = [...currentAuthors];
+  //   updatedAuthors[authorIndex] = {
+  //     ...updatedAuthors[authorIndex],
+  //     ...authorData,
+  //     name: authorData.name.trim(),
+  //     updatedAt: new Date(),
+  //   };
 
-    this.authorsSubject.next(updatedAuthors);
+  //   this.authorsSubject.next(updatedAuthors);
 
-    return true;
-  }
+  //   return true;
+  // }
 
   // Remove author
   removeAuthor(id: number): boolean {
@@ -314,5 +314,17 @@ export class AuthorService {
     let url = `${environment.user_library_service_url}/user_author_preferences/${id}`;
 
     return this.http.get<UserAuthorPreferenceHttpResponse>(url);
+  }
+
+  updateUserAuthorPreference(authorData: AuthorUpdateRequestDTO): Observable<UserAuthorPreferenceHttpResponse> {
+    let url = `${environment.user_library_service_url}/user_author_preferences`;
+
+    return this.http.put<UserAuthorPreferenceHttpResponse>(url, authorData);
+  }
+
+  deleteUserAuthorPreference(id: number): Observable<UserAuthorPreferenceHttpResponse> {
+    let url = `${environment.user_library_service_url}/user_author_preferences/${id}`;
+    
+    return this.http.delete<UserAuthorPreferenceHttpResponse>(url);
   }
 }

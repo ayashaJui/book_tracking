@@ -19,6 +19,7 @@ export class AllAuthorsComponent implements OnInit {
   authors: UserAuthorPreferenceDTO[] = [];
   filteredAuthors: UserAuthorPreferenceDTO[] = [];
   loading = false;
+  userId: number = 0;
   // pagedAuthors
 
   // Search and filtering
@@ -48,25 +49,18 @@ export class AllAuthorsComponent implements OnInit {
 
   constructor(
     private authorService: AuthorService,
-    private router: Router,
-    private messageService: MessageService, private catalogApiService: CatalogApiService,
+    private router: Router, private catalogApiService: CatalogApiService,
     private confirmationService: ConfirmationService, private uiService: UiService
   ) { }
 
   ngOnInit() {
-    let userId = localStorage.getItem('userId');
+    this.userId = parseInt(localStorage.getItem('userId') || '0');
 
-    if (userId) {
-      this.loadAuthors(parseInt(userId));
+    if (this.userId) {
+      this.loadAuthors(this.userId);
     }
     // this.extractGenreOptions();
   }
-
-  // ngOnDestroy() {
-  //   if (this.authorsSubscription) {
-  //     this.authorsSubscription.unsubscribe();
-  //   }
-  // }
 
   loadAuthors(userId: number) {
     this.loading = true;
@@ -226,22 +220,20 @@ export class AllAuthorsComponent implements OnInit {
     });
   }
 
-  deleteAuthor(author: Author) {
-    const success = this.authorService.removeAuthor(author.id!);
+  deleteAuthor(author: UserAuthorPreferenceDTO) { 
+    this.authorService.deleteUserAuthorPreference(author.id!).subscribe({
+      next: (response) => {
+        if(response.data){
+          this.uiService.setCustomSuccess('Success', `Author ${author?.catalogAuthor?.name} deleted successfully`);
 
-    if (success) {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: `Author "${author.name}" deleted successfully`
-      });
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete author'
-      });
-    }
+          this.loadAuthors(this.userId);
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting author preference:', error);
+        this.uiService.setCustomError('Error', error.message || 'Failed to delete author preference');
+      }
+    })
   }
 
   // Utility methods
