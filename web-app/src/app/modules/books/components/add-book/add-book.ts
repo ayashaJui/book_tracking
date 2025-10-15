@@ -733,4 +733,10 @@ export class AddBook implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+
+  onGenrePreferenceUpdated(preference: any) {
+    console.log('Genre preference updated:', preference);
+    // Optionally show a success message or handle the preference update
+    // The preference is automatically saved by the genre selector component
+  }
 }

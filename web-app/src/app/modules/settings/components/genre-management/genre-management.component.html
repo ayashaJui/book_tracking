@@ -1,0 +1,855 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg"
+        >
+          <i class="pi pi-tags text-white text-xl"></i>
+        </div>
+        <div>
+          <h1
+            class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white tracking-tight"
+          >
+            Genre Management
+          </h1>
+          <p class="text-gray-600 dark:text-gray-300 text-sm lg:text-base mt-1">
+            Manage catalog genres and user preferences
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New Genre Card -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+          <i class="pi pi-plus-circle text-green-600 mr-2"></i>
+          Add New Genre
+        </h2>
+      </div>
+
+      <!-- Catalog Search Section -->
+      <div class="space-y-6">
+        <div
+          class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
+        >
+          <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+            <i class="pi pi-search text-blue-600 dark:text-blue-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Search Catalog First
+          </h3>
+        </div>
+
+        <div
+          class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+        >
+          <p class="text-blue-800 dark:text-blue-300 text-sm mb-4">
+            <i class="pi pi-info-circle mr-2"></i>
+            Search our catalog first to avoid creating duplicate genres. If the
+            genre doesn't exist, you can create a new one.
+          </p>
+
+          <app-catalog-search
+            searchType="genre"
+            placeholder="Search for genres..."
+            (itemSelected)="onCatalogGenreSelected($event)"
+            (createNewClicked)="onCreateNewFromCatalog($event)"
+            (searchPerformed)="catalogSearchPerformed = true"
+          >
+          </app-catalog-search>
+        </div>
+      </div>
+
+      <!-- Catalog Genre Info -->
+      <div
+        *ngIf="isFromCatalog && showGenreForm"
+        class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg mt-3 p-4 mb-6"
+      >
+        <div class="flex items-center gap-2">
+          <i class="pi pi-info-circle text-amber-600"></i>
+          <p class="text-amber-800 dark:text-amber-300 text-sm font-medium">
+            Catalog Genre Selected
+          </p>
+        </div>
+        <p class="text-amber-700 dark:text-amber-400 text-sm mt-1">
+          This genre's basic information comes from our catalog and cannot be
+          edited. You can still customize your personal preferences and notes
+          below.
+        </p>
+      </div>
+
+      <form
+        [formGroup]="genreService.genreForm"
+        (ngSubmit)="addGenre()"
+        class="space-y-6"
+        *ngIf="showGenreForm"
+      >
+        <!-- Basic Information Section -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+          <h3
+            class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-info-circle text-blue-600 mr-2"></i>
+            Basic Information
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Name Field -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+              >
+                Genre Name <span class="text-red-500">*</span>
+                <i
+                  *ngIf="isFromCatalog"
+                  class="pi pi-lock text-gray-500 text-xs"
+                  pTooltip="This field cannot be modified for catalog genres"
+                ></i>
+              </label>
+              <input
+                type="text"
+                formControlName="name"
+                placeholder="e.g., Epic Fantasy, Space Opera"
+                [class]="
+                  'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                  (isFromCatalog
+                    ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100')
+                "
+                maxlength="50"
+              />
+              <small
+                class="text-red-500 mt-1 block"
+                *ngIf="genreService.genreForm.get('name')?.errors?.['required'] && genreService.genreForm.get('name')?.touched"
+              >
+                Name is required
+              </small>
+              <small
+                class="text-red-500 mt-1 block"
+                *ngIf="genreService.genreForm.get('name')?.errors?.['duplicate']"
+              >
+                Genre "{{ genreService.genreForm.get("name")?.value }}" already
+                exists
+              </small>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+              >
+                Description
+                <i
+                  *ngIf="isFromCatalog"
+                  class="pi pi-lock text-gray-500 text-xs"
+                  pTooltip="This field cannot be modified for catalog genres"
+                ></i>
+              </label>
+              <textarea
+                formControlName="description"
+                placeholder="Describe what makes this genre unique..."
+                [class]="
+                  'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                  (isFromCatalog
+                    ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100')
+                "
+                maxlength="200"
+              ></textarea>
+              <small class="text-gray-500 mt-1 block">
+                {{
+                  genreService.genreForm.get("description")?.value?.length || 0
+                }}/200 characters
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hierarchy & Status Section -->
+        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+          <h3
+            class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-sitemap text-purple-600 mr-2"></i>
+            Hierarchy & Status
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Parent Genre -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+              >
+                Parent Genre
+                <i
+                  *ngIf="isFromCatalog"
+                  class="pi pi-lock text-gray-500 text-xs"
+                  pTooltip="This field cannot be modified for catalog genres"
+                ></i>
+              </label>
+              <select
+                formControlName="parentGenreId"
+                [class]="
+                  'w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                  (isFromCatalog
+                    ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100')
+                "
+              >
+                <option value="">None (Root Genre)</option>
+                <option
+                  *ngFor="let option of parentGenreOptions"
+                  [value]="option.id"
+                >
+                  {{ option.name }}
+                </option>
+              </select>
+              <small class="text-gray-500 mt-1 block">
+                <i class="pi pi-info-circle mr-1"></i>
+                Create sub-genre under existing genre or leave empty for root
+                genre
+              </small>
+            </div>
+
+            <!-- Active Status -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+              >
+                Status
+                <i
+                  *ngIf="isFromCatalog"
+                  class="pi pi-lock text-gray-500 text-xs"
+                  pTooltip="This field cannot be modified for catalog genres"
+                ></i>
+              </label>
+              <div class="flex items-center gap-3 mt-3">
+                <label
+                  [class]="
+                    'flex items-center ' +
+                    (isFromCatalog
+                      ? 'cursor-not-allowed opacity-60'
+                      : 'cursor-pointer')
+                  "
+                >
+                  <p-checkbox
+                    formControlName="isActive"
+                    binary="true"
+                    inputId="isActive"
+                  ></p-checkbox>
+                  <span
+                    class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Active Genre
+                  </span>
+                </label>
+              </div>
+              <small class="text-gray-500 mt-1 block">
+                Inactive genres won't appear in selection lists
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Preference Section -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+          <h3
+            class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+          >
+            <i class="pi pi-star text-yellow-600 mr-2"></i>
+            Default User Preference
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Preference Level -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Default Preference Level <span class="text-red-500">*</span>
+              </label>
+              <p-select
+                [options]="preferenceLevelOptions"
+                optionValue="value"
+                optionLabel="label"
+                formControlName="preferenceLevel"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+              </p-select>
+              <small class="text-gray-500 mt-1 block">
+                <i class="pi pi-info-circle mr-1"></i>
+                How much users typically like this genre - Required
+              </small>
+            </div>
+
+            <!-- User Options -->
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Default User Settings
+              </label>
+              <div class="space-y-3 mt-3">
+                <label class="flex items-center cursor-pointer">
+                  <p-checkbox
+                    formControlName="isExcluded"
+                    binary="true"
+                    inputId="isExcluded"
+                  ></p-checkbox>
+                  <span
+                    class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <i class="pi pi-ban text-red-500 mr-1"></i>
+                    Exclude from recommendations
+                  </span>
+                </label>
+              </div>
+              <small class="text-gray-500 mt-1 block">
+                Default settings for new users
+              </small>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mt-4">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Default Notes
+            </label>
+            <textarea
+              formControlName="notes"
+              placeholder="Add default notes about this genre preference..."
+              rows="2"
+              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              maxlength="150"
+            ></textarea>
+            <small class="text-gray-500 mt-1 block">
+              {{ genreService.genreForm.get("notes")?.value?.length || 0 }}/150
+              characters
+            </small>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div
+          class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600"
+        >
+          <small class="text-gray-500 text-xs flex items-center">
+            <i class="pi pi-info-circle mr-1"></i>
+            Fields marked with * are required
+          </small>
+          <div class="flex items-center gap-3">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-times"
+              label="Cancel"
+              class="p-button-outlined p-button-secondary"
+              (click)="cancelAdd()"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              icon="pi pi-plus"
+              label="Create Genre"
+              class="p-button-success p-button-raised"
+              [disabled]="!genreService.genreForm.valid"
+            ></button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Genres List -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+          <i class="pi pi-list text-blue-600 mr-2"></i>
+          All Genres ({{ genres.length }})
+        </h2>
+
+        <!-- Search and View Toggle -->
+        <div class="flex items-center gap-4">
+          <p-button
+            type="button"
+            icon="pi pi-table"
+            styleClass="p-button-outlined p-button-sm"
+            (click)="toggleView()"
+            [label]="viewMode === 'cards' ? 'Table View' : 'Card View'"
+          ></p-button>
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Search genres..."
+              class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <i
+              class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            ></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card View -->
+      <div
+        *ngIf="viewMode === 'cards' && filteredGenres.length > 0"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      >
+        <div
+          *ngFor="let genre of filteredGenres"
+          class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all duration-200 group"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-gray-800 dark:text-white">
+                {{ genre?.catalogGenre?.name }}
+              </span>
+              <i
+                *ngIf="!genre.catalogGenre?.isActive"
+                class="pi pi-ban text-red-500 text-xs"
+                pTooltip="Inactive"
+              ></i>
+              <i
+                *ngIf="genre.catalogGenre?.parentGenreId"
+                class="pi pi-arrow-right text-blue-500 text-xs"
+                pTooltip="Sub-genre"
+              ></i>
+            </div>
+            <div
+              class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-text p-button-sm p-button-rounded"
+                (click)="editGenre(genre)"
+                pTooltip="Edit genre"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-text p-button-sm p-button-rounded p-button-danger"
+                (click)="confirmDeleteGenre(genre)"
+                pTooltip="Delete genre"
+              ></button>
+            </div>
+          </div>
+
+          <p
+            *ngIf="genre.catalogGenre?.description"
+            class="text-sm text-gray-600 dark:text-gray-400 mb-2"
+          >
+            {{ genre.catalogGenre?.description }}
+          </p>
+
+          <div class="space-y-1 text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center justify-between">
+              <span>Preference:</span>
+              <div class="flex items-center gap-1">
+                <span>{{ genre.preferenceLevel || 0 }}/5</span>
+                <div class="flex">
+                  <i
+                    *ngFor="let star of [1, 2, 3, 4, 5]"
+                    [class]="
+                      star <= (genre.preferenceLevel || 0)
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'
+                    "
+                    class="pi pi-star-fill text-xs"
+                  ></i>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Excluded:</span>
+              <div class="flex items-center gap-1">
+                <span>{{ genre.isExcluded ? "Yes" : "No" }}</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Parent:</span>
+              <span>{{
+                getParentGenreName(genre.catalogGenre?.parentGenreId) || "None"
+              }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Created:</span>
+              <span>{{ genre.createdAt | date : "short" }}</span>
+            </div>
+            <p
+              *ngIf="genre.notes"
+              class="text-sm text-gray-600 dark:text-gray-400 my-3"
+            >
+              <i class="pi pi-paperclip"></i>
+              {{ genre.notes }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div
+        *ngIf="viewMode === 'table' && filteredGenres.length > 0"
+        class="overflow-x-auto"
+      >
+        <table class="w-full text-sm text-left">
+          <thead class="text-xs uppercase bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th class="px-4 py-3">Name</th>
+              <th class="px-4 py-3">Description</th>
+              <th class="px-4 py-3">Parent</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Preference</th>
+              <th class="px-4 py-3">Excluded</th>
+              <th class="px-4 py-3">Notes</th>
+              <th class="px-4 py-3">Created</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let genre of filteredGenres"
+              class="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              <td class="px-4 py-3 font-medium">
+                <div class="flex items-center gap-2">
+                  {{ genre.catalogGenre?.name }}
+                  <i
+                    *ngIf="genre.catalogGenre?.parentGenreId"
+                    class="pi pi-arrow-right text-blue-500 text-xs"
+                    pTooltip="Sub-genre"
+                  ></i>
+                </div>
+              </td>
+              <td class="px-4 py-3 max-w-xs">
+                <span
+                  class="truncate"
+                  [pTooltip]="genre.catalogGenre?.description"
+                >
+                  {{ genre.catalogGenre?.description || "-" }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                {{
+                  getParentGenreName(genre.catalogGenre?.parentGenreId) || "-"
+                }}
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  [class]="
+                    genre.catalogGenre?.isActive
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                  "
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                >
+                  {{ genre.catalogGenre?.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <span>{{ genre.preferenceLevel || 0 }}/5</span>
+                  <div class="flex">
+                    <i
+                      *ngFor="let star of [1, 2, 3, 4, 5]"
+                      [class]="
+                        star <= (genre.preferenceLevel || 0)
+                          ? 'text-yellow-400'
+                          : 'text-gray-300'
+                      "
+                      class="pi pi-star-fill text-xs"
+                    ></i>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  *ngIf="genre.isExcluded"
+                  class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full text-xs font-medium"
+                >
+                  Excluded
+                </span>
+                <span *ngIf="!genre.isExcluded" class="text-gray-400">-</span>
+              </td>
+              <td class="px-4 py-3 max-w-xs">
+                <span class="truncate" [pTooltip]="genre.notes">
+                  {{ genre.notes || "-" }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-xs">
+                {{ genre.createdAt | date : "short" }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-pencil"
+                    class="p-button-text p-button-sm p-button-rounded"
+                    (click)="editGenre(genre)"
+                    pTooltip="Edit"
+                  ></button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    class="p-button-text p-button-sm p-button-rounded p-button-danger"
+                    (click)="confirmDeleteGenre(genre)"
+                    pTooltip="Delete"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredGenres.length === 0" class="text-center py-12">
+        <div
+          class="w-24 h-24 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <i class="pi pi-search text-white text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+          {{ searchTerm ? "No matching genres found" : "No genres available" }}
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          {{
+            searchTerm
+              ? "Try adjusting your search terms."
+              : "Start by adding your first genre above!"
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Genre Dialog -->
+<p-dialog
+  [header]="'Edit Genre'"
+  [(visible)]="showEditDialog"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '700px', maxWidth: '95vw' }"
+  styleClass="rounded-xl overflow-hidden"
+>
+
+  <form
+    [formGroup]="genreService.genreForm"
+    (ngSubmit)="saveEdit()"
+    class="space-y-6"
+    *ngIf="editingGenre"
+  >
+    <!-- Basic Information Section -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+      <h3
+        class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+      >
+        <i class="pi pi-info-circle text-blue-600 mr-2"></i>
+        Basic Information
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Name -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+          >
+            Genre Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            pInputText
+            class="w-full"
+            type="text"
+            formControlName="name"
+            placeholder="Enter genre name"
+            maxlength="50"
+          />
+          <small
+            class="text-red-500 mt-1 block"
+            *ngIf="genreService.genreForm.get('name')?.errors?.['duplicate']"
+          >
+            Genre "{{ genreService.genreForm.get("name")?.value }}" already
+            exists
+          </small>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+          >
+            Description
+          </label>
+          <textarea
+            pInputTextarea
+            class="w-full"
+            formControlName="description"
+            placeholder="Enter description"
+            maxlength="200"
+          ></textarea>
+          <small class="text-gray-500 mt-1 block">
+            {{
+              genreService.genreForm.get("description")?.value?.length || 0
+            }}/200 characters
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hierarchy & Status Section -->
+    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+      <h3
+        class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+      >
+        <i class="pi pi-sitemap text-purple-600 mr-2"></i>
+        Hierarchy & Status
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Parent Genre -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+          >
+            Parent Genre
+          </label>
+          <p-select
+            formControlName="parentGenreId"
+            class="w-full"
+            [options]="parentGenreOptions"
+            optionValue="id"
+            optionLabel="name"
+            placeholder="Select Parent Genre"
+          >
+          </p-select>
+        </div>
+
+        <!-- Status Checkboxes -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2"
+          >
+            Status Options
+          </label>
+          <div class="space-y-3 mt-3">
+            <label>
+              <p-checkbox
+                formControlName="isActive"
+                binary="true"
+                inputId="editIsActive"
+              ></p-checkbox>
+              <span
+                class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Active Genre
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Preference Section -->
+    <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+      <h3
+        class="text-lg font-medium text-gray-800 dark:text-white mb-4 flex items-center"
+      >
+        <i class="pi pi-star text-yellow-600 mr-2"></i>
+        User Preference Settings
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Preference Level -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Preference Level <span class="text-red-500">*</span>
+          </label>
+          <p-select
+            [options]="preferenceLevelOptions"
+            optionValue="value"
+            optionLabel="label"
+            formControlName="preferenceLevel"
+            class="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Exclusion Options -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >
+            Recommendation Settings
+          </label>
+          <div class="space-y-3 mt-3">
+            <label class="flex items-center cursor-pointer">
+              <p-checkbox
+                formControlName="isExcluded"
+                binary="true"
+                inputId="editIsExcluded"
+              ></p-checkbox>
+              <span
+                class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Exclude from recommendations
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mt-4">
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          Personal Notes
+        </label>
+        <textarea
+          pTextarea
+          formControlName="notes"
+          placeholder="Add personal notes about this genre..."
+          rows="2"
+          class="w-full"
+          maxlength="150"
+        ></textarea>
+        <small class="text-gray-500 mt-1 block">
+          {{ genreService.genreForm.get("notes")?.value?.length || 0 }}/150
+          characters
+        </small>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="cancelEdit()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Save Changes"
+        class="p-button-success"
+        (click)="saveEdit()"
+        [disabled]="!genreService.genreForm.valid"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

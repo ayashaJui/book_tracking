@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.service;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreCreateDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreUpdateDTO;
@@ -22,4 +23,8 @@ public interface GenreService {
     String deleteGenre(Integer id, HttpServletRequest request, Jwt jwt);
 
     Page<GenreDTO> getAllGenresWithPagination(PageRequestDTO pageRequestDTO, HttpServletRequest request, Jwt jwt);
+
+    List<GenreDTO> searchGenre(String genreName, HttpServletRequest request, Jwt jwt);
+
+    List<GenreDTO> getGenresByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt);
 }

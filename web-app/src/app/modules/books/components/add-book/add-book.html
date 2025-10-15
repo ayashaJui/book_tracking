@@ -78,7 +78,7 @@
   <!-- Main Content Container -->
   <div class="py-6 lg:py-8 max-w-7xl mx-auto">
     <!-- Main Form Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto py-8">
       <!-- CATALOG SEARCH SECTION -->
       <div *ngIf="showCatalogSearch" class="mb-8">
         <div
@@ -99,7 +99,7 @@
 
           <app-catalog-search
             searchType="book"
-            placeholder="Search for books, authors, or series..."
+            placeholder="Search for"
             (itemSelected)="onCatalogBookSelected($event)"
             (createNewClicked)="onCreateNewFromCatalog($event)"
             (searchPerformed)="catalogSearchPerformed = true"
@@ -632,8 +632,12 @@
                   <app-genre-selector
                     [(ngModel)]="newBook.genres"
                     name="genres"
-                    placeholder="Select genres"
+                    placeholder="Select genres and set preferences"
+                    [showPreferences]="true"
+                    [hierarchical]="true"
+                    [userId]="1"
                     (genreCreated)="onGenreCreated($event)"
+                    (preferenceUpdated)="onGenrePreferenceUpdated($event)"
                   ></app-genre-selector>
                 </div>
 

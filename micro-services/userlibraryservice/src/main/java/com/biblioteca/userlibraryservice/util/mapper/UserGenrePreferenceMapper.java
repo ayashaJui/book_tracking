@@ -4,12 +4,12 @@ package com.biblioteca.userlibraryservice.util.mapper;
 import com.biblioteca.userlibraryservice.dto.userGenrePreferences.UserGenrePreferenceCreateDTO;
 import com.biblioteca.userlibraryservice.dto.userGenrePreferences.UserGenrePreferenceDTO;
 import com.biblioteca.userlibraryservice.dto.userGenrePreferences.UserGenrePreferenceUpdateDTO;
-import com.biblioteca.userlibraryservice.entity.UserGenrePrefernce;
+import com.biblioteca.userlibraryservice.entity.UserGenrePreference;
 
 import java.time.LocalDateTime;
 
 public class UserGenrePreferenceMapper {
-    public static UserGenrePreferenceDTO toDTO(UserGenrePrefernce userGenrePreference) {
+    public static UserGenrePreferenceDTO toDTO(UserGenrePreference userGenrePreference) {
         return UserGenrePreferenceDTO.builder()
                 .id(userGenrePreference.getId())
                 .userId(userGenrePreference.getUserId())
@@ -22,8 +22,10 @@ public class UserGenrePreferenceMapper {
                 .build();
     }
 
-    public static UserGenrePrefernce fromCreateDTO(UserGenrePreferenceCreateDTO  userGenrePreferenceCreateDTO) {
-        return UserGenrePrefernce.builder()
+    public static UserGenrePreference fromCreateDTO(UserGenrePreferenceCreateDTO  userGenrePreferenceCreateDTO, Integer userId, Integer catalogGenreId) {
+        return UserGenrePreference.builder()
+                .userId(userId)
+                .catalogGenreId(catalogGenreId)
                 .preferenceLevel(userGenrePreferenceCreateDTO.getPreferenceLevel())
                 .isExcluded(userGenrePreferenceCreateDTO.getIsExcluded())
                 .notes(userGenrePreferenceCreateDTO.getNotes())
@@ -31,7 +33,7 @@ public class UserGenrePreferenceMapper {
                 .build();
     }
 
-    public static UserGenrePrefernce fromUpdateDTO(UserGenrePreferenceUpdateDTO userGenrePreferenceUpdateDTO, UserGenrePrefernce userGenrePreference) {
+    public static UserGenrePreference fromUpdateDTO(UserGenrePreferenceUpdateDTO userGenrePreferenceUpdateDTO, UserGenrePreference userGenrePreference) {
         userGenrePreference.setPreferenceLevel(userGenrePreferenceUpdateDTO.getPreferenceLevel());
         userGenrePreference.setIsExcluded(userGenrePreferenceUpdateDTO.getIsExcluded());
         userGenrePreference.setNotes(userGenrePreferenceUpdateDTO.getNotes());

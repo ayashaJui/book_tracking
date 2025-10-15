@@ -1,0 +1,121 @@
+<!-- Example usage of the enhanced genre selector -->
+
+<!-- Basic usage (backward compatible) -->
+<app-genre-selector
+  [(ngModel)]="newBook.genres"
+  name="genres"
+  placeholder="Select genres"
+  (genreCreated)="onGenreCreated($event)"
+></app-genre-selector>
+
+<!-- Enhanced usage with user preferences -->
+<app-genre-selector
+  [(ngModel)]="newBook.genres"
+  name="genres"
+  placeholder="Select genres with preferences"
+  [showPreferences]="true"
+  [userId]="currentUser.id"
+  [hierarchical]="true"
+  (genreCreated)="onGenreCreated($event)"
+  (preferenceUpdated)="onGenrePreferenceUpdated($event)"
+></app-genre-selector>
+
+<!-- Usage for genre management page -->
+<div class="genre-management">
+  <h2>Manage Your Genre Preferences</h2>
+
+  <app-genre-selector
+    [(ngModel)]="selectedGenres"
+    name="genrePreferences"
+    placeholder="Browse and set your genre preferences"
+    [showPreferences]="true"
+    [userId]="currentUser.id"
+    [hierarchical]="true"
+    (preferenceUpdated)="onGenrePreferenceUpdated($event)"
+  ></app-genre-selector>
+
+  <!-- Display current preferences -->
+  <div class="mt-6" *ngIf="userGenrePreferences.length > 0">
+    <h3>Your Current Preferences</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        *ngFor="let pref of userGenrePreferences"
+        class="p-4 border rounded-lg"
+        [class.bg-red-50]="pref.isExcluded"
+        [class.bg-green-50]="pref.preferenceLevel >= 4"
+      >
+        <div class="flex items-center justify-between">
+          <h4 class="font-semibold">{{ pref.catalogGenre?.name }}</h4>
+          <div class="flex items-center gap-2">
+            <!-- Rating display -->
+            <p-rating
+              [ngModel]="pref.preferenceLevel"
+              [readonly]="true"
+              [stars]="5"
+            ></p-rating>
+            <!-- Excluded indicator -->
+            <i
+              *ngIf="pref.isExcluded"
+              class="pi pi-ban text-red-500"
+              title="Excluded"
+            ></i>
+          </div>
+        </div>
+
+        <p
+          class="text-sm text-gray-600 mt-1"
+          *ngIf="pref.catalogGenre?.description"
+        >
+          {{ pref.catalogGenre.description }}
+        </p>
+
+        <p class="text-sm text-gray-700 mt-2" *ngIf="pref.notes">
+          <em>"{{ pref.notes }}"</em>
+        </p>
+
+        <div class="flex justify-end mt-3">
+          <button
+            pButton
+            class="p-button-sm p-button-text"
+            (click)="editGenrePreference(pref)"
+            label="Edit"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TypeScript component methods to handle the events -->
+<!--
+export class YourComponent {
+  currentUser = { id: 1 }; // Get from auth service
+  selectedGenres: string[] = [];
+  userGenrePreferences: UserGenrePreference[] = [];
+
+  constructor(private genreService: GenreService) {
+    // Load user's current preferences
+    this.loadUserPreferences();
+  }
+
+  loadUserPreferences(): void {
+    this.userGenrePreferences = this.genreService.getUserGenrePreferences()
+      .filter(pref => pref.userId === this.currentUser.id);
+  }
+
+  onGenreCreated(genreName: string): void {
+    console.log('New genre created:', genreName);
+    // Handle new genre creation
+  }
+
+  onGenrePreferenceUpdated(preference: UserGenrePreference): void {
+    console.log('Genre preference updated:', preference);
+    this.loadUserPreferences(); // Refresh the preferences
+  }
+
+  editGenrePreference(preference: UserGenrePreference): void {
+    // Open the genre selector with this genre selected for editing
+    // You can implement this by programmatically triggering the preference dialog
+  }
+}
+-->

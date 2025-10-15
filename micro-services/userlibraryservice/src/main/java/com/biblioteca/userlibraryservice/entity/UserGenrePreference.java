@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @Table(name = "user_genre_preferences")
-public class UserGenrePrefernce {
+public class UserGenrePreference {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

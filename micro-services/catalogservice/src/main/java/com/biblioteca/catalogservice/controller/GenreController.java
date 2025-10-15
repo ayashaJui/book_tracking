@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.controller;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreCreateDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreUpdateDTO;
@@ -90,5 +91,28 @@ public class GenreController {
         Page<GenreDTO> genreDTOPage = genreService.getAllGenresWithPagination(pageRequestDTO, request, jwt);
 
         return new ResponseEntity<>(new  ResponseDTO<>(genreDTOPage, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "APT ID: Genre007")
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<GenreDTO>>> searchGenre(@RequestParam(value = "genreName", required = false) String genreName,
+                                                                     HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ) {
+        log.info("searchGenre in GenreController is called  by user: {}", jwt.getSubject());
+
+        List<GenreDTO> genreDTOS = genreService.searchGenre(genreName, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(genreDTOS, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "API ID: Author008")
+    @GetMapping("/genre_ids")
+    public ResponseEntity<ResponseDTO<List<GenreDTO>>> getGenresByIds(@RequestParam("ids") List<Integer> ids,
+                                                                        HttpServletRequest request,
+                                                                        @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
+        log.info("getGenresByIds in GenreController is called  by user: {}", jwt.getSubject());
+
+        List<GenreDTO> dtos = genreService.getGenresByIds(ids, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(dtos, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
 }

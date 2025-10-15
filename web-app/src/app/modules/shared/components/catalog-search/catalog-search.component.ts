@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angu
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 import { CatalogService } from '../../services/catalog.service';
 import { CatalogSearchResult, CatalogSearchQuery, CatalogAuthor, CatalogBook, CatalogSeries, CatalogPublisher, CatalogGenre } from '../../models/catalog.model';
+import { CatalogApiService } from '../../services/catalog.api.service';
 
 @Component({
     selector: 'app-catalog-search',
@@ -28,7 +29,7 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
     private searchSubject = new Subject<string>();
     private destroy$ = new Subject<void>();
 
-    constructor(private catalogService: CatalogService) { }
+    constructor(private catalogService: CatalogService, private catalogApiService: CatalogApiService) { }
 
     ngOnInit(): void {
         this.setupSearch();
@@ -68,11 +69,11 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                     this.isSearching = true;
                     this.searchPerformed.emit(query);
 
-                    const searchQuery: CatalogSearchQuery = {
-                        query,
-                        type: this.searchType,
-                        limit: 10
-                    };
+                    // const searchQuery: CatalogSearchQuery = {
+                    //     query,
+                    //     type: this.searchType,
+                    //     limit: 10
+                    // };
 
                     // route to correct search call based on type
                     switch (this.searchType) {
@@ -80,7 +81,7 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                             return this.catalogService.searchBooks(query);
 
                         case 'author':
-                            return this.catalogService.searchAuthors(query);
+                            return this.catalogApiService.searchAuthors(query);
 
                         case 'publisher':
                             return this.catalogService.searchPublishers(query);
@@ -88,9 +89,8 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                         case 'series':
                             return this.catalogService.searchSeries(query);
 
-
                         case 'genre':
-                            return this.catalogService.search({ query, type: 'genre', limit: 10 });
+                            return this.catalogApiService.searchGenres(query);
 
                         default:
 

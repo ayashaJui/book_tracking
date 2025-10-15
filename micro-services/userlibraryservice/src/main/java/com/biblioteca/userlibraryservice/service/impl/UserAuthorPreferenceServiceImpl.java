@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,9 @@ public class UserAuthorPreferenceServiceImpl implements UserAuthorPreferenceServ
     public Page<UserAuthorPreferenceDTO> getUserAuthorsWithPagination(PageRequestDTO pageRequestDTO, Integer userId, HttpServletRequest request, Jwt jwt) {
         log.info("getUserAuthorsWithPagination in UserAuthorPreferenceServiceImpl is called with userId: {}", userId);
 
-        Pageable pageable = PaginationUtil.getPageable(pageRequestDTO.getPage(),  pageRequestDTO.getSize());
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+
+        Pageable pageable = PaginationUtil.getPageableSorted(pageRequestDTO.getPage(),  pageRequestDTO.getSize(), sort);
 
         // TODO: after propagation send catalog author info with it.
         Page<UserAuthorPreference> userAuthorPreferences = userAuthorPreferenceRepository.findByUserId(userId, pageable);

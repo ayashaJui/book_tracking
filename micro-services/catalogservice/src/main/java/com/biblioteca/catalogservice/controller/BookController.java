@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.controller;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.book.BookCreateDTO;
 import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.book.BookUpdateDTO;
@@ -124,5 +125,16 @@ public class BookController {
         List<BookDTO> bookDTO = bookService.getBookByGenreId(genreId, request, jwt);
 
         return new ResponseEntity<>(new ResponseDTO<>(bookDTO, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "APT ID: Book008")
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<BookDTO>>> searchAuthor(@RequestParam(value = "title", required = false) String title,
+                                                                     HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ) {
+        log.info("searchAuthor in AuthorController is called  by user: {}", jwt.getSubject());
+
+        List<BookDTO> authorDTOs = bookService.searchBook(title,  request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(authorDTOs, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
 }

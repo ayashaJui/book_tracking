@@ -5,6 +5,7 @@ import com.biblioteca.catalogservice.dto.genre.GenreDTO;
 import com.biblioteca.catalogservice.dto.genre.GenreUpdateDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.pagination.PaginationUtil;
+import com.biblioteca.catalogservice.entity.Author;
 import com.biblioteca.catalogservice.entity.Genre;
 import com.biblioteca.catalogservice.repository.GenreRepository;
 import com.biblioteca.catalogservice.service.GenreService;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -158,6 +160,35 @@ public class GenreServiceImpl implements GenreService {
         Page<Genre> genrePage = genreRepository.findAll(pageable);
 
         return genrePage.map(this::convertToDTO);
+    }
+
+    @Override
+    public List<GenreDTO> searchGenre(String genreName, HttpServletRequest request, Jwt jwt) {
+        log.info("searchGenre in GenreServiceImpl is called with name: {}", genreName);
+
+        List<Genre> genres = genreRepository.findByNameContaining(genreName);
+
+        List<GenreDTO> dtos = genres.stream().map(this::convertToDTO).toList();
+
+        return dtos;
+    }
+
+    @Override
+    public List<GenreDTO> getGenresByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt) {
+        log.info("getGenresByIds in GenreServiceImpl is called with ids: {}", ids);
+
+        if (ids == null || ids.isEmpty()) {
+            throw new CustomException("Genre ID list cannot be empty", HttpStatus.BAD_REQUEST.value());
+        }
+
+        List<Genre> genres = genreRepository.findAllById(ids);
+        if (genres.isEmpty()) {
+            throw new CustomException("No genres found for given IDs", HttpStatus.NOT_FOUND.value());
+        }
+
+        List<GenreDTO> dtos = genres.stream().map(this::convertToDTO).toList();
+
+        return dtos;
     }
 
     private Genre findById(Integer id) {

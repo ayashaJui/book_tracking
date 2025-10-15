@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { ToastMsg } from './components/toast-msg/toast-msg';
 import { NotFoundComponent } from './components/not-found/not-found';
-import { GenreSelectorComponent } from './components/genre-selector.component';
+import { GenreSelectorComponent } from './components/genre-selector/genre-selector.component';
 import { TagSelectorComponent } from './components/tag-selector.component';
 import { AuthorSelectorComponent } from './components/author-selector/author-selector';
 import { ImageUploadComponent } from './components/image-upload/image-upload';

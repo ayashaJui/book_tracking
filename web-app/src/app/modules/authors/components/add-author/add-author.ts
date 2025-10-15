@@ -29,6 +29,7 @@ export class AddAuthorComponent implements OnInit {
   catalogSearchPerformed = false;
   selectedCatalogAuthor: CatalogSearchResult | null = null;
   isFromCatalog = false;
+  showForm = false;
 
 
   preferenceLevelOptions = [
@@ -52,6 +53,7 @@ export class AddAuthorComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
+        this.showForm = true;
         this.authorId = +params['id'];
         this.loadAuthor();
       }
@@ -72,7 +74,6 @@ export class AddAuthorComponent implements OnInit {
             next: (catalogResponse) => {
               if (catalogResponse.data) {
                 this.catalogAuthor = catalogResponse.data;
-                console.log('Catalog Author:', this.catalogAuthor);
 
                 this.authorService.authorForm.patchValue({
                   name: this.catalogAuthor.name,
@@ -296,10 +297,10 @@ export class AddAuthorComponent implements OnInit {
 
   // Catalog search methods
   onCatalogAuthorSelected(author: any) {
-    console.log('Catalog Author Selected:', author);
     if (author.type === 'author') {
       this.selectedCatalogAuthor = author;
       this.isFromCatalog = true;
+      this.showForm = true;
 
       this.authorService.authorForm.patchValue({
         ...author,
@@ -316,6 +317,7 @@ export class AddAuthorComponent implements OnInit {
 
   onCreateNewFromCatalog(searchTerm: string) {
     this.isFromCatalog = false;
+    this.showForm = true;
     this.updateFieldsEnabledState();
     this.proceedWithNewAuthor(searchTerm);
   }

@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.service;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.book.BookCreateDTO;
 import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.book.BookUpdateDTO;
@@ -28,4 +29,6 @@ public interface BookService {
     List<BookDTO> getBookByAuthorId(Integer authorId, HttpServletRequest request, Jwt jwt);
 
     List<BookDTO> getBookByGenreId(Integer genreId, HttpServletRequest request, Jwt jwt);
+
+    List<BookDTO> searchBook(String title, HttpServletRequest request, Jwt jwt);
 }

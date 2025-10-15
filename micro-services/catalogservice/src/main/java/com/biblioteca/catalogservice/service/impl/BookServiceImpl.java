@@ -265,6 +265,16 @@ public class BookServiceImpl implements BookService {
         return bookDTOList;
     }
 
+    @Override
+    public List<BookDTO> searchBook(String title, HttpServletRequest request, Jwt jwt) {
+        log.info("searchBook in BookServiceImpl is called with title: {} by user: {}", title, jwt.getSubject());
+
+        List<Book> books = bookRepository.findByTitleContaining(title);
+        List<BookDTO> bookDTOList = books.stream().map(this::convertToDTO).toList();
+
+        return bookDTOList;
+    }
+
     private Book findById(Integer id){
         return bookRepository.findById(id).orElseThrow(() -> {
             log.error("Book with id {} not found", id);

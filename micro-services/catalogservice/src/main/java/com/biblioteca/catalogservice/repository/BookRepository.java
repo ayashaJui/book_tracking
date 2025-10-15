@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.repository;
 
+import com.biblioteca.catalogservice.entity.Author;
 import com.biblioteca.catalogservice.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("SELECT b FROM BookGenre bg JOIN bg.book b " +
             "WHERE bg.genre.id = :genreId")
     List<Book> findByBookGenres(@Param("genreId") Integer genreId);
+
+    List<Book> findByTitleContaining(String title);
 }
