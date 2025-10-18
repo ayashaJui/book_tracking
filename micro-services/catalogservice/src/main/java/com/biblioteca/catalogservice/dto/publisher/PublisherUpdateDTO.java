@@ -19,4 +19,6 @@ public class PublisherUpdateDTO {
     private String location;
 
     private String website;
+
+    private String description;
 }

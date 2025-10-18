@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.service;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.publisher.PublisherCreateDTO;
 import com.biblioteca.catalogservice.dto.publisher.PublisherDTO;
@@ -22,4 +23,7 @@ public interface PublisherService {
     PublisherDTO updatePublisher(PublisherUpdateDTO publisherUpdateDTO, HttpServletRequest request, Jwt jwt);
 
     String deletePublisher(Integer id, HttpServletRequest request, Jwt jwt);
+
+    List<PublisherDTO> searchPublisher(String publisherName, HttpServletRequest request, Jwt jwt);
+
 }

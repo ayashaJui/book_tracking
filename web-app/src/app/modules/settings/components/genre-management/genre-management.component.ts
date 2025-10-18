@@ -4,7 +4,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { CatalogGenreCreateRequestDTO, CatalogGenreDTO, CatalogGenreUpdateRequestDTO, UserGenrePreferenceDTO } from '../../models/genre.model';
 import { GenreService } from '../../services/genre.service';
 import { UiService } from '../../../shared/services/ui.service.service';
-import { CatalogApiService } from '../../../shared/services/catalog.api.service';
 
 @Component({
     selector: 'app-genre-management',
@@ -43,7 +42,6 @@ export class GenreManagementComponent implements OnInit {
 
     constructor(
         public genreService: GenreService,
-        private catalogApiService: CatalogApiService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private uiService: UiService
@@ -72,7 +70,7 @@ export class GenreManagementComponent implements OnInit {
                     const ids = this.genres.map(pref => pref.catalogGenreId).filter(id => id !== undefined) as number[];
 
                     if (ids.length > 0) {
-                        this.catalogApiService.getCatalogGenreDetails(ids).subscribe({
+                        this.genreService.getCatalogGenreDetails(ids).subscribe({
                             next: (catalogResponse) => {
                                 if (catalogResponse.data) {
                                     let catalogGenres: CatalogGenreDTO[] = catalogResponse.data;
@@ -102,10 +100,9 @@ export class GenreManagementComponent implements OnInit {
     }
 
     updateParentGenreOptions() {
-        this.catalogApiService.getAllCatalogGenres().subscribe((response) => {
+        this.genreService.getAllCatalogGenres().subscribe((response) => {
             if (response.data) {
                 this.parentGenreOptions = response.data;
-                console.log('Parent Genre Options:', this.parentGenreOptions);
             }
         });
     }
@@ -178,7 +175,7 @@ export class GenreManagementComponent implements OnInit {
 
         console.log('New Catalog Genre Data:', newCatalogGenreData);
 
-        this.catalogApiService.createCatalogGenre(newCatalogGenreData).subscribe({
+        this.genreService.createCatalogGenre(newCatalogGenreData).subscribe({
             next: (response) => {
                 if (response.data) {
                     this.uiService.setCustomSuccess('Success', `Genre "${newCatalogGenreData.name}" created`);
@@ -282,7 +279,7 @@ export class GenreManagementComponent implements OnInit {
             notes: formData.notes?.trim() || undefined
         }
 
-        this.catalogApiService.updateCatalogGenre(catalogUpdateData).subscribe({
+        this.genreService.updateCatalogGenre(catalogUpdateData).subscribe({
             next: (response) => {
                 if (response.data) {
                     this.uiService.setCustomSuccess('Success', `Genre "${catalogUpdateData.name}" updated`);

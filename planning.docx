@@ -1370,3 +1370,7 @@ WHERE user_id = ? AND status LIKE 'wishlist_%';
 Data propagation to user library db
 
 author -> authorId, name, nationality, genre, totalBooks, Average rating, bio 
+genre -> genreId, name, description, parentGenreId, isActive 
+
+
+publisher -> no of book publisher have & how many user owned.

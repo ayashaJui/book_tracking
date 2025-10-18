@@ -1,0 +1,122 @@
+<form [formGroup]="publisherForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <!-- Name Field -->
+  <div class="space-y-2">
+    <label
+      for="name"
+      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+    >
+      <i class="pi pi-building text-indigo-500 mr-2"></i>
+      Publisher Name *
+    </label>
+    <input
+      type="text"
+      id="name"
+      formControlName="name"
+      placeholder="Enter publisher name"
+      class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      [class.border-red-500]="nameControl?.invalid && nameControl?.touched"
+    />
+    <div
+      *ngIf="nameControl?.invalid && nameControl?.touched"
+      class="text-red-500 text-sm"
+    >
+      <span *ngIf="nameControl?.errors?.['required']"
+        >Publisher name is required</span
+      >
+      <span *ngIf="nameControl?.errors?.['minlength']"
+        >Publisher name must be at least 2 characters</span
+      >
+    </div>
+  </div>
+
+  <!-- Location Field -->
+  <div class="space-y-2">
+    <label
+      for="location"
+      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+    >
+      <i class="pi pi-map-marker text-indigo-500 mr-2"></i>
+      Location
+    </label>
+    <input
+      type="text"
+      id="location"
+      formControlName="location"
+      placeholder="City, Country"
+      class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+    />
+  </div>
+
+  <!-- Website Field -->
+  <div class="space-y-2">
+    <label
+      for="website"
+      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+    >
+      <i class="pi pi-globe text-indigo-500 mr-2"></i>
+      Website
+    </label>
+    <input
+      type="url"
+      id="website"
+      formControlName="website"
+      placeholder="https://publisher-website.com"
+      class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      [class.border-red-500]="
+        websiteControl?.invalid && websiteControl?.touched
+      "
+    />
+    <div
+      *ngIf="websiteControl?.invalid && websiteControl?.touched"
+      class="text-red-500 text-sm"
+    >
+      <span *ngIf="websiteControl?.errors?.['pattern']"
+        >Please enter a valid URL (starting with http:// or https://)</span
+      >
+    </div>
+  </div>
+
+  <!-- Description Field -->
+  <div class="space-y-2">
+    <label
+      for="description"
+      class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
+    >
+      <i class="pi pi-file-edit text-indigo-500 mr-2"></i>
+      Description
+    </label>
+    <textarea
+      id="description"
+      formControlName="description"
+      rows="3"
+      placeholder="Brief description of the publisher..."
+      class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-vertical"
+    ></textarea>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-end gap-3 pt-4">
+    <button
+      *ngIf="showCancelButton"
+      type="button"
+      pButton
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-outlined p-button-secondary"
+      (click)="onCancel()"
+      [disabled]="loading"
+    ></button>
+
+    <button
+      type="submit"
+      pButton
+      [label]="submitButtonLabel"
+      icon="pi pi-check"
+      class="p-button-raised"
+      [class.p-button-success]="mode === 'add'"
+      [class.p-button-primary]="mode === 'edit'"
+      [disabled]="!publisherForm.valid || loading"
+      [loading]="loading"
+    ></button>
+  </div>
+</form>

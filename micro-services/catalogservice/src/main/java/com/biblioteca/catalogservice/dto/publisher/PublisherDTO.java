@@ -19,6 +19,8 @@ public class PublisherDTO {
 
     private String website;
 
+    private String description;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

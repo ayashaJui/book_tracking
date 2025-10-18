@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Publisher } from '../../models/publisher.model';
+import { CatalogPublisherDTO, Publisher } from '../../models/publisher.model';
 import { PublisherService } from '../../services/publisher.service';
 import { BookService } from '../../../books/services/book.service';
 import { EditionService } from '../../../books/services/edition.service';
@@ -16,15 +16,15 @@ import { MessageService, ConfirmationService } from 'primeng/api';
   providers: [MessageService, ConfirmationService]
 })
 export class AllPublishersComponent implements OnInit, OnDestroy {
-  publishers: Publisher[] = [];
-  filteredPublishers: Publisher[] = [];
+  publishers: CatalogPublisherDTO[] = [];
+  filteredPublishers: CatalogPublisherDTO[] = [];
   searchTerm: string = '';
   loading: boolean = false;
-  
+
   // Sorting and filtering
   sortBy: string = 'name';
   bookCountFilter: string = 'all';
-  
+
   sortOptions = [
     { label: 'Name (A-Z)', value: 'name' },
     { label: 'Name (Z-A)', value: 'name-desc' },
@@ -32,7 +32,7 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
     { label: 'Book Count (Low-High)', value: 'books-asc' },
     { label: 'Location', value: 'location' }
   ];
-  
+
   bookCountFilterOptions = [
     { label: 'All Publishers', value: 'all' },
     { label: 'No Books (0)', value: '0' },
@@ -40,7 +40,7 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
     { label: 'Many Books (6-15)', value: '6-15' },
     { label: 'Extensive (16+)', value: '16+' }
   ];
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -50,7 +50,7 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadPublishers();
@@ -63,27 +63,16 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
 
   loadPublishers(): void {
     this.loading = true;
-    this.publisherService.publishers$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (publishers) => {
-          this.publishers = publishers.map(publisher => ({
-            ...publisher,
-            bookCount: this.bookService.getBooksByPublisher(publisher.id || 0).length
-          }));
+
+    this.publisherService.getAllCatalogPublishers().subscribe({
+      next: (response) => {
+        if (response.data) {
+          this.publishers = response.data
+          this.loading = false;
           this.applyFilters();
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error loading publishers:', error);
-          this.loading = false;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load publishers'
-          });
         }
-      });
+      }
+    });
   }
 
   onSearch(): void {
@@ -163,7 +152,7 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
 
   getTopPublisher(): string {
     if (this.publishers.length === 0) return 'None';
-    const top = this.publishers.reduce((max, publisher) => 
+    const top = this.publishers.reduce((max, publisher) =>
       (publisher.bookCount || 0) > (max.bookCount || 0) ? publisher : max
     );
     return top.name;
@@ -219,8 +208,8 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
 
   addBookFromPublisher(publisher: Publisher): void {
     // Navigate to add book page with publisher pre-selected
-    this.router.navigate(['/books/add'], { 
-      queryParams: { publisherId: publisher.id } 
+    this.router.navigate(['/books/add'], {
+      queryParams: { publisherId: publisher.id }
     });
   }
 
@@ -244,7 +233,7 @@ export class AllPublishersComponent implements OnInit, OnDestroy {
     if (!publisher.id) return;
 
     const booksCount = this.bookService.getBooksByPublisher(publisher.id).length;
-    
+
     if (booksCount > 0) {
       this.messageService.add({
         severity: 'warn',

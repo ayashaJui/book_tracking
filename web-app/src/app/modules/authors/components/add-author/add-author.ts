@@ -7,7 +7,6 @@ import { AuthorService } from '../../services/author.service';
 import {
   CatalogSearchResult
 } from '../../../shared/models/catalog.model';
-import { CatalogApiService } from '../../../shared/services/catalog.api.service';
 import { UiService } from '../../../shared/services/ui.service.service';
 
 @Component({
@@ -42,7 +41,6 @@ export class AddAuthorComponent implements OnInit {
 
   constructor(
     public authorService: AuthorService,
-    private catalogApiService: CatalogApiService,
     private router: Router,
     private route: ActivatedRoute,
     private uiService: UiService
@@ -70,7 +68,7 @@ export class AddAuthorComponent implements OnInit {
         if (response.data) {
           this.userAuthorPreference = response.data;
 
-          this.catalogApiService.getCatalogAuthorDetailsById(this.userAuthorPreference.catalogAuthorId).subscribe({
+          this.authorService.getCatalogAuthorDetailsById(this.userAuthorPreference.catalogAuthorId).subscribe({
             next: (catalogResponse) => {
               if (catalogResponse.data) {
                 this.catalogAuthor = catalogResponse.data;
@@ -157,7 +155,7 @@ export class AddAuthorComponent implements OnInit {
         threadsUrl: formValue.threadsUrl?.trim() || ''
       }
 
-      this.catalogApiService.createCatalogAuthor(catalogAuthorData).subscribe({
+      this.authorService.createCatalogAuthor(catalogAuthorData).subscribe({
         next: (response) => {
           if (response.data) {
             authorData.catalogAuthorId = response.data.id;
@@ -227,7 +225,7 @@ export class AddAuthorComponent implements OnInit {
       personalNotes: formValue.personalNotes?.trim() || '',
     };
 
-    this.catalogApiService.updateCatalogAuthor(catalogAuthorData).subscribe({
+    this.authorService.updateCatalogAuthor(catalogAuthorData).subscribe({
       next: (response) => {
         if (response.data) {
           this.uiService.setCustomSuccess('Success', 'Catalog Author updated successfully');

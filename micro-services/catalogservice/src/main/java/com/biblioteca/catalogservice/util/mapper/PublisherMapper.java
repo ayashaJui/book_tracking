@@ -16,6 +16,7 @@ public class PublisherMapper {
                 .website(publisher.getWebsite())
                 .createdAt(publisher.getCreatedAt())
                 .updatedAt(publisher.getUpdatedAt())
+                .description(publisher.getDescription())
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class PublisherMapper {
                 .name(publisherCreateDTO.getName())
                 .location(publisherCreateDTO.getLocation())
                 .website(publisherCreateDTO.getWebsite())
+                .description(publisherCreateDTO.getDescription())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -32,6 +34,7 @@ public class PublisherMapper {
         publisher.setName(publisherUpdateDTO.getName());
         publisher.setLocation(publisherUpdateDTO.getLocation());
         publisher.setWebsite(publisherUpdateDTO.getWebsite());
+        publisher.setDescription(publisherUpdateDTO.getDescription());
         publisher.setUpdatedAt(LocalDateTime.now());
 
         return publisher;

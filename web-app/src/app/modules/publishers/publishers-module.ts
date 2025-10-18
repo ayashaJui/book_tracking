@@ -20,7 +20,6 @@ import { SelectModule } from 'primeng/select';
 
 import { AllPublishersComponent } from './components/all-publishers/all-publishers';
 import { AddPublisherComponent } from './components/add-publisher/add-publisher';
-import { EditPublisherComponent } from './components/edit-publisher/edit-publisher';
 import { PublisherDetailsComponent } from './components/publisher-details/publisher-details';
 import { PublishersRoutingModule } from './publishers-routing-module';
 
@@ -28,7 +27,6 @@ import { PublishersRoutingModule } from './publishers-routing-module';
   declarations: [
     AllPublishersComponent,
     AddPublisherComponent,
-    EditPublisherComponent,
     PublisherDetailsComponent
   ],
   imports: [
@@ -37,7 +35,7 @@ import { PublishersRoutingModule } from './publishers-routing-module';
     ReactiveFormsModule,
     PublishersRoutingModule,
     SharedModule,
-    
+
     // PrimeNG modules
     ButtonModule,
     InputTextModule,

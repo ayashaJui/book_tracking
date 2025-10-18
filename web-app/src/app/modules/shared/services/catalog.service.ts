@@ -27,6 +27,7 @@ export class CatalogService {
 
     // Search across all catalog entities
     search(query: CatalogSearchQuery): Observable<CatalogSearchResult[]> {
+        console.log('CatalogService.search called with query:', query);
         const params = new HttpParams()
             .set('query', query.query)
             .set('type', query.type || 'all')

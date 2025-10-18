@@ -51,6 +51,8 @@ export class AddBook implements OnInit {
   publisherOptions: { label: string; value: number | string }[] = [];
   selectedPublisherId: number | string | null = null;
   showAddPublisherDialog: boolean = false;
+  showEditPublisherDialog: boolean = false;
+  publisherToEdit: Publisher | null = null;
   newPublisherData = {
     name: '',
     location: '',
@@ -680,46 +682,49 @@ export class AddBook implements OnInit {
     this.showAddPublisherDialog = true;
   }
 
-  onAddNewPublisher() {
-    this.showAddPublisherDialog = true;
-  }
-
-  createNewPublisher() {
-    if (this.newPublisherData.name.trim()) {
-      const newPublisher = this.publisherService.createPublisher({
-        name: this.newPublisherData.name,
-        location: this.newPublisherData.location,
-        website: this.newPublisherData.website,
-        description: this.newPublisherData.description
-      });
-
-      if (newPublisher) {
-        // Reload publisher options
-        this.loadPublisherOptions();
-
-        // Select the newly created publisher
-        this.selectedPublisherId = newPublisher.id!;
-
-        // Reset form and close dialog
-        this.newPublisherData = {
-          name: '',
-          location: '',
-          website: '',
-          description: ''
-        };
-        this.showAddPublisherDialog = false;
+  openEditPublisherDialog() {
+    if (this.selectedPublisherId && typeof this.selectedPublisherId === 'number') {
+      this.publisherToEdit = this.publisherService.getPublisherById(this.selectedPublisherId);
+      if (this.publisherToEdit) {
+        this.showEditPublisherDialog = true;
       }
     }
   }
 
-  cancelAddPublisher() {
-    this.newPublisherData = {
-      name: '',
-      location: '',
-      website: '',
-      description: ''
-    };
+  onPublisherSaved(publisher: Publisher) {
+    // Reload publisher options to reflect changes
+    this.loadPublisherOptions();
+
+    // Update selected publisher if it was edited
+    if (this.showEditPublisherDialog) {
+      this.selectedPublisherId = publisher.id!;
+    }
+
+    // Close dialogs
     this.showAddPublisherDialog = false;
+    this.showEditPublisherDialog = false;
+    this.publisherToEdit = null;
+  }
+
+  onPublisherDialogCancelled() {
+    this.showAddPublisherDialog = false;
+    this.showEditPublisherDialog = false;
+    this.publisherToEdit = null;
+  }
+
+  getSelectedPublisher(): Publisher | null {
+    if (this.selectedPublisherId && typeof this.selectedPublisherId === 'number') {
+      return this.publisherService.getPublisherById(this.selectedPublisherId);
+    }
+    return null;
+  }
+
+  onAddNewPublisher() {
+    this.showAddPublisherDialog = true;
+  }
+
+  cancelAddPublisher() {
+    this.onPublisherDialogCancelled();
   }
 
   onCoverUpload(event: any) {

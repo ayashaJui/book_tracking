@@ -295,9 +295,8 @@ export class UserSettings {
     this.messageService.add({
       severity: isEnabled ? 'success' : 'info',
       summary: `${notificationType} ${isEnabled ? 'Enabled' : 'Disabled'}`,
-      detail: `${notificationType} have been ${
-        isEnabled ? 'enabled' : 'disabled'
-      }`,
+      detail: `${notificationType} have been ${isEnabled ? 'enabled' : 'disabled'
+        }`,
       life: 3000,
     });
   }
@@ -477,7 +476,7 @@ export class UserSettings {
     const serviceLower = service.toLowerCase().replace(' ', '');
     const isConnected =
       this.settings.integrations[
-        serviceLower as keyof typeof this.settings.integrations
+      serviceLower as keyof typeof this.settings.integrations
       ];
 
     if (isConnected) {
@@ -907,17 +906,26 @@ export class UserSettings {
 
   createPublisher() {
     if (this.newPublisherData.name.trim()) {
-      const newPublisher = this.publisherService.createPublisher(this.newPublisherData);
-      if (newPublisher) {
-        this.loadPublishers();
-        this.showAddPublisherDialog = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Publisher Added',
-          detail: `${newPublisher.name} has been added successfully.`,
-          life: 3000,
-        });
-      }
+      this.publisherService.createPublisherOld(this.newPublisherData).subscribe({
+        next: (newPublisher) => {
+          this.loadPublishers();
+          this.showAddPublisherDialog = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Publisher Added',
+            detail: `${newPublisher.name} has been added successfully.`,
+            life: 3000,
+          });
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to add publisher',
+            life: 3000,
+          });
+        }
+      });
     }
   }
 
@@ -928,18 +936,28 @@ export class UserSettings {
 
   updatePublisher() {
     if (this.editingPublisher && this.editingPublisher.id) {
-      const updated = this.publisherService.updatePublisher(this.editingPublisher as any);
-      if (updated) {
-        this.loadPublishers();
-        this.showEditPublisherDialog = false;
-        this.editingPublisher = null;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Publisher Updated',
-          detail: `${updated.name} has been updated successfully.`,
-          life: 3000,
-        });
-      }
+      const { id, ...updateData } = this.editingPublisher;
+      this.publisherService.updatePublisher(id, updateData).subscribe({
+        next: (updated) => {
+          this.loadPublishers();
+          this.showEditPublisherDialog = false;
+          this.editingPublisher = null;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Publisher Updated',
+            detail: `${updated.name} has been updated successfully.`,
+            life: 3000,
+          });
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update publisher',
+            life: 3000,
+          });
+        }
+      });
     }
   }
 

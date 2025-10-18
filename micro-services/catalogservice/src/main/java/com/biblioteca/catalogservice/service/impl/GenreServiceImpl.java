@@ -38,7 +38,7 @@ public class GenreServiceImpl implements GenreService {
     public GenreDTO createGenre(GenreCreateDTO genreCreateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("createGenre in GenreServiceImpl is called with data: {} by user: {}", genreCreateDTO, jwt.getSubject());
 
-        Optional<Genre> existingGenre = genreRepository.findByName(genreCreateDTO.getName());
+        Optional<Genre> existingGenre = genreRepository.findByNameIgnoreCase(genreCreateDTO.getName());
 
         if (existingGenre.isPresent()) {
             log.warn("Genre with name '{}' already exists. Creation aborted.", genreCreateDTO.getName());
@@ -91,7 +91,7 @@ public class GenreServiceImpl implements GenreService {
     public GenreDTO updateGenre(GenreUpdateDTO genreUpdateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("updateGenre in GenreServiceImpl is called with data: {} by user: {}", genreUpdateDTO, jwt.getSubject());
 
-        Optional<Genre> existingGenre = genreRepository.findByName(genreUpdateDTO.getName());
+        Optional<Genre> existingGenre = genreRepository.findByNameIgnoreCase(genreUpdateDTO.getName());
 
         if (existingGenre.isPresent() && !existingGenre.get().getId().equals(genreUpdateDTO.getId())) {
             log.warn("Genre with name '{}' already exists. Update aborted.", genreUpdateDTO.getName());

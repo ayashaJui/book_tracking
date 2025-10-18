@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 import { PublisherService } from '../../services/publisher.service';
 import { BookService } from '../../../books/services/book.service';
 import { ImageService } from '../../../shared/services/image.service';
-import { Publisher } from '../../models/publisher.model';
+import { CatalogPublisherDTO, Publisher } from '../../models/publisher.model';
 
 interface PublisherBook {
   id: number;
@@ -38,10 +38,10 @@ interface PublisherStats {
 })
 export class PublisherDetailsComponent implements OnInit {
   publisherId?: number;
-  publisher: Publisher | null = null;
+  publisher: CatalogPublisherDTO | null = null;
   books: PublisherBook[] = [];
   stats: PublisherStats | null = null;
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -49,187 +49,23 @@ export class PublisherDetailsComponent implements OnInit {
     private bookService: BookService,
     private messageService: MessageService,
     private imageService: ImageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.publisherId = Number(this.route.snapshot.paramMap.get('id')) || undefined;
-    
-    // Enhanced dummy data for demonstration
-    this.loadDummyData();
+
+    this.loadCatalogPublisherDetails(this.publisherId!);
   }
 
-  private loadDummyData(): void {
-    // Comprehensive publisher information
-    this.publisher = {
-      id: 1,
-      name: 'DAW Books',
-      location: 'New York, NY, USA',
-      website: 'https://www.dawbooks.com',
-      description: 'DAW Books is a major science fiction and fantasy publisher founded in 1971 by Donald A. Wollheim. Known for publishing award-winning authors and breakthrough novels in speculative fiction, DAW has been home to legendary writers like Ursula K. Le Guin, Tad Williams, Mercedes Lackey, and Patrick Rothfuss. The publisher is renowned for discovering new talent and supporting innovative storytelling in the science fiction and fantasy genres.',
-      logo: '/assets/images/product-not-found.png',
-      dateAdded: '2024-01-01',
-      bookCount: 12
-    };
-
-    // Comprehensive book catalog from this publisher
-    this.books = [
-      {
-        id: 1,
-        title: 'The Name of the Wind',
-        author: 'Patrick Rothfuss',
-        genres: ['Fantasy', 'Adventure', 'Magic'],
-        pages: 662,
-        status: 'Read',
-        rating: 5,
-        publicationYear: 2007,
-        isbn: '978-0756404079',
-        series: 'The Kingkiller Chronicle',
-        seriesOrder: 1
-      },
-      {
-        id: 2,
-        title: 'The Wise Man\'s Fear',
-        author: 'Patrick Rothfuss',
-        genres: ['Fantasy', 'Adventure', 'Magic'],
-        pages: 994,
-        status: 'Reading',
-        rating: 5,
-        publicationYear: 2011,
-        isbn: '978-0756407919',
-        series: 'The Kingkiller Chronicle',
-        seriesOrder: 2
-      },
-      {
-        id: 3,
-        title: 'The Left Hand of Darkness',
-        author: 'Ursula K. Le Guin',
-        genres: ['Science Fiction', 'Social Science Fiction'],
-        pages: 304,
-        status: 'Read',
-        rating: 4.5,
-        publicationYear: 1969,
-        isbn: '978-0441478125'
-      },
-      {
-        id: 4,
-        title: 'The Dispossessed',
-        author: 'Ursula K. Le Guin',
-        genres: ['Science Fiction', 'Political Fiction'],
-        pages: 341,
-        status: 'Read',
-        rating: 4.8,
-        publicationYear: 1974,
-        isbn: '978-0061054884'
-      },
-      {
-        id: 5,
-        title: 'Otherland: City of Golden Shadow',
-        author: 'Tad Williams',
-        genres: ['Science Fiction', 'Cyberpunk', 'Virtual Reality'],
-        pages: 780,
-        status: 'Want to Read',
-        rating: 4.2,
-        publicationYear: 1996,
-        isbn: '978-0886777630',
-        series: 'Otherland',
-        seriesOrder: 1
-      },
-      {
-        id: 6,
-        title: 'The Dragonbone Chair',
-        author: 'Tad Williams',
-        genres: ['Fantasy', 'Epic Fantasy'],
-        pages: 766,
-        status: 'Read',
-        rating: 4.3,
-        publicationYear: 1988,
-        isbn: '978-0886774035',
-        series: 'Memory, Sorrow and Thorn',
-        seriesOrder: 1
-      },
-      {
-        id: 7,
-        title: 'Magic\'s Pawn',
-        author: 'Mercedes Lackey',
-        genres: ['Fantasy', 'LGBTQ+', 'Romance'],
-        pages: 352,
-        status: 'Read',
-        rating: 4.1,
-        publicationYear: 1989,
-        isbn: '978-0886773922',
-        series: 'The Last Herald-Mage',
-        seriesOrder: 1
-      },
-      {
-        id: 8,
-        title: 'Arrows of the Queen',
-        author: 'Mercedes Lackey',
-        genres: ['Fantasy', 'Young Adult'],
-        pages: 319,
-        status: 'Read',
-        rating: 4.0,
-        publicationYear: 1987,
-        isbn: '978-0886773786',
-        series: 'Heralds of Valdemar',
-        seriesOrder: 1
-      },
-      {
-        id: 9,
-        title: 'The Hundred Thousand Kingdoms',
-        author: 'N.K. Jemisin',
-        genres: ['Fantasy', 'Mythology', 'African-inspired'],
-        pages: 427,
-        status: 'On Hold',
-        rating: 4.4,
-        publicationYear: 2010,
-        isbn: '978-0316043915',
-        series: 'Inheritance Trilogy',
-        seriesOrder: 1
-      },
-      {
-        id: 10,
-        title: 'The Fifth Season',
-        author: 'N.K. Jemisin',
-        genres: ['Fantasy', 'Post-Apocalyptic', 'Geological Fantasy'],
-        pages: 512,
-        status: 'Want to Read',
-        rating: 4.6,
-        publicationYear: 2015,
-        isbn: '978-0316229296',
-        series: 'The Broken Earth',
-        seriesOrder: 1
-      },
-      {
-        id: 11,
-        title: 'Dune',
-        author: 'Frank Herbert',
-        genres: ['Science Fiction', 'Space Opera', 'Political'],
-        pages: 688,
-        status: 'Read',
-        rating: 4.7,
-        publicationYear: 1965,
-        isbn: '978-0441172719',
-        series: 'Dune Chronicles',
-        seriesOrder: 1
-      },
-      {
-        id: 12,
-        title: 'Foundation',
-        author: 'Isaac Asimov',
-        genres: ['Science Fiction', 'Space Opera', 'Galactic Empire'],
-        pages: 244,
-        status: 'Read',
-        rating: 4.5,
-        publicationYear: 1951,
-        isbn: '978-0553293357',
-        series: 'Foundation',
-        seriesOrder: 1
+  loadCatalogPublisherDetails(publisherId: number): void {
+    this.publisherService.getCatalogPublisherById(publisherId).subscribe((response) => {
+      if(response.data){
+        this.publisher = response.data;
       }
-    ];
-
-    // Calculate comprehensive statistics
-    this.calculateStats();
+    })
   }
+
+ 
 
   private calculateStats(): void {
     if (this.books.length === 0) return;
@@ -279,7 +115,7 @@ export class PublisherDetailsComponent implements OnInit {
 
   getSeriesBooks(): { [key: string]: PublisherBook[] } {
     const seriesBooks: { [key: string]: PublisherBook[] } = {};
-    
+
     this.books.forEach(book => {
       if (book.series) {
         if (!seriesBooks[book.series]) {
@@ -299,7 +135,7 @@ export class PublisherDetailsComponent implements OnInit {
 
   getDecadeDistribution(): { [key: string]: number } {
     const decades: { [key: string]: number } = {};
-    
+
     this.books.forEach(book => {
       if (book.publicationYear) {
         const decade = Math.floor(book.publicationYear / 10) * 10;
@@ -311,63 +147,5 @@ export class PublisherDetailsComponent implements OnInit {
     return decades;
   }
 
-  onImageUploaded(imageUrl: string) {
-    if (this.publisher && this.publisher.id) {
-      const updatedPublisher = {
-        id: this.publisher.id,
-        name: this.publisher.name,
-        location: this.publisher.location,
-        website: this.publisher.website,
-        description: this.publisher.description,
-        logo: imageUrl
-      };
-      
-      const success = this.publisherService.updatePublisher(updatedPublisher);
-      
-      if (success) {
-        this.publisher.logo = imageUrl;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Logo Updated',
-          detail: 'Publisher logo has been updated successfully'
-        });
-      } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update publisher logo'
-        });
-      }
-    }
-  }
-
-  onImageRemoved() {
-    if (this.publisher && this.publisher.id) {
-      const updatedPublisher = {
-        id: this.publisher.id,
-        name: this.publisher.name,
-        location: this.publisher.location,
-        website: this.publisher.website,
-        description: this.publisher.description,
-        logo: undefined
-      };
-      
-      const success = this.publisherService.updatePublisher(updatedPublisher);
-      
-      if (success) {
-        this.publisher.logo = undefined;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Logo Removed',
-          detail: 'Publisher logo has been removed successfully'
-        });
-      } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to remove publisher logo'
-        });
-      }
-    }
-  }
+  
 }

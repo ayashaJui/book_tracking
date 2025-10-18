@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AllPublishersComponent } from './components/all-publishers/all-publishers';
 import { AddPublisherComponent } from './components/add-publisher/add-publisher';
-import { EditPublisherComponent } from './components/edit-publisher/edit-publisher';
 import { PublisherDetailsComponent } from './components/publisher-details/publisher-details';
 
 const routes: Routes = [
@@ -16,7 +15,7 @@ const routes: Routes = [
   },
   {
     path: 'edit/:id',
-    component: EditPublisherComponent
+    component: AddPublisherComponent
   },
   {
     path: 'details/:id',

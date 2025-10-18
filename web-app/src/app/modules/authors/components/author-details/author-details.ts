@@ -7,7 +7,6 @@ import { Author, AuthorStats, UserAuthorPreferenceDTO } from '../../models/autho
 import { AuthorService } from '../../services/author.service';
 import { ImageService } from '../../../shared/services/image.service';
 import { UiService } from '../../../shared/services/ui.service.service';
-import { CatalogApiService } from '../../../shared/services/catalog.api.service';
 
 @Component({
   selector: 'app-author-details',
@@ -30,7 +29,7 @@ export class AuthorDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
     private imageService: ImageService,
-    private uiService: UiService, private catalogApiService: CatalogApiService
+    private uiService: UiService
   ) { }
 
   ngOnInit() {
@@ -56,7 +55,7 @@ export class AuthorDetailsComponent implements OnInit {
           let catalogAuthorId = this.author?.catalogAuthorId;
 
           if (catalogAuthorId) {
-            this.catalogApiService.getCatalogAuthorDetailsById(catalogAuthorId).subscribe({
+            this.authorService.getCatalogAuthorDetailsById(catalogAuthorId).subscribe({
               next: (catalogResponse) => {
                 if (catalogResponse.data) {
                   this.author!.catalogAuthor = catalogResponse.data;

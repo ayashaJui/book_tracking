@@ -21,3 +21,29 @@ export interface PublisherCreateRequest {
 export interface PublisherUpdateRequest extends Partial<PublisherCreateRequest> {
   id: number;
 }
+
+export interface CatalogPublisherCreateRequestDTO {
+  name: string;
+  location: string;
+  website: string;
+  description?: string;
+}
+
+export interface CatalogPublisherUpdateRequestDTO {
+  id: number;
+  name: string;
+  location: string;
+  website: string;
+  description?: string;
+}
+
+export interface CatalogPublisherDTO {
+  id: number;
+  name: string;
+  location: string;
+  website: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  bookCount: number;
+}

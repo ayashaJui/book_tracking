@@ -38,11 +38,7 @@ export interface CatalogPublisher {
     name: string;
     description?: string;
     website?: string;
-    foundedYear?: number;
-    headquarters?: string;
-    logoUrl?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    
 }
 
 export interface CatalogSeries {

@@ -75,9 +75,23 @@ export class HttpRequestInterceptor implements HttpInterceptor {
           err.error.error === ErrorMessage.SERVER_ERROR
         ) {
           this.uiService.setCustomError(AlertType.FAILED, AlertMessage.FAILED);
+        } else if (err.status === ErrorCode.UNAUTHORIZED) {
+          this.unauthorizedError$.next();
+        } else if (err.status === ErrorCode.BAD_REQUEST) {
+          this.uiService.setCustomError(AlertType.FAILED, err.error.message);
+        } else if (err.status === ErrorCode.CONFLICT) {
+          this.uiService.setCustomError(
+            AlertType.DUPLICATE,
+            err.error.message
+          );
+        } else if (err.status === ErrorCode.INTERNAL_SERVER_ERROR) {
+          this.uiService.setCustomError(AlertType.FAILED, err.error.message);
+        } else if (err.status === ErrorCode.METHOD_NOT_ALLOWED) {
+          this.uiService.setCustomError(AlertType.FAILED, 'Method not allowed');
         }
 
-        throw err.statusText;
+        
+        throw err;
       })
     );
   }

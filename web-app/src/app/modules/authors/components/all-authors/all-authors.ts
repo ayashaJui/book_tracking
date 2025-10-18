@@ -6,7 +6,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { Author, CatalogAuthorDTO, UserAuthorPreferenceDTO } from '../../models/author.model';
 import { AuthorService } from '../../services/author.service';
 import { UiService } from '../../../shared/services/ui.service.service';
-import { CatalogApiService } from '../../../shared/services/catalog.api.service';
 
 @Component({
   selector: 'app-all-authors',
@@ -49,7 +48,7 @@ export class AllAuthorsComponent implements OnInit {
 
   constructor(
     private authorService: AuthorService,
-    private router: Router, private catalogApiService: CatalogApiService,
+    private router: Router, 
     private confirmationService: ConfirmationService, private uiService: UiService
   ) { }
 
@@ -73,7 +72,7 @@ export class AllAuthorsComponent implements OnInit {
 
           let ids = pagedData.content.map(pref => pref.catalogAuthorId).filter(id => id !== undefined) as number[];
 
-          this.catalogApiService.getCatalogAuthorDetails(ids).subscribe({
+          this.authorService.getCatalogAuthorDetails(ids).subscribe({
             next: (catalogResponse) => {
               if (catalogResponse.data) {
                 let catalogAuthors: CatalogAuthorDTO[] = catalogResponse.data;

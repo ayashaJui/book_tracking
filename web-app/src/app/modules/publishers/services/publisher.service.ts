@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Publisher, PublisherCreateRequest, PublisherUpdateRequest } from '../models/publisher.model';
+import { CatalogPublisherCreateRequestDTO, CatalogPublisherUpdateRequestDTO, Publisher, PublisherCreateRequest, PublisherUpdateRequest } from '../models/publisher.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CatalogPublisherHttpResponse } from '../models/response.model';
+import { environment } from '../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +13,16 @@ export class PublisherService {
   private readonly STORAGE_KEY = 'book_tracking_publishers';
   private publishersSubject = new BehaviorSubject<Publisher[]>([]);
 
-  constructor() {
-    this.loadPublishersFromStorage();
+  publisherForm!: FormGroup
+
+  constructor(private fb: FormBuilder, private http: HttpClient) {
+    this.publisherForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      location: [''],
+      website: ['', [Validators.pattern(/^https?:\/\/.*$/)]],
+      description: ['']
+    });
+
   }
 
   // Observable for components to subscribe to
@@ -29,52 +41,59 @@ export class PublisherService {
   }
 
   // Create new publisher
-  createPublisher(publisherData: PublisherCreateRequest): Publisher {
-    const publishers = this.publishersSubject.value;
-    const newId = this.generateId();
-    
-    const newPublisher: Publisher = {
-      ...publisherData,
-      id: newId,
-      dateAdded: new Date().toISOString(),
-      bookCount: 0
-    };
+  createPublisherOld(publisherData: PublisherCreateRequest): Observable<Publisher> {
+    return new Observable(observer => {
+      const publishers = this.publishersSubject.value;
+      const newId = this.generateId();
 
-    const updatedPublishers = [...publishers, newPublisher];
-    this.publishersSubject.next(updatedPublishers);
-    this.savePublishersToStorage(updatedPublishers);
-    
-    return newPublisher;
+      const newPublisher: Publisher = {
+        ...publisherData,
+        id: newId,
+        dateAdded: new Date().toISOString(),
+        bookCount: 0
+      };
+
+      const updatedPublishers = [...publishers, newPublisher];
+      this.publishersSubject.next(updatedPublishers);
+      this.savePublishersToStorage(updatedPublishers);
+
+      observer.next(newPublisher);
+      observer.complete();
+    });
   }
 
   // Update existing publisher
-  updatePublisher(publisherData: PublisherUpdateRequest): Publisher | null {
-    const publishers = this.publishersSubject.value;
-    const index = publishers.findIndex(p => p.id === publisherData.id);
-    
-    if (index === -1) {
-      return null;
-    }
+  updatePublisher(id: number, publisherData: Partial<PublisherCreateRequest>): Observable<Publisher> {
+    return new Observable(observer => {
+      const publishers = this.publishersSubject.value;
+      const index = publishers.findIndex(p => p.id === id);
 
-    const updatedPublisher: Publisher = {
-      ...publishers[index],
-      ...publisherData
-    };
+      if (index === -1) {
+        observer.error(new Error('Publisher not found'));
+        return;
+      }
 
-    const updatedPublishers = [...publishers];
-    updatedPublishers[index] = updatedPublisher;
-    
-    this.publishersSubject.next(updatedPublishers);
-    this.savePublishersToStorage(updatedPublishers);
-    
-    return updatedPublisher;
+      const updatedPublisher: Publisher = {
+        ...publishers[index],
+        ...publisherData
+      };
+
+      const updatedPublishers = [...publishers];
+      updatedPublishers[index] = updatedPublisher;
+
+      this.publishersSubject.next(updatedPublishers);
+      this.savePublishersToStorage(updatedPublishers);
+
+      observer.next(updatedPublisher);
+      observer.complete();
+    });
   }
 
   // Delete publisher
   deletePublisher(id: number): boolean {
     const publishers = this.publishersSubject.value;
     const filteredPublishers = publishers.filter(p => p.id !== id);
-    
+
     if (filteredPublishers.length === publishers.length) {
       return false; // Publisher not found
     }
@@ -93,7 +112,8 @@ export class PublisherService {
     const searchTerm = query.toLowerCase();
     return this.publishersSubject.value.filter(publisher =>
       publisher.name.toLowerCase().includes(searchTerm) ||
-      publisher.location?.toLowerCase().includes(searchTerm)
+      publisher.location?.toLowerCase().includes(searchTerm) ||
+      publisher.description?.toLowerCase().includes(searchTerm)
     );
   }
 
@@ -101,14 +121,14 @@ export class PublisherService {
   updatePublisherBookCount(publisherId: number, bookCount: number): void {
     const publishers = this.publishersSubject.value;
     const index = publishers.findIndex(p => p.id === publisherId);
-    
+
     if (index !== -1) {
       const updatedPublishers = [...publishers];
       updatedPublishers[index] = {
         ...updatedPublishers[index],
         bookCount
       };
-      
+
       this.publishersSubject.next(updatedPublishers);
       this.savePublishersToStorage(updatedPublishers);
     }
@@ -120,18 +140,6 @@ export class PublisherService {
     return publishers.length > 0 ? Math.max(...publishers.map(p => p.id || 0)) + 1 : 1;
   }
 
-  private loadPublishersFromStorage(): void {
-    try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (stored) {
-        const publishers = JSON.parse(stored) as Publisher[];
-        this.publishersSubject.next(publishers);
-      }
-    } catch (error) {
-      console.error('Error loading publishers from storage:', error);
-      this.publishersSubject.next([]);
-    }
-  }
 
   private savePublishersToStorage(publishers: Publisher[]): void {
     try {
@@ -139,5 +147,29 @@ export class PublisherService {
     } catch (error) {
       console.error('Error saving publishers to storage:', error);
     }
+  }
+
+
+  // api methods goes here
+  createCatalogPublisher(data: CatalogPublisherCreateRequestDTO): Observable<CatalogPublisherHttpResponse> {
+    let url = `${environment.catalog_service_url}/publishers`;
+
+    return this.http.post<CatalogPublisherHttpResponse>(url, data);
+  }
+
+  getAllCatalogPublishers(): Observable<CatalogPublisherHttpResponse> {
+    let url = `${environment.catalog_service_url}/publishers`;
+
+    return this.http.get<CatalogPublisherHttpResponse>(url);
+  }
+
+  getCatalogPublisherById(id: number): Observable<CatalogPublisherHttpResponse> {
+    let url = `${environment.catalog_service_url}/publishers/${id}`;
+    return this.http.get<CatalogPublisherHttpResponse>(url);
+  }
+
+  updateCatalogPublisher(data: CatalogPublisherUpdateRequestDTO): Observable<CatalogPublisherHttpResponse> {
+    let url = `${environment.catalog_service_url}/publishers`;
+    return this.http.put<CatalogPublisherHttpResponse>(url, data);
   }
 }

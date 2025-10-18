@@ -32,4 +32,7 @@ public class Publisher {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 }

@@ -16,17 +16,6 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
 
     <div *ngIf="publisher" class="flex items-start gap-6">
-      <!-- Publisher Logo with Image Upload -->
-      <div class="flex-shrink-0">
-        <app-image-upload
-          [entityType]="'publisher'"
-          [entityId]="publisher.id || 0"
-          [entityName]="publisher.name || ''"
-          [currentImageUrl]="publisher.logo || null"
-          (imageUploaded)="onImageUploaded($event)"
-          (imageRemoved)="onImageRemoved()"
-        ></app-image-upload>
-      </div>
 
       <!-- Publisher Info -->
       <div class="flex-1">
@@ -46,9 +35,9 @@
             </a>
           </div>
 
-          <div *ngIf="publisher.dateAdded" class="flex items-center gap-1">
+          <div *ngIf="publisher.createdAt" class="flex items-center gap-1">
             <i class="pi pi-calendar"></i>
-            <span>Added {{ publisher.dateAdded | date:'MMM yyyy' }}</span>
+            <span>Added {{ publisher.createdAt | date:'MMM yyyy' }}</span>
           </div>
 
           <div class="flex items-center gap-1">

@@ -1,10 +1,12 @@
 package com.biblioteca.catalogservice.service.impl;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.pagination.PaginationUtil;
 import com.biblioteca.catalogservice.dto.publisher.PublisherCreateDTO;
 import com.biblioteca.catalogservice.dto.publisher.PublisherDTO;
 import com.biblioteca.catalogservice.dto.publisher.PublisherUpdateDTO;
+import com.biblioteca.catalogservice.entity.Author;
 import com.biblioteca.catalogservice.entity.Publisher;
 import com.biblioteca.catalogservice.repository.PublisherRepository;
 import com.biblioteca.catalogservice.service.PublisherService;
@@ -36,7 +38,7 @@ public class PublisherServiceImpl implements PublisherService {
     public PublisherDTO createPublisher(PublisherCreateDTO publisherCreateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("createPublisher in PublisherServiceImpl is called with data: {} by user: {}", publisherCreateDTO, jwt.getSubject());
 
-        Optional<Publisher> existingPublisher = publisherRepository.findByName(publisherCreateDTO.getName());
+        Optional<Publisher> existingPublisher = publisherRepository.findByNameIgnoreCase(publisherCreateDTO.getName());
         if(existingPublisher.isPresent()) {
             log.warn("publisher with name {} already exists", publisherCreateDTO.getName());
             throw new CustomException("Publisher with the same name already exists", HttpStatus.CONFLICT.value());
@@ -94,7 +96,7 @@ public class PublisherServiceImpl implements PublisherService {
     public PublisherDTO updatePublisher(PublisherUpdateDTO publisherUpdateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("updatePublisher in PublisherServiceImpl is called with data: {} by user: {}",publisherUpdateDTO, jwt.getSubject());
 
-        Optional<Publisher> existingPublisher = publisherRepository.findByName(publisherUpdateDTO.getName());
+        Optional<Publisher> existingPublisher = publisherRepository.findByNameIgnoreCase(publisherUpdateDTO.getName());
         if(existingPublisher.isPresent() && !existingPublisher.get().getId().equals(publisherUpdateDTO.getId())) {
             log.warn("Publisher with name '{}' already exists. Update aborted.", publisherUpdateDTO.getName());
             throw new CustomException("Publisher with the same name already exists", HttpStatus.CONFLICT.value());
@@ -128,6 +130,16 @@ public class PublisherServiceImpl implements PublisherService {
             log.error("Error occurred while deleting publisher: {}", e.getMessage());
             throw new CustomException("Failed to delete publisher", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+    }
+
+    @Override
+    public List<PublisherDTO> searchPublisher(String publisherName, HttpServletRequest request, Jwt jwt) {
+        log.info("searchPublisher in PublisherServiceImpl is called with data: {} by user: {}", publisherName, jwt.getSubject());
+
+        List<Publisher>  publishers = publisherRepository.findByNameContaining(publisherName);
+        List<PublisherDTO> publisherDTOs = publishers.stream().map(this::convertToDTO).toList();
+
+        return publisherDTOs;
     }
 
     private Publisher findById(Integer id) {

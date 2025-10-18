@@ -77,20 +77,22 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
 
                     // route to correct search call based on type
                     switch (this.searchType) {
-                        case 'book':
-                            return this.catalogService.searchBooks(query);
-
                         case 'author':
                             return this.catalogApiService.searchAuthors(query);
 
+                        case 'genre':
+                            return this.catalogApiService.searchGenres(query);
+
                         case 'publisher':
-                            return this.catalogService.searchPublishers(query);
+                            return this.catalogApiService.searchPublishers(query);
+
+                        case 'book':
+                            return this.catalogService.searchBooks(query);
 
                         case 'series':
                             return this.catalogService.searchSeries(query);
 
-                        case 'genre':
-                            return this.catalogApiService.searchGenres(query);
+                        
 
                         default:
 

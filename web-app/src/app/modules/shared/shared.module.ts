@@ -10,6 +10,7 @@ import { AuthorSelectorComponent } from './components/author-selector/author-sel
 import { ImageUploadComponent } from './components/image-upload/image-upload';
 import { CatalogSearchComponent } from './components/catalog-search/catalog-search.component';
 import { DuplicateDetectionDialogComponent } from './components/duplicate-dialog/duplicate-dialog.component';
+import { PublisherFormComponent } from './components/publisher-form/publisher-form.component';
 
 import { ButtonModule } from 'primeng/button';
 import { Rating } from 'primeng/rating';
@@ -55,7 +56,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @NgModule({
-  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, TagSelectorComponent, AuthorSelectorComponent, ImageUploadComponent, CatalogSearchComponent, DuplicateDetectionDialogComponent],
+  declarations: [ToastMsg, NotFoundComponent, GenreSelectorComponent, TagSelectorComponent, AuthorSelectorComponent, ImageUploadComponent, CatalogSearchComponent, DuplicateDetectionDialogComponent, PublisherFormComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -146,6 +147,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     ImageUploadComponent,
     CatalogSearchComponent,
     DuplicateDetectionDialogComponent,
+    PublisherFormComponent,
     ProgressSpinnerModule,
     Select,
     // Textarea,

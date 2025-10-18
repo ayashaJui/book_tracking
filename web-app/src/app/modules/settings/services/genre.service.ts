@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserGenrePreferenceCreateRequestDTO } from '../../shared/models/genre.model';
 import { Observable } from 'rxjs';
-import { UserGenrePreferenceHttpResponse } from '../models/response.model';
+import { CatalogGenreHttpResponse, UserGenrePreferenceHttpResponse } from '../models/response.model';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { GenreUpdateRequestDTO } from '../models/genre.model';
+import { CatalogGenreCreateRequestDTO, CatalogGenreUpdateRequestDTO, GenreUpdateRequestDTO } from '../models/genre.model';
 
 @Injectable({
   providedIn: 'root'
@@ -55,5 +55,36 @@ export class GenreService {
     let url = `${environment.user_library_service_url}/user_genre_preferences/${id}`;
 
     return this.http.delete<UserGenrePreferenceHttpResponse>(url);
+  }
+
+  // CRUD for Catalog Genres
+  createCatalogGenre(catalogData: CatalogGenreCreateRequestDTO): Observable<CatalogGenreHttpResponse> {
+    let url = `${environment.catalog_service_url}/genres`;
+
+    return this.http.post<CatalogGenreHttpResponse>(url, catalogData);
+  }
+
+  getCatalogGenreDetails(catalogGenreIds: number[]): Observable<CatalogGenreHttpResponse> {
+    let params = catalogGenreIds.map(id => `ids=${id}`).join('&');
+    let url = `${environment.catalog_service_url}/genres/genre_ids?${params}`;
+
+    return this.http.get<CatalogGenreHttpResponse>(url);
+  }
+
+  getCatalogGenreDetailsById(catalogGenreId: number): Observable<CatalogGenreHttpResponse> {
+    let url = `${environment.catalog_service_url}/genres/${catalogGenreId}`;
+    return this.http.get<CatalogGenreHttpResponse>(url);
+  }
+
+  updateCatalogGenre(catalogGenreData: CatalogGenreUpdateRequestDTO): Observable<CatalogGenreHttpResponse> {
+    let url = `${environment.catalog_service_url}/genres`;
+
+    return this.http.put<CatalogGenreHttpResponse>(url, catalogGenreData);
+  }
+
+  getAllCatalogGenres(): Observable<CatalogGenreHttpResponse> {
+    let url = `${environment.catalog_service_url}/genres`;
+
+    return this.http.get<CatalogGenreHttpResponse>(url);
   }
 }

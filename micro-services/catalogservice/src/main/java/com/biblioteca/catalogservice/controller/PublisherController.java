@@ -96,4 +96,15 @@ public class PublisherController {
 
         return new ResponseEntity<>(new ResponseDTO<>(message, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
+
+    @Operation(summary = "APT ID: Publisher007")
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<PublisherDTO>>> searchPublisher(@RequestParam(value = "publisherName", required = false) String publisherName,
+                                                                     HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ) {
+        log.info("searchPublisher in PublisherController is called  by user: {}", jwt.getSubject());
+
+        List<PublisherDTO> authorDTOs = publisherService.searchPublisher(publisherName,  request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(authorDTOs, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
 }

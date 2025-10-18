@@ -347,8 +347,25 @@
                       [showClear]="true"
                       class="flex-1"
                     ></p-select>
+
+                    <!-- Edit button for selected publisher -->
                     <button
-                      *ngIf="selectedPublisherId"
+                      *ngIf="
+                        selectedPublisherId && selectedPublisherId !== 'add_new'
+                      "
+                      pButton
+                      icon="pi pi-pencil"
+                      class="p-button-outlined p-button-secondary p-button-sm"
+                      pTooltip="Edit Publisher"
+                      (click)="openEditPublisherDialog()"
+                      type="button"
+                    ></button>
+
+                    <!-- View publisher details button -->
+                    <button
+                      *ngIf="
+                        selectedPublisherId && selectedPublisherId !== 'add_new'
+                      "
                       pButton
                       icon="pi pi-info-circle"
                       class="p-button-outlined p-button-sm"
@@ -356,6 +373,8 @@
                       (click)="viewPublisherDetails(selectedPublisherId)"
                       type="button"
                     ></button>
+
+                    <!-- Add new publisher button -->
                     <button
                       pButton
                       icon="pi pi-plus"
@@ -939,98 +958,31 @@
     styleClass="publisher-dialog"
     [style]="{ width: '500px', maxWidth: '90vw' }"
   >
-    <div class="space-y-6">
-      <!-- Publisher Name -->
-      <div class="space-y-2">
-        <label
-          class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-        >
-          <i class="pi pi-building text-indigo-500 mr-2"></i>
-          Publisher Name *
-        </label>
-        <input
-          type="text"
-          pInputText
-          [(ngModel)]="newPublisherData.name"
-          placeholder="Enter publisher name"
-          class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-          required
-        />
-      </div>
+    <app-publisher-form
+      mode="add"
+      (publisherSaved)="onPublisherSaved($event)"
+      (cancelled)="onPublisherDialogCancelled()"
+    ></app-publisher-form>
+  </p-dialog>
 
-      <!-- Location -->
-      <div class="space-y-2">
-        <label
-          class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-        >
-          <i class="pi pi-map-marker text-indigo-500 mr-2"></i>
-          Location
-        </label>
-        <input
-          type="text"
-          pInputText
-          [(ngModel)]="newPublisherData.location"
-          placeholder="Enter publisher location (optional)"
-          class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-        />
-      </div>
-
-      <!-- Website -->
-      <div class="space-y-2">
-        <label
-          class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-        >
-          <i class="pi pi-globe text-indigo-500 mr-2"></i>
-          Website
-        </label>
-        <input
-          type="url"
-          pInputText
-          [(ngModel)]="newPublisherData.website"
-          placeholder="Enter publisher website (optional)"
-          class="w-full h-12 rounded-xl border-0 bg-gray-50 transition-all duration-200"
-        />
-      </div>
-
-      <!-- Description -->
-      <div class="space-y-2">
-        <label
-          class="block text-sm font-semibold text-gray-700 dark:text-gray-200"
-        >
-          <i class="pi pi-file-text text-indigo-500 mr-2"></i>
-          Description
-        </label>
-        <textarea
-          pTextarea
-          [(ngModel)]="newPublisherData.description"
-          placeholder="Enter publisher description (optional)"
-          rows="3"
-          class="w-full rounded-xl border-0 bg-gray-50 transition-all duration-200"
-        ></textarea>
-      </div>
-    </div>
-
-    <ng-template pTemplate="footer">
-      <div class="flex gap-3 justify-end">
-        <button
-          type="button"
-          pButton
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-outlined"
-          (click)="cancelAddPublisher()"
-        ></button>
-        <button
-          type="button"
-          pButton
-          label="Add Publisher"
-          icon="pi pi-check"
-          class="p-button-success"
-          (click)="createNewPublisher()"
-          [disabled]="!newPublisherData.name.trim()"
-        ></button>
-      </div>
-    </ng-template>
+  <!-- Edit Publisher Dialog -->
+  <p-dialog
+    header="Edit Publisher"
+    [(visible)]="showEditPublisherDialog"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="publisher-dialog"
+    [style]="{ width: '500px', maxWidth: '90vw' }"
+  >
+    <app-publisher-form
+      *ngIf="publisherToEdit"
+      mode="edit"
+      [publisher]="publisherToEdit"
+      (publisherSaved)="onPublisherSaved($event)"
+      (cancelled)="onPublisherDialogCancelled()"
+    ></app-publisher-form>
   </p-dialog>
 
   <!-- Duplicate Detection Dialog -->

@@ -268,18 +268,28 @@ export class EditBook implements OnInit {
         description: this.newPublisherData.description
       };
 
-      const addedPublisher = this.publisherService.createPublisher(newPublisher);
-      this.loadPublisherOptions();
-      this.selectedPublisherId = addedPublisher.id || 0;
-      this.onPublisherChange();
+      this.publisherService.createPublisherOld(newPublisher).subscribe({
+        next: (addedPublisher) => {
+          this.loadPublisherOptions();
+          this.selectedPublisherId = addedPublisher.id || 0;
+          this.onPublisherChange();
 
-      this.newPublisherData = { name: '', location: '', website: '', description: '' };
-      this.showAddPublisherDialog = false;
+          this.newPublisherData = { name: '', location: '', website: '', description: '' };
+          this.showAddPublisherDialog = false;
 
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Publisher added successfully'
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Publisher added successfully'
+          });
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to add publisher'
+          });
+        }
       });
     }
   }

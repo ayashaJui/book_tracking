@@ -17,4 +17,5 @@ public class PublisherCreateDTO {
 
     private String website;
 
+    private String description;
 }

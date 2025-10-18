@@ -45,7 +45,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO createAuthor(AuthorCreateDTO authorCreateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("createAuthor in AuthorServiceImpl is called with data: {} by user: {}", authorCreateDTO, jwt.getSubject());
 
-        Optional<Author> existingAuthor = authorRepository.findByName(authorCreateDTO.getName());
+        Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(authorCreateDTO.getName());
         if (existingAuthor.isPresent()) {
             log.error("Author with name '{}' already exists", authorCreateDTO.getName());
             throw new CustomException("Author with the same name already exists", CONFLICT.value());
@@ -128,7 +128,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO updateAuthor(AuthorUpdateDTO updateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("updateAuthor in AuthorServiceImpl is called with data: {} by user: {}", updateDTO, jwt.getSubject());
 
-        Optional<Author> existingAuthor = authorRepository.findByName(updateDTO.getName());
+        Optional<Author> existingAuthor = authorRepository.findByNameIgnoreCase(updateDTO.getName());
 
         if(existingAuthor.isPresent() && !existingAuthor.get().getId().equals(updateDTO.getId())) {
             log.error("Author with name '{}' already exists", updateDTO.getName());

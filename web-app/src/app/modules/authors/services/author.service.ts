@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Author, AuthorStats, AuthorCreateRequestDTO, AuthorCreateRequest, CatalogAuthorCreateRequestDTO, AuthorUpdateRequestDTO } from '../models/author.model';
+import { Author, AuthorStats, AuthorCreateRequestDTO, AuthorCreateRequest, CatalogAuthorCreateRequestDTO, AuthorUpdateRequestDTO, CatalogAuthorUpdateRequestDTO } from '../models/author.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CatalogAuthorHttpResponse, UserAuthorPreferenceHttpPagedResponse, UserAuthorPreferenceHttpResponse } from '../models/response.model';
 import { environment } from '../../../../environments/environment';
@@ -324,7 +324,33 @@ export class AuthorService {
 
   deleteUserAuthorPreference(id: number): Observable<UserAuthorPreferenceHttpResponse> {
     let url = `${environment.user_library_service_url}/user_author_preferences/${id}`;
-    
+
     return this.http.delete<UserAuthorPreferenceHttpResponse>(url);
+  }
+
+
+  // CRUD for Catalog Authors
+  createCatalogAuthor(catalogData: CatalogAuthorCreateRequestDTO): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors`;
+
+    return this.http.post<CatalogAuthorHttpResponse>(url, catalogData);
+  }
+
+  getCatalogAuthorDetails(catalogAuthorIds: number[]): Observable<CatalogAuthorHttpResponse> {
+    let params = catalogAuthorIds.map(id => `ids=${id}`).join('&');
+    let url = `${environment.catalog_service_url}/authors/author_ids?${params}`;
+
+    return this.http.get<CatalogAuthorHttpResponse>(url);
+  }
+
+  getCatalogAuthorDetailsById(catalogAuthorId: number): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors/${catalogAuthorId}`;
+    return this.http.get<CatalogAuthorHttpResponse>(url);
+  }
+
+  updateCatalogAuthor(catalogAuthorData: CatalogAuthorUpdateRequestDTO): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors`;
+
+    return this.http.put<CatalogAuthorHttpResponse>(url, catalogAuthorData);
   }
 }
