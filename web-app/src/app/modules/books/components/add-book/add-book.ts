@@ -3,9 +3,9 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Book, BookCreateRequest, BookAuthor } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
-import { Series } from '../../../series/models/series.model';
+import { SeriesDTO } from '../../../series/models/series.model';
 import { SeriesService } from '../../../series/services/series.service';
-import { GenreService } from '../../../shared/services/genre.service';
+import { GenreSelectorService } from '../../../shared/services/genre.selector.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { Author } from '../../../authors/models/author.model';
 import { PublisherService } from '../../../publishers/services/publisher.service';
@@ -130,7 +130,7 @@ export class AddBook implements OnInit {
     private location: Location,
     private router: Router,
     private seriesService: SeriesService,
-    private genreService: GenreService,
+    private genreSelectorService: GenreSelectorService,
     private bookService: BookService,
     private authorService: AuthorService,
     private publisherService: PublisherService,
@@ -144,7 +144,7 @@ export class AddBook implements OnInit {
   }
 
   loadGenreOptions() {
-    this.genreOptions = this.genreService.getGenreOptions();
+    // this.genreOptions = this.genreService.getGenreOptions();
   }
 
   loadPublisherOptions() {
@@ -285,7 +285,7 @@ export class AddBook implements OnInit {
           const authors = this.authorService.getAuthors();
           const matchingAuthor = authors.find(author =>
             series.authors.some(seriesAuthor =>
-              author.name.toLowerCase() === seriesAuthor.name.toLowerCase()
+              author.name.toLowerCase() === seriesAuthor.authorName.toLowerCase()
             )
           );
           if (matchingAuthor) {
@@ -302,7 +302,7 @@ export class AddBook implements OnInit {
     }
   }
 
-  updateAvailableSeriesOrders(series: Series) {
+  updateAvailableSeriesOrders(series: SeriesDTO) {
     // Get existing order positions
     const existingOrders = series.books
       .map((book) => book.orderInSeries)
@@ -329,9 +329,9 @@ export class AddBook implements OnInit {
 
   createNewSeries() {
     if (this.newSeriesData.title && this.newSeriesData.author) {
-      const newSeries: Series = {
+      const newSeries: SeriesDTO = {
         title: this.newSeriesData.title,
-        authors: [{ name: this.newSeriesData.author, role: 'Author' }],
+        authors: [{ authorName: this.newSeriesData.author, authorRole: 'Author' }],
         totalBooks: this.newSeriesData.totalBooks,
         readBooks: 0,
         genres: this.newSeriesData.genres,

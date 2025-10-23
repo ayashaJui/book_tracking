@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 import { BookService } from '../../services/book.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { PublisherService } from '../../../publishers/services/publisher.service';
-import { GenreService } from '../../../shared/services/genre.service';
+import { GenreSelectorService } from '../../../shared/services/genre.selector.service';
 import { CollectionService } from '../../../collections/services/collection.service';
 import { Book, BookAuthor } from '../../models/book.model';
 import { Author } from '../../../authors/models/author.model';
@@ -154,7 +154,7 @@ export class BookDetails implements OnInit {
     private bookService: BookService,
     private authorService: AuthorService,
     private publisherService: PublisherService,
-    private genreService: GenreService,
+    private genreSelectorService: GenreSelectorService,
     private collectionService: CollectionService
   ) { }
 
@@ -324,7 +324,7 @@ export class BookDetails implements OnInit {
   }
 
   loadGenreOptions() {
-    this.genreOptions = this.genreService.getGenreOptions();
+    // this.genreOptions = this.genreSelectorService.getGenreOptions();
   }
 
   loadPublisherOptions() {

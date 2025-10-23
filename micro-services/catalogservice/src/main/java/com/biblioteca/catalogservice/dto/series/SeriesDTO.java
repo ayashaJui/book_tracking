@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.dto.series;
 
+import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.seriesAuthor.SeriesAuthorDTO;
 import com.biblioteca.catalogservice.dto.seriesGenre.SeriesGenreDTO;
 import lombok.*;
@@ -27,6 +28,8 @@ public class SeriesDTO {
     private List<SeriesAuthorDTO> seriesAuthors;
 
     private List<SeriesGenreDTO> seriesGenres;
+
+    private List<BookDTO> seriesBooks;
 
     private LocalDateTime createdAt;
 

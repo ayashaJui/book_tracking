@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Series } from '../models/series.model';
+import { SeriesDTO } from '../models/series.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SeriesService {
-  private seriesSubject = new BehaviorSubject<Series[]>([
+  seriesForm!: FormGroup;
+
+  private seriesSubject = new BehaviorSubject<SeriesDTO[]>([
     {
       id: 1,
       title: 'The Lord of the Rings',
       authors: [
-        { name: 'J.R.R. Tolkien', role: 'Author' }
+        { authorName: 'J.R.R. Tolkien', authorRole: 'Author' }
       ],
       totalBooks: 3,
       readBooks: 2,
@@ -46,7 +50,7 @@ export class SeriesService {
       id: 2,
       title: 'Harry Potter',
       authors: [
-        { name: 'J.K. Rowling', role: 'Author' }
+        { authorName: 'J.K. Rowling', authorRole: 'Author' }
       ],
       totalBooks: 7,
       readBooks: 4,
@@ -106,24 +110,43 @@ export class SeriesService {
 
   public series$ = this.seriesSubject.asObservable();
 
-  constructor() {}
+  constructor(private fb: FormBuilder, private http: HttpClient) {
+    this.seriesForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      description: [''],
+      totalBooks: [0, [Validators.required, Validators.min(1)]],
+      isCompleted: [false],
+      genres: [[]],
+      authors: this.fb.array([]),
 
-  getAllSeries(): Series[] {
+      // User series related fields
+      booksRead: [0, [Validators.min(0)]],
+      booksOwned: [0, [Validators.min(0)]],
+      status: ['Want to Read', [Validators.required]],
+      startDate: [''],
+      completionDate: [''],
+      isFavorite: [false],
+      readingOrderPreference: ['Publication Order'],
+      notes: [''],
+    });
+  }
+
+  getAllSeries(): SeriesDTO[] {
     return this.seriesSubject.value;
   }
 
-  getSeriesById(id: number): Series | undefined {
+  getSeriesById(id: number): SeriesDTO | undefined {
     return this.seriesSubject.value.find((series) => series.id === id);
   }
 
-  addSeries(series: Series): void {
+  addSeries(series: SeriesDTO): void {
     const currentSeries = this.seriesSubject.value;
     const newId = Math.max(...currentSeries.map((s) => s.id || 0), 0) + 1;
     series.id = newId;
     this.seriesSubject.next([...currentSeries, series]);
   }
 
-  updateSeries(updatedSeries: Series): void {
+  updateSeries(updatedSeries: SeriesDTO): void {
     const currentSeries = this.seriesSubject.value;
     const index = currentSeries.findIndex((s) => s.id === updatedSeries.id);
     if (index !== -1) {
@@ -135,7 +158,7 @@ export class SeriesService {
   // Helper method to get series options for dropdowns
   getSeriesOptions(): { label: string; value: number }[] {
     return this.seriesSubject.value.map((series) => ({
-      label: `${series.title} by ${series.authors.map(a => a.name).join(', ')}`,
+      label: `${series.title} by ${series.authors.map(a => a.authorName).join(', ')}`,
       value: series.id!,
     }));
   }

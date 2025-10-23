@@ -1,0 +1,88 @@
+version: '3.9'
+
+services:
+  # 🟩 Eureka Service Registry
+  service-registry:
+    build: ./service-registry
+    container_name: service-registry
+    ports:
+      - "9070:9070"
+    networks:
+      - micro-net
+
+  # 🟦 Config Server
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=git
+      - GIT_URI=https://github.com/<your-config-repo>
+    networks:
+      - micro-net
+    depends_on:
+      - service-registry
+
+  # 🐘 Local PostgreSQL (optional)
+  postgres:
+    image: postgres:17
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: bookdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - micro-net
+
+  # 🟨 Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    networks:
+      - micro-net
+    depends_on:
+      - config-server
+      - service-registry
+
+  # 🟧 User Service
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    networks:
+      - micro-net
+    depends_on:
+      - config-server
+      - service-registry
+
+  # 🟪 API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    networks:
+      - micro-net
+    depends_on:
+      - config-server
+      - service-registry
+
+networks:
+  micro-net:
+
+volumes:
+  pgdata:

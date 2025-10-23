@@ -1,4 +1,4 @@
-CREATE TABLE book_series (
+CREATE TABLE IF NOT EXISTS book_series (
     id SERIAL PRIMARY KEY,
     book_id INT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
     series_id INT NOT NULL REFERENCES series(id) ON DELETE CASCADE,

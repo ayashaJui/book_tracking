@@ -20,4 +20,6 @@ public interface SeriesRepository extends JpaRepository<Series, Integer> {
     @Query("SELECT s FROM SeriesGenre sg JOIN sg.series s " +
             "WHERE sg.genre.id = :genreId")
     List<Series> findBySeriesGenres(@Param("genreId") Integer genreId);
+
+    List<Series> findByNameContaining(String name);
 }

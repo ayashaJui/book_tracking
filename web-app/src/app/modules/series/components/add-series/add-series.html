@@ -53,17 +53,8 @@
           <button
             pButton
             type="button"
-            icon="pi pi-eye"
-            label="Preview"
-            class="p-button-outlined"
-            [class.p-button-success]="previewMode"
-            (click)="togglePreview()"
-          ></button>
-          <button
-            pButton
-            type="button"
-            icon="pi pi-times"
-            label="Cancel"
+            icon="pi pi-arrow-left"
+            label="Back to Series List"
             class="p-button-outlined p-button-secondary"
             (click)="cancel()"
           ></button>
@@ -73,103 +64,79 @@
   </div>
 </div>
 
-<!-- Main Content -->
-<div class="max-w-7xl mx-auto py-6 lg:py-8">
-  <!-- Form Container -->
-  <div class="mx-auto">
-    <form [formGroup]="seriesForm" (ngSubmit)="onSubmit()">
-      <!-- Preview Mode -->
-      <div *ngIf="previewMode" class="mb-8">
-        <div
-          class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-        >
-          <div class="flex items-center gap-3 mb-6">
-            <div
-              class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
-            >
-              <i class="pi pi-eye text-white"></i>
+<!-- Main Content Container -->
+<div class="py-6 lg:py-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Enhanced Form -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700"
+    >
+      <form
+        [formGroup]="seriesService.seriesForm"
+        (ngSubmit)="onSubmit()"
+        class="p-8 space-y-8"
+      >
+        <!-- Catalog Search Section -->
+        <div class="space-y-6">
+          <div
+            class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <i class="pi pi-search text-blue-600 dark:text-blue-400"></i>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
-              Preview
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              Search Catalog First
             </h2>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-1">
-              <img
-                [src]="
-                  seriesForm.get('coverUrl')?.value ||
-                  'assets/images/product-not-found.png'
-                "
-                class="w-full h-64 object-cover rounded-xl border border-gray-200 dark:border-gray-700"
-                alt="Series Cover"
-              />
-            </div>
-            <div class="md:col-span-2 space-y-4">
-              <div>
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-white">
-                  {{ seriesForm.get("title")?.value || "Series Title" }}
-                </h3>
-                <div class="text-gray-600 dark:text-gray-400">
-                  <span *ngIf="authorsArray.length === 0">by Author Name</span>
-                  <span *ngIf="authorsArray.length > 0">
-                    by
-                    <span
-                      *ngFor="
-                        let author of authorsArray.controls;
-                        let i = index
-                      "
-                    >
-                      {{ author.get("name")?.value || "Author Name" }}
-                      <span class="text-sm text-gray-500"
-                        >({{ author.get("role")?.value }})</span
-                      >
-                      <span *ngIf="i < authorsArray.length - 1">, </span>
-                    </span>
-                  </span>
-                </div>
-                <p
-                  class="text-sm text-gray-500 mt-2"
-                  *ngIf="seriesForm.get('genre')?.value"
-                >
-                  {{ seriesForm.get("genre")?.value }}
-                </p>
-              </div>
-              <p
-                class="text-gray-700 dark:text-gray-300"
-                *ngIf="seriesForm.get('description')?.value"
-              >
-                {{ seriesForm.get("description")?.value }}
-              </p>
-              <div
-                class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400"
-              >
-                <span
-                  >{{ seriesForm.get("totalBooks")?.value || 0 }} Total Books
-                  Expected</span
-                >
-                <span>{{ booksArray.length }} Books Added</span>
-                <span>{{ getCompletedBooksCount() }} Completed</span>
-              </div>
-            </div>
+          <div
+            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 relative z-10"
+          >
+            <p class="text-blue-800 dark:text-blue-300 text-sm mb-4">
+              <i class="pi pi-info-circle mr-2"></i>
+              Search our catalog first to avoid creating duplicate series. If
+              the series doesn't exist, you can create a new one.
+            </p>
+
+            <app-catalog-search
+              searchType="series"
+              (itemSelected)="onCatalogSeriesSelected($event)"
+              (createNewClicked)="onCreateNewFromCatalog($event)"
+              (searchPerformed)="catalogSearchPerformed = true"
+            >
+            </app-catalog-search>
           </div>
         </div>
-      </div>
 
-      <!-- Form Mode -->
-      <div *ngIf="!previewMode" class="space-y-8">
-        <!-- Series Information Card -->
+        <!-- Catalog Series Info -->
         <div
-          class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+          *ngIf="isFromCatalog && showForm"
+          class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4"
         >
-          <div class="flex items-center gap-3 mb-6">
-            <div
-              class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
-            >
-              <i class="pi pi-book text-white"></i>
+          <div class="flex items-center gap-2">
+            <i class="pi pi-info-circle text-amber-600"></i>
+            <p class="text-amber-800 dark:text-amber-300 text-sm font-medium">
+              Catalog Series Selected
+            </p>
+          </div>
+          <p class="text-amber-700 dark:text-amber-400 text-sm mt-1">
+            This series' basic information comes from our catalog and cannot be
+            edited. You can still customize your books and preferences below.
+          </p>
+        </div>
+
+        <!-- Basic Information Section -->
+        <div class="space-y-6" *ngIf="showForm && !previewMode">
+          <div
+            class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+              <i
+                class="pi pi-info-circle text-indigo-600 dark:text-indigo-400"
+              ></i>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
-              Series Information
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              Basic Information
             </h2>
           </div>
 
@@ -185,103 +152,12 @@
                 pInputText
                 type="text"
                 placeholder="Enter series title"
-                formControlName="title"
+                formControlName="name"
                 class="w-full"
-                [class.ng-invalid]="isFieldInvalid('title')"
+                [class.ng-invalid]="isFieldInvalid('name')"
               />
-              <small class="text-red-500" *ngIf="isFieldInvalid('title')">
-                {{ getFieldError("title") }}
-              </small>
-            </div>
-
-            <!-- Authors -->
-            <div class="md:col-span-2 space-y-4">
-              <div class="flex items-center justify-between">
-                <label
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Authors <span class="text-red-500">*</span>
-                </label>
-                <button
-                  type="button"
-                  pButton
-                  icon="pi pi-plus"
-                  label="Add Author"
-                  class="p-button-sm p-button-outlined"
-                  (click)="addAuthor()"
-                ></button>
-              </div>
-
-              <div
-                *ngFor="let author of authorsArray.controls; let i = index"
-                class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
-              >
-                <!-- Author Selection -->
-                <div class="md:col-span-2 space-y-2">
-                  <label
-                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Author Name
-                  </label>
-                  <app-author-selector
-                    [placeholder]="'Select author...'"
-                    [formControl]="$any(author.get('author'))"
-                    [multiple]="false"
-                    [showAddButton]="true"
-                    [required]="true"
-                    (authorSelected)="onAuthorSelected($event, i)"
-                    class="w-full"
-                    [class.ng-invalid]="isAuthorFieldInvalid(i, 'author')"
-                  ></app-author-selector>
-                  <small
-                    class="text-red-500"
-                    *ngIf="isAuthorFieldInvalid(i, 'author')"
-                  >
-                    Author is required
-                  </small>
-                </div>
-
-                <!-- Author Role -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-xs font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Role
-                  </label>
-                  <p-select
-                    [formControl]="$any(author.get('role'))"
-                    [options]="roleOptions"
-                    placeholder="Select role"
-                    class="w-full"
-                    [class.ng-invalid]="isAuthorFieldInvalid(i, 'role')"
-                  ></p-select>
-                  <small
-                    class="text-red-500"
-                    *ngIf="isAuthorFieldInvalid(i, 'role')"
-                  >
-                    {{ getAuthorFieldError(i, "role") }}
-                  </small>
-                </div>
-
-                <!-- Remove Author Button -->
-                <div
-                  class="flex items-end justify-end"
-                  *ngIf="authorsArray.length > 1"
-                >
-                  <button
-                    type="button"
-                    pButton
-                    icon="pi pi-trash"
-                    class="p-button-sm p-button-text p-button-danger"
-                    (click)="removeAuthor(i)"
-                    pTooltip="Remove Author"
-                  ></button>
-                </div>
-              </div>
-
-              <small class="text-gray-500 dark:text-gray-400">
-                You can add multiple authors and specify their roles in the
-                series.
+              <small class="text-red-500" *ngIf="isFieldInvalid('name')">
+                {{ getFieldError("name") }}
               </small>
             </div>
 
@@ -304,23 +180,77 @@
               <small class="text-red-500" *ngIf="isFieldInvalid('totalBooks')">
                 {{ getFieldError("totalBooks") }}
               </small>
-              <small class="text-gray-500 text-xs">
-                You can add individual books below. This field helps track the
-                expected total.
-              </small>
             </div>
 
-            <!-- Genres -->
+            <!-- Series Completion Status -->
             <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Series Status
+              </label>
+              <div class="flex items-center gap-3 mt-3">
+                <p-checkbox
+                  formControlName="isCompleted"
+                  binary="true"
+                  inputId="isCompleted"
+                ></p-checkbox>
+                <label
+                  for="isCompleted"
+                  class="text-sm text-gray-600 dark:text-gray-400"
+                >
+                  Series is complete (no more books will be published)
+                </label>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="md:col-span-2 space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Description
+              </label>
+              <textarea
+                pInputTextarea
+                formControlName="description"
+                maxlength="1000"
+                placeholder="Enter series description"
+                class="w-full"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <!-- Cover URL -->
+            <!-- <div class="md:col-span-2 space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Cover Image URL
+              </label>
+              <input
+                pInputText
+                type="url"
+                placeholder="Enter cover image URL"
+                formControlName="coverUrl"
+                class="w-full"
+              />
+            </div> -->
+
+            <!-- Genres -->
+            <div class="md:col-span-2 space-y-2">
               <label
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Genres <span class="text-red-500">*</span>
               </label>
               <app-genre-selector
-                formControlName="genres"
-                placeholder="Select genres"
+                [placeholder]="'Select genres...'" [hierarchical]="true" [showPreferences]="true"
+                [formControl]="$any(seriesService.seriesForm.get('genres'))"
+                [required]="true"
                 (genreCreated)="onGenreCreated($event)"
+                class="w-full"
+                [class.ng-invalid]="isFieldInvalid('genres')"
               ></app-genre-selector>
               <small class="text-red-500" *ngIf="isFieldInvalid('genres')">
                 {{ getFieldError("genres") }}
@@ -328,14 +258,15 @@
             </div>
 
             <!-- Custom Tags -->
-            <div class="space-y-2">
+            <!-- <div class="space-y-2">
               <label
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Custom Tags (Optional)
               </label>
               <app-tag-selector
-                formControlName="customTags"
+                [(ngModel)]="series.customTags"
+                name="customTags"
                 placeholder="Add custom tags..."
                 (customTagCreated)="onCustomTagCreated($event)"
                 class="w-full"
@@ -344,235 +275,487 @@
                 Add personal tags to organize your series. Use tags like
                 "comfort-read", "reread-worthy", or create your own.
               </small>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Authors Section -->
+        <div class="space-y-6" *ngIf="showForm && !previewMode">
+          <div
+            class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                <i class="pi pi-users text-green-600 dark:text-green-400"></i>
+              </div>
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
+                Authors
+              </h2>
+            </div>
+            <button
+              type="button"
+              pButton
+              icon="pi pi-plus"
+              label="Add Author"
+              class="p-button-sm p-button-outlined"
+              (click)="addAuthor()"
+            ></button>
+          </div>
+
+          <div
+            *ngFor="let author of authorsArray.controls; let i = index"
+            class="author-role-container grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+          >
+            <!-- Author Selection -->
+            <div class="md:col-span-3 space-y-2 flex flex-col">
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400"
+              >
+                Author Name
+              </label>
+              <div class="flex-1">
+                <app-author-selector
+                  [placeholder]="'Select author...'"
+                  [formControl]="$any(author.get('author'))"
+                  [multiple]="false"
+                  [showAddButton]="true"
+                  [required]="true"
+                  (authorSelected)="onAuthorSelected($event, i)"
+                  class="w-full h-12"
+                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'author')"
+                ></app-author-selector>
+              </div>
+              <small
+                class="text-red-500"
+                *ngIf="isAuthorFieldInvalid(i, 'author')"
+              >
+                Author is required
+              </small>
             </div>
 
-            <!-- Cover URL -->
-            <div class="space-y-2">
+            <!-- Author Role -->
+            <div
+              class="md:col-span-2 space-y-2 flex flex-col w-full"
+              style="width: 100% !important"
+            >
               <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400"
               >
-                Cover Image URL (Optional)
+                Role
               </label>
-              <input
-                pInputText
-                type="url"
-                placeholder="https://example.com/cover.jpg"
-                formControlName="coverUrl"
-                class="w-full"
-              />
+              <div class="flex-1 w-full">
+                <p-select
+                  [formControl]="$any(author.get('role'))"
+                  [options]="roleOptions"
+                  placeholder="Select role"
+                  class="w-full h-12"
+                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'role')"
+                  style="height: 2.8rem !important; width: 100% !important"
+                ></p-select>
+              </div>
+              <small
+                class="text-red-500"
+                *ngIf="isAuthorFieldInvalid(i, 'role')"
+              >
+                {{ getAuthorFieldError(i, "role") }}
+              </small>
             </div>
 
-            <!-- Description -->
-            <div class="space-y-2 md:col-span-2">
-              <label
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Description (Optional)
-              </label>
-              <textarea
-                rows="4"
-                placeholder="Enter series description"
-                formControlName="description"
-                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              ></textarea>
+            <!-- Remove Author Button -->
+            <div
+              class="md:col-span-1 flex items-end justify-end"
+              *ngIf="authorsArray.length > 1"
+            >
+              <button
+                type="button"
+                pButton
+                icon="pi pi-trash"
+                class="p-button-sm p-button-text p-button-danger"
+                (click)="removeAuthor(i)"
+                pTooltip="Remove Author"
+              ></button>
             </div>
           </div>
         </div>
 
-        <!-- Books Card -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-        >
-          <div class="flex items-center justify-between mb-6">
+        <!-- Books Section -->
+        <!-- <div class="space-y-6" *ngIf="showForm && !previewMode">
+          <div
+            class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700"
+          >
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center"
-              >
-                <i class="pi pi-list text-white"></i>
+              <div class="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+                <i class="pi pi-book text-orange-600 dark:text-orange-400"></i>
               </div>
-              <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+              <h2
+                class="text-xl font-semibold text-gray-800 dark:text-gray-200"
+              >
                 Books in Series
               </h2>
             </div>
             <button
-              pButton
               type="button"
+              pButton
               icon="pi pi-plus"
               label="Add Book"
-              class="p-button-outlined"
+              class="p-button-sm p-button-outlined"
               (click)="addBook()"
             ></button>
           </div>
 
-          <!-- Books Count Message -->
-          <div class="mb-4" *ngIf="seriesForm.get('totalBooks')?.value">
+          <div
+            *ngFor="let book of booksArray.controls; let i = index"
+            class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-lg font-medium text-gray-800 dark:text-white">
+                Book #{{ i + 1 }}
+              </h4>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-angle-up"
+                  class="p-button-sm p-button-text"
+                  [disabled]="i === 0"
+                  (click)="moveBookUp(i)"
+                  pTooltip="Move up"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-angle-down"
+                  class="p-button-sm p-button-text"
+                  [disabled]="i === booksArray.length - 1"
+                  (click)="moveBookDown(i)"
+                  pTooltip="Move down"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-sm p-button-text p-button-danger"
+                  *ngIf="booksArray.length > 1"
+                  (click)="removeBook(i)"
+                  pTooltip="Remove book"
+                ></button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                  pInputText
+                  type="text"
+                  placeholder="Book title"
+                  formControlName="title"
+                  class="w-full"
+                  [class.ng-invalid]="isBookFieldInvalid(i, 'title')"
+                />
+                <small
+                  class="text-red-500"
+                  *ngIf="isBookFieldInvalid(i, 'title')"
+                >
+                  {{ getBookFieldError(i, "title") }}
+                </small>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Status
+                </label>
+                <p-select
+                  [formControl]="$any(book.get('status'))"
+                  [options]="statusOptions"
+                  placeholder="Select status"
+                  class="w-full"
+                ></p-select>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Pages Read
+                </label>
+                <p-inputNumber
+                  [formControl]="$any(book.get('pagesRead'))"
+                  placeholder="Pages read"
+                  [min]="0"
+                  [useGrouping]="false"
+                  class="w-full"
+                ></p-inputNumber>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Rating
+                </label>
+                <p-rating
+                  [formControl]="$any(book.get('rating'))"
+                  [stars]="5"
+                ></p-rating>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Finished Date
+                </label>
+                <p-datePicker
+                  [formControl]="$any(book.get('finishedDate'))"
+                  placeholder="Select date"
+                  dateFormat="yy-mm-dd"
+                  class="w-full"
+                ></p-datePicker>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- User Series Fields Section -->
+        <div class="space-y-6" *ngIf="showForm && !previewMode">
+          <div
+            class="flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+              <i class="pi pi-user text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              Personal Reading Preferences
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Series Status -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Series Status <span class="text-red-500">*</span>
+              </label>
+              <p-select
+                [options]="seriesStatusOptions"
+                formControlName="status"
+                placeholder="Select status"
+                class="w-full"
+                [class.ng-invalid]="isFieldInvalid('status')"
+              ></p-select>
+              <small class="text-red-500" *ngIf="isFieldInvalid('status')">
+                {{ getFieldError("status") }}
+              </small>
+            </div>
+
+            <!-- Books Read -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Books Read
+              </label>
+              <p-inputNumber
+                formControlName="booksRead"
+                placeholder="0"
+                [min]="0"
+                [max]="seriesService.seriesForm.get('totalBooks')?.value || 100"
+                class="w-full"
+                [class.ng-invalid]="isFieldInvalid('booksRead')"
+              ></p-inputNumber>
+              <small class="text-gray-500 text-xs">
+                How many books from this series have you finished reading?
+              </small>
+              <small class="text-red-500" *ngIf="isFieldInvalid('booksRead')">
+                {{ getFieldError("booksRead") }}
+              </small>
+            </div>
+
+            <!-- Books Owned -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Books Owned
+              </label>
+              <p-inputNumber
+                formControlName="booksOwned"
+                placeholder="0"
+                [min]="0"
+                [max]="100"
+                class="w-full"
+                [class.ng-invalid]="isFieldInvalid('booksOwned')"
+              ></p-inputNumber>
+              <small class="text-gray-500 text-xs">
+                How many books from this series do you physically or digitally
+                own?
+              </small>
+              <small class="text-red-500" *ngIf="isFieldInvalid('booksOwned')">
+                {{ getFieldError("booksOwned") }}
+              </small>
+            </div>
+
+            <!-- Is Favorite -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Favorite Series
+              </label>
+              <div class="flex items-center gap-3 mt-3">
+                <p-checkbox
+                  formControlName="isFavorite"
+                  binary="true"
+                  inputId="favorite"
+                ></p-checkbox>
+                <label
+                  for="favorite"
+                  class="text-sm text-gray-600 dark:text-gray-400"
+                >
+                  Mark as favorite series
+                </label>
+              </div>
+            </div>
+
+            <!-- Start Date -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Start Date
+              </label>
+              <p-datePicker
+                formControlName="startDate"
+                placeholder="When did you start?"
+                dateFormat="yy-mm-dd"
+                class="w-full"
+              ></p-datePicker>
+            </div>
+
+            <!-- Completion Date -->
             <div
-              class="p-3 rounded-lg text-sm"
-              [ngClass]="{
-                'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800':
-                  getCountMessageSeverity() === 'info',
-                'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800':
-                  getCountMessageSeverity() === 'warn',
-                'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800':
-                  getCountMessageSeverity() === 'success'
-              }"
+              class="space-y-2"
+              *ngIf="seriesService.seriesForm.get('status')?.value === 'Completed'"
             >
-              <i
-                class="mr-2"
-                [ngClass]="{
-                  'pi pi-info-circle': getCountMessageSeverity() === 'info',
-                  'pi pi-exclamation-triangle':
-                    getCountMessageSeverity() === 'warn',
-                  'pi pi-check-circle': getCountMessageSeverity() === 'success'
-                }"
-              ></i>
-              {{ getBooksCountMessage() }}
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Completion Date
+              </label>
+              <p-datePicker
+                formControlName="completionDate"
+                placeholder="When did you complete the series?"
+                dateFormat="yy-mm-dd"
+                class="w-full"
+              ></p-datePicker>
+            </div>
+
+            <!-- Reading Order Preference -->
+            <div class="space-y-2">
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Reading Order Preference
+              </label>
+              <p-select
+                [options]="readingOrderOptions"
+                formControlName="readingOrderPreference"
+                placeholder="Select reading order"
+                class="w-full"
+              ></p-select>
+              <small class="text-gray-500 text-xs">
+                Choose how you prefer to read this series (publication order,
+                story chronology, or your own custom order).
+              </small>
             </div>
           </div>
 
-          <div formArrayName="books" class="space-y-4">
-            <div
-              *ngFor="let book of booksArray.controls; let i = index"
-              [formGroupName]="i"
-              class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600"
+          <!-- Personal Notes -->
+          <div class="space-y-2">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-semibold"
-                  >
-                    {{ i + 1 }}
-                  </span>
-                  <h3 class="font-medium text-gray-800 dark:text-white">
-                    Book {{ i + 1 }}
-                  </h3>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-angle-up"
-                    class="p-button-text p-button-sm"
-                    [disabled]="i === 0"
-                    (click)="moveBookUp(i)"
-                    pTooltip="Move up"
-                  ></button>
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-angle-down"
-                    class="p-button-text p-button-sm"
-                    [disabled]="i === booksArray.length - 1"
-                    (click)="moveBookDown(i)"
-                    pTooltip="Move down"
-                  ></button>
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-trash"
-                    class="p-button-text p-button-danger p-button-sm"
-                    [disabled]="booksArray.length === 1"
-                    (click)="removeBook(i)"
-                    pTooltip="Remove book"
-                  ></button>
-                </div>
+              Personal Notes
+            </label>
+            <textarea
+              pInputTextarea
+              formControlName="notes"
+              placeholder="Add your personal thoughts, recommendations, or reminders about this series..."
+              rows="4"
+              class="w-full"
+            ></textarea>
+            <small class="text-gray-500 text-xs">
+              Keep track of your thoughts, favorite quotes, or anything you want
+              to remember about this series.
+            </small>
+          </div>
+
+          <!-- Reading Summary -->
+          <div
+            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+          >
+            <div class="flex items-center gap-2 mb-3">
+              <i class="pi pi-info-circle text-blue-600 dark:text-blue-400"></i>
+              <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                Reading Summary
+              </h3>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+              <div>
+                <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">
+                  {{ seriesService.seriesForm.get("status")?.value || "Not Set" }}
+                </span>
               </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Book Title -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Title <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    pInputText
-                    type="text"
-                    placeholder="Book title"
-                    formControlName="title"
-                    class="w-full"
-                    [class.ng-invalid]="isBookFieldInvalid(i, 'title')"
-                  />
-                  <small
-                    class="text-red-500"
-                    *ngIf="isBookFieldInvalid(i, 'title')"
-                  >
-                    {{ getBookFieldError(i, "title") }}
-                  </small>
-                </div>
-
-                <!-- Status -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Status <span class="text-red-500">*</span>
-                  </label>
-                  <p-select
-                    [options]="statusOptions"
-                    formControlName="status"
-                    placeholder="Select status"
-                    class="w-full"
-                  ></p-select>
-                </div>
-
-                <!-- Pages Read -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Pages Read
-                  </label>
-                  <p-inputNumber
-                    formControlName="pagesRead"
-                    placeholder="0"
-                    [min]="0"
-                    [useGrouping]="false"
-                    class="w-full"
-                  ></p-inputNumber>
-                </div>
-
-                <!-- Rating -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Rating (1-5)
-                  </label>
-                  <p-inputNumber
-                    formControlName="rating"
-                    placeholder="0"
-                    [min]="1"
-                    [max]="5"
-                    [useGrouping]="false"
-                    class="w-full"
-                  ></p-inputNumber>
-                </div>
-
-                <!-- Finished Date -->
-                <div class="space-y-2">
-                  <label
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Finished Date
-                  </label>
-                  <p-datePicker
-                    formControlName="finishedDate"
-                    placeholder="Select date"
-                    class="w-full"
-                  ></p-datePicker>
-                </div>
-
-                <!-- Order in Series (Hidden) -->
-                <input type="hidden" formControlName="orderInSeries" />
+              <div>
+                <span class="text-gray-600 dark:text-gray-400"
+                  >Books Read:</span
+                >
+                <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">
+                  {{ seriesService.seriesForm.get("booksRead")?.value || 0 }}/{{
+                    seriesService.seriesForm.get("totalBooks")?.value || 0
+                  }}
+                </span>
+              </div>
+              <div>
+                <span class="text-gray-600 dark:text-gray-400"
+                  >Books Owned:</span
+                >
+                <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">
+                  {{ seriesService.seriesForm.get("booksOwned")?.value || 0 }}
+                </span>
+              </div>
+              <div>
+                <span class="text-gray-600 dark:text-gray-400">Complete:</span>
+                <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">
+                  {{ seriesService.seriesForm.get("isComplete")?.value ? "Yes" : "No" }}
+                </span>
+              </div>
+              <div>
+                <span class="text-gray-600 dark:text-gray-400">Favorite:</span>
+                <span class="ml-1 font-medium text-gray-900 dark:text-gray-100">
+                  {{ seriesService.seriesForm.get("isFavorite")?.value ? "Yes" : "No" }}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex justify-end gap-4">
+        <div
+          class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700"
+          *ngIf="showForm"
+        >
           <button
             pButton
             type="button"
@@ -587,12 +770,12 @@
             label="Create Series"
             icon="pi pi-check"
             class="p-button-success"
-            [disabled]="seriesForm.invalid || isSubmitting"
+            [disabled]="seriesService.seriesForm.invalid || isSubmitting"
             [loading]="isSubmitting"
           ></button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 

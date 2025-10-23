@@ -90,7 +90,7 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                             return this.catalogService.searchBooks(query);
 
                         case 'series':
-                            return this.catalogService.searchSeries(query);
+                            return this.catalogApiService.searchSeries(query);
 
                         
 

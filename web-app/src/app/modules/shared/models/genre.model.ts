@@ -31,7 +31,7 @@ export interface Genre {
     description?: string;
     parentGenreId?: number;
     isActive: boolean;
-    createdAt: Date;
+    createdAt?: Date;
     updatedAt?: Date;
 
     // User preference fields (from user_genre_preferences table)
@@ -44,9 +44,6 @@ export interface Genre {
     subGenres?: Genre[];
     parentGenre?: Genre;
     level?: number;
-
-    // Legacy field for backward compatibility
-    isFromCatalog?: boolean;
 }
 
 // DTOs for API calls
@@ -86,50 +83,12 @@ export interface UserGenrePreferenceUpdateRequestDTO {
     notes: string;
 }
 
-// Response DTOs
-export interface CatalogGenreHttpResponse {
-    id: number;
-    name: string;
-    description: string;
-    parentGenreId: number;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface UserGenrePreferenceHttpResponse {
-    id: number;
-    userId: number;
-    catalogGenreId: number;
-    preferenceLevel: number;
-    isExcluded: boolean;
-    notes: string;
-    createdAt: string;
-    updatedAt: string;
-    catalogGenre: CatalogGenreHttpResponse;
-}
-
-export interface UserGenrePreferenceHttpPagedResponse {
-    content: UserGenrePreferenceHttpResponse[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-}
-
 // Genre statistics
 export interface GenreStats {
     totalBooks: number;
     readBooks: number;
     unreadBooks: number;
     averageRating: number;
-    totalPages: number;
-    readingProgress: {
-        completed: number;
-        reading: number;
-        wantToRead: number;
-        onHold: number;
-    };
 }
 
 // Genre hierarchy helper
@@ -151,3 +110,4 @@ export interface GenreFilterOptions {
         max?: number;
     };
 }
+

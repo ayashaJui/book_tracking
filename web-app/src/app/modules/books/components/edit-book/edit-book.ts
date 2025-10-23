@@ -4,9 +4,9 @@ import { Location } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { Book, BookUpdateRequest, BookAuthor } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
-import { Series } from '../../../series/models/series.model';
+import { SeriesDTO } from '../../../series/models/series.model';
 import { SeriesService } from '../../../series/services/series.service';
-import { GenreService } from '../../../shared/services/genre.service';
+import { GenreSelectorService } from '../../../shared/services/genre.selector.service';
 import { AuthorService } from '../../../authors/services/author.service';
 import { Author } from '../../../authors/models/author.model';
 import { PublisherService } from '../../../publishers/services/publisher.service';
@@ -91,7 +91,7 @@ export class EditBook implements OnInit {
     private location: Location,
     private bookService: BookService,
     private seriesService: SeriesService,
-    private genreService: GenreService,
+    private genreSelectorService: GenreSelectorService,
     private authorService: AuthorService,
     private publisherService: PublisherService,
     private messageService: MessageService
@@ -155,16 +155,17 @@ export class EditBook implements OnInit {
   }
 
   private loadGenres() {
-    const genres = this.genreService.getGenres();
-    this.genreOptions = genres.map(genre => ({
-      label: typeof genre === 'string' ? genre : genre.toString(),
-      value: typeof genre === 'string' ? genre : genre.toString()
-    }));
+    this.genreSelectorService.getGenres().subscribe(genres => {
+      this.genreOptions = genres.map(genre => ({
+        label: typeof genre === 'string' ? genre : genre.toString(),
+        value: typeof genre === 'string' ? genre : genre.toString()
+      }));
+    });
   }
 
   private loadSeriesOptions() {
     const allSeries = this.seriesService.getAllSeries();
-    this.seriesOptions = allSeries.map((series: Series) => ({
+    this.seriesOptions = allSeries.map((series: SeriesDTO) => ({
       label: series.title,
       value: series.id || 0
     }));

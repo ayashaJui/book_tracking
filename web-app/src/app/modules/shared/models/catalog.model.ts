@@ -47,8 +47,8 @@ export interface CatalogSeries {
     description?: string;
     totalBooks?: number;
     isCompleted?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
+    seriesAuthors?: CatalogAuthor[];
+    seriesGenres?: CatalogGenre[];
 }
 
 export interface CatalogGenre {

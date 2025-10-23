@@ -1,4 +1,4 @@
-CREATE TABLE publishers (
+CREATE TABLE IF NOT EXISTS publishers (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     location VARCHAR(255),

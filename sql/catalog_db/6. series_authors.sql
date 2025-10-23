@@ -1,4 +1,4 @@
-CREATE TABLE series_authors (
+CREATE TABLE IF NOT EXISTS series_authors (
     id SERIAL PRIMARY KEY,
     series_id INT NOT NULL REFERENCES series(id) ON DELETE CASCADE,
     author_id INT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,

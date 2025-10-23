@@ -35,7 +35,7 @@ CREATE TABLE oauth2_authorization (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE oauth2_authorization (
+CREATE TABLE IF NOT EXISTS oauth2_authorization (
     id varchar(100) PRIMARY KEY,
     registered_client_id varchar(100) NOT NULL,
     principal_name varchar(200) NOT NULL,

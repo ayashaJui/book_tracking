@@ -4,7 +4,7 @@ import { CatalogAuthorCreateRequestDTO, CatalogAuthorUpdateRequestDTO } from '..
 import { Observable } from 'rxjs';
 import { CatalogAuthorHttpResponse } from '../../authors/models/response.model';
 import { environment } from '../../../../environments/environment';
-import { CatalogAuthor, CatalogGenre, CatalogPublisher } from '../models/catalog.model';
+import { CatalogAuthor, CatalogGenre, CatalogPublisher, CatalogSeries } from '../models/catalog.model';
 import { CatalogGenreCreateRequestDTO, CatalogGenreUpdateRequestDTO } from '../../settings/models/genre.model';
 import { CatalogGenreHttpResponse } from '../../settings/models/response.model';
 
@@ -41,7 +41,14 @@ export class CatalogApiService {
     return this.http.get(url, { params }) as Observable<CatalogPublisher[]>
   }
 
-  
+  // Search for series
+  searchSeries(name: string): Observable<CatalogSeries[]> {
+    const params = new HttpParams().set('seriesName', name);
 
-  
+    let url = `${environment.catalog_service_url}/series/search`;
+
+    return this.http.get(url, { params }) as Observable<CatalogSeries[]>
+  }
+
+
 }

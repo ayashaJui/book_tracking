@@ -23,6 +23,8 @@ public class UserSeriesUpdateDTO {
     @NotNull(message = "catalogSeriesId can not be null")
     private Integer catalogSeriesId;
 
+    private Integer totalBooks;
+
     private Integer booksRead;
 
     private Integer booksOwned;

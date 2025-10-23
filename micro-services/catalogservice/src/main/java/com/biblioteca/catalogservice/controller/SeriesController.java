@@ -1,5 +1,6 @@
 package com.biblioteca.catalogservice.controller;
 
+import com.biblioteca.catalogservice.dto.author.AuthorDTO;
 import com.biblioteca.catalogservice.dto.book.BookDTO;
 import com.biblioteca.catalogservice.dto.pagination.PageRequestDTO;
 import com.biblioteca.catalogservice.dto.response.ResponseDTO;
@@ -115,5 +116,28 @@ public class SeriesController {
         List<SeriesDTO> seriesDTOS = seriesService.getSeriesByGenreId(genreId, request, jwt);
 
         return new ResponseEntity<>(new ResponseDTO<>(seriesDTOS, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "APT ID: Series009")
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<SeriesDTO>>> searchSeries(@RequestParam(value = "seriesName", required = false) String seriesName,
+                                                                     HttpServletRequest request, @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ) {
+        log.info("searchSeries in SeriesController is called  by user: {}", jwt.getSubject());
+
+        List<SeriesDTO> seriesDTOs = seriesService.searchSeries(seriesName,  request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(seriesDTOs, "success", HttpStatus.OK.value()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "API ID: Series010")
+    @GetMapping("/series_ids")
+    public ResponseEntity<ResponseDTO<List<SeriesDTO>>> getSeriesByIds(@RequestParam("ids") List<Integer> ids,
+                                                                        HttpServletRequest request,
+                                                                        @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt ){
+        log.info("getSeriesByIds in SeriesController is called  by user: {}", jwt.getSubject());
+
+        List<SeriesDTO> dtos = seriesService.getSeriesByIds(ids, request, jwt);
+
+        return new ResponseEntity<>(new ResponseDTO<>(dtos, "success", HttpStatus.OK.value()), HttpStatus.OK);
     }
 }

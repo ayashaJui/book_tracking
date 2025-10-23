@@ -96,7 +96,7 @@
                     pInputText
                     type="text"
                     placeholder="Enter author name"
-                    [(ngModel)]="author.name"
+                    [(ngModel)]="author.authorName"
                     [name]="'author-name-' + i"
                     class="w-full"
                     required
@@ -111,7 +111,7 @@
                     Role
                   </label>
                   <p-select
-                    [(ngModel)]="author.role"
+                    [(ngModel)]="author.authorRole"
                     [options]="roleOptions"
                     [name]="'author-role-' + i"
                     placeholder="Select role"
@@ -423,7 +423,7 @@
               <div
                 class="text-2xl font-bold text-purple-600 dark:text-purple-400"
               >
-                {{ series.totalBooks - series.readBooks }}
+                {{ series.totalBooks - (series.readBooks || 0) }}
               </div>
               <div class="text-sm text-purple-700 dark:text-purple-300">
                 Remaining
@@ -435,7 +435,7 @@
               >
                 {{
                   series.totalBooks > 0
-                    ? ((series.readBooks / series.totalBooks) * 100).toFixed(0)
+                    ? ((series.readBooks || 0) / series.totalBooks * 100).toFixed(0)
                     : 0
                 }}%
               </div>

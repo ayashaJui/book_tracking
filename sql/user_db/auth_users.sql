@@ -1,4 +1,4 @@
-CREATE TABLE auth_users (
+CREATE TABLE IF NOT EXISTS auth_users (
     id SERIAL PRIMARY KEY,
     email_address VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -19,10 +19,13 @@ CREATE TABLE auth_users (
     otp VARCHAR(100)
 );
 
-CREATE TABLE user_authorities (
+CREATE TABLE IF NOT EXISTS user_authorities (
     id INTEGER REFERENCES auth_users(id) ON DELETE CASCADE,
     authority VARCHAR(100) NOT NULL,
     PRIMARY KEY (id, authority)
+    CONSTRAINT fk_user_authorities_auth_users FOREIGN KEY (id)
+        REFERENCES public.auth_users (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE user_authorities (

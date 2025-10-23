@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
-import { Series, SeriesBook, SeriesAuthor } from '../../models/series.model';
+import { SeriesDTO, SeriesBookDTO, SeriesAuthorDTO } from '../../models/series.model';
 
 @Component({
   selector: 'app-edit-series',
@@ -11,9 +11,9 @@ import { Series, SeriesBook, SeriesAuthor } from '../../models/series.model';
   providers: [MessageService],
 })
 export class EditSeries implements OnInit {
-  series: Series = {
+  series: SeriesDTO = {
     title: '',
-    authors: [{ name: '', role: 'Author' }],
+    authors: [{ authorName: '', authorRole: 'Author' }],
     totalBooks: 0,
     readBooks: 0,
     books: [],
@@ -81,7 +81,7 @@ export class EditSeries implements OnInit {
   }
 
   addBook() {
-    const newBook: SeriesBook = {
+    const newBook: SeriesBookDTO = {
       title: '',
       status: 'Want to Read',
       orderInSeries: this.series.books.length + 1,
@@ -155,7 +155,7 @@ export class EditSeries implements OnInit {
   }
 
   addAuthor() {
-    this.series.authors.push({ name: '', role: 'Author' });
+    this.series.authors.push({ authorName: '', authorRole: 'Author' });
   }
 
   removeAuthor(index: number) {
@@ -171,7 +171,7 @@ export class EditSeries implements OnInit {
   }
 
   onSubmit() {
-    if (!this.series.title || !this.series.authors || this.series.authors.length === 0 || !this.series.authors[0].name.trim()) {
+    if (!this.series.title || !this.series.authors || this.series.authors.length === 0 || !this.series.authors[0].authorName.trim()) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Warning',

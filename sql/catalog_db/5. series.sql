@@ -1,4 +1,4 @@
-CREATE TABLE series (
+CREATE TABLE IF NOT EXISTS series (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,

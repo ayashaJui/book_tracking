@@ -1,4 +1,4 @@
-CREATE TABLE genres (
+CREATE TABLE IF NOT EXISTS genres (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,

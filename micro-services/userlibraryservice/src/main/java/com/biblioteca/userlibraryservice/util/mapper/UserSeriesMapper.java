@@ -34,7 +34,7 @@ public class UserSeriesMapper {
 //                .catalogSeriesId(userSeriesCreateDTO.getCatalogSeriesId())
                 .booksRead(userSeriesCreateDTO.getBooksRead())
                 .booksOwned(userSeriesCreateDTO.getBooksOwned())
-                .completionPercentage(userSeriesCreateDTO.getCompletionPercentage())
+//                .completionPercentage(userSeriesCreateDTO.getCompletionPercentage())
                 .status(userSeriesCreateDTO.getStatus().name())
                 .startDate(userSeriesCreateDTO.getStartDate())
                 .completionDate(userSeriesCreateDTO.getCompletionDate())
@@ -51,7 +51,7 @@ public class UserSeriesMapper {
         userSeries.setCompletionPercentage(userSeriesUpdateDTO.getCompletionPercentage());
         userSeries.setStatus(userSeriesUpdateDTO.getStatus().name());
         userSeries.setStartDate(userSeriesUpdateDTO.getStartDate());
-        userSeries.setCompletionDate(userSeriesUpdateDTO.getCompletionDate());
+//        userSeries.setCompletionDate(userSeriesUpdateDTO.getCompletionDate());
         userSeries.setIsFavorite(userSeriesUpdateDTO.getIsFavorite());
         userSeries.setReadingOrderPreference(userSeriesUpdateDTO.getReadingOrderPreference());
         userSeries.setNotes(userSeriesUpdateDTO.getNotes());

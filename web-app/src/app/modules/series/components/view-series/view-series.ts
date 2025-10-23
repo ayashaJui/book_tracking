@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
-import { Series } from '../../models/series.model';
+import { SeriesDTO } from '../../models/series.model';
 
 @Component({
   selector: 'app-view-series',
@@ -11,7 +11,7 @@ import { Series } from '../../models/series.model';
   providers: [MessageService],
 })
 export class ViewSeries implements OnInit {
-  series: Series | null = null;
+  series: SeriesDTO | null = null;
   isLoading = true;
   seriesId: number | null = null;
 
@@ -50,18 +50,18 @@ export class ViewSeries implements OnInit {
     this.isLoading = false;
   }
 
-  formatAuthors(series: Series): string {
+  formatAuthors(series: SeriesDTO): string {
     if (!series.authors || series.authors.length === 0) {
       return 'Unknown Author';
     }
-    return series.authors.map(a => `${a.name} (${a.role})`).join(', ');
+    return series.authors.map(a => `${a.authorName} (${a.authorRole})`).join(', ');
   }
 
-  getAuthorNames(series: Series): string {
+  getAuthorNames(series: SeriesDTO): string {
     if (!series.authors || series.authors.length === 0) {
       return 'Unknown Author';
     }
-    return series.authors.map(a => a.name).join(', ');
+    return series.authors.map(a => a.authorName).join(', ');
   }
 
   editSeries() {
@@ -90,7 +90,7 @@ export class ViewSeries implements OnInit {
 
   getProgressWidth(): number {
     if (!this.series || this.series.totalBooks === 0) return 0;
-    return (this.series.readBooks / this.series.totalBooks) * 100;
+    return (this.series.readBooks || 0) / this.series.totalBooks * 100;
   }
 
   getRatingStars(rating?: number): string[] {

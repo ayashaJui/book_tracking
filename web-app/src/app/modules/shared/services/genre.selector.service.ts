@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -15,6 +15,9 @@ import {
   GenreStats
 } from '../models/genre.model';
 import { environment } from '../../../../environments/environment';
+import { CatalogAuthorHttpResponse } from '../../authors/models/response.model';
+import { CatalogGenreHttpResponse } from '../../settings/models/response.model';
+import { CatalogGenreDTO } from '../../settings/models/genre.model';
 
 // Export interfaces for backward compatibility
 export type { Genre, CatalogGenre, UserGenrePreference };
@@ -22,7 +25,7 @@ export type { Genre, CatalogGenre, UserGenrePreference };
 @Injectable({
   providedIn: 'root',
 })
-export class GenreService {
+export class GenreSelectorService {
   genreForm!: FormGroup;
 
   // Catalog genres (from catalog database)
@@ -149,9 +152,6 @@ export class GenreService {
   }
 
   // Get current genres value
-  getGenres(): Genre[] {
-    return this.genresSubject.value;
-  }
 
   getCatalogGenres(): CatalogGenre[] {
     return this.catalogGenresSubject.value;
@@ -161,41 +161,52 @@ export class GenreService {
     return this.userGenrePreferencesSubject.value;
   }
 
-  // Get genre options for dropdowns
-  getGenreOptions(includeInactive: boolean = false): { label: string; value: string }[] {
-    return this.genresSubject.value
-      .filter(genre => includeInactive || genre.isActive)
-      .map((genre) => ({
-        label: genre.name,
-        value: genre.name,
-      }));
+  getGenres(isActive: boolean = false): Observable<CatalogGenreDTO[]> {
+    const url = `${environment.catalog_service_url}/genres`;
+    return this.http.get<CatalogGenreHttpResponse>(url).pipe(
+      map(response =>
+        response.data.filter((genre: any) => isActive || genre.isActive)
+      )
+    );
   }
 
-  // Get hierarchical genre options
-  getHierarchicalGenreOptions(includeInactive: boolean = false): { label: string; value: string; level: number }[] {
-    const options: { label: string; value: string; level: number }[] = [];
+  // Get genre options for dropdowns --> api
+  getGenreOptions(isActive: boolean = false): Observable<{ label: string; value: string }[]> {
+    return this.getGenres(isActive).pipe(
+      map(genres =>
+        genres.map(g => ({
+          label: g.name,
+          value: g.id.toString()
+        }))
+      )
+    );
+  }
 
-    const addGenreOptions = (genres: Genre[], level: number = 0) => {
-      genres.forEach(genre => {
-        if (includeInactive || genre.isActive) {
-          const prefix = '  '.repeat(level);
-          options.push({
-            label: `${prefix}${genre.name}`,
-            value: genre.name,
-            level
-          });
 
-          if (genre.subGenres && genre.subGenres.length > 0) {
-            addGenreOptions(genre.subGenres, level + 1);
-          }
-        }
-      });
-    };
+  // Get hierarchical genre options --> api
+  getHierarchicalGenreOptions(isActive: boolean = false): Observable<{ label: string; value: string; level: number }[]> {
+    return this.getGenres(isActive).pipe(
+      map((genres) => {
+        const options: { label: string; value: string; level: number }[] = [];
 
-    const rootGenres = this.genresSubject.value.filter(g => !g.parentGenreId);
-    addGenreOptions(rootGenres);
+        const addGenreOptions = (parentId: number | null, level: number = 0) => {
+          genres
+            .filter(g => g.parentGenreId === parentId)
+            .forEach(g => {
+              const prefix = '  '.repeat(level);
+              options.push({
+                label: `${prefix}${g.name}`,
+                value: g.id.toString(),
+                level
+              });
+              addGenreOptions(g.id, level + 1);
+            });
+        };
 
-    return options;
+        addGenreOptions(null);
+        return options;
+      })
+    );
   }
 
   // Get genre by name

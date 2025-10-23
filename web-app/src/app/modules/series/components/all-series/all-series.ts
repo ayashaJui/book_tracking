@@ -14,7 +14,7 @@ import { LayoutService } from '../../../../layout/service/layout.service';
 import { Subscription } from 'rxjs';
 import { UiService } from '../../../shared/services/ui.service.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Series, SeriesBook } from '../../models/series.model';
+import { SeriesDTO, SeriesBookDTO } from '../../models/series.model';
 import { SeriesService } from '../../services/series.service';
 import { MessageService } from 'primeng/api';
 
@@ -47,11 +47,11 @@ export class AllSeries implements OnInit {
   @ViewChild('chart') chart: any;
   subscription: Subscription[] = [];
 
-  seriesList: Series[] = [
+  seriesList: SeriesDTO[] = [
     {
       title: 'The Lord of the Rings',
       authors: [
-        { name: 'J.R.R. Tolkien', role: 'Author' }
+        { authorName: 'J.R.R. Tolkien', authorRole: 'Author' }
       ],
       totalBooks: 3,
       readBooks: 2,
@@ -79,7 +79,7 @@ export class AllSeries implements OnInit {
     {
       title: 'Harry Potter',
       authors: [
-        { name: 'J.K. Rowling', role: 'Author' }
+        { authorName: 'J.K. Rowling', authorRole: 'Author' }
       ],
       totalBooks: 7,
       readBooks: 4,
@@ -122,7 +122,7 @@ export class AllSeries implements OnInit {
     },
   ];
 
-  selectedSeries: Series | null = null;
+  selectedSeries: SeriesDTO | null = null;
 
   filterStatus: 'All' | 'Finished' | 'Reading' | 'Want to Read' = 'All';
   sortOption: 'Completion' | 'Title' | 'Author' = 'Completion';
@@ -149,20 +149,20 @@ export class AllSeries implements OnInit {
     this.loadSeriesData();
   }
 
-  openSeries(series: Series) {
+  openSeries(series: SeriesDTO) {
     this.selectedSeries = series;
     this.showDialog = true;
   }
 
-  viewSeries(series: Series) {
+  viewSeries(series: SeriesDTO) {
     this.router.navigate(['/series/view', series.id]);
   }
 
-  editSeries(series: Series) {
+  editSeries(series: SeriesDTO) {
     this.router.navigate(['/series/edit', series.id]);
   }
 
-  getNextBookToRead(series: Series): SeriesBook | null {
+  getNextBookToRead(series: SeriesDTO): SeriesBookDTO | null {
     // Find the first book that is not finished and not currently being read
     const nextBook = series.books
       .filter((book) => book.status === 'Want to Read')
@@ -171,7 +171,7 @@ export class AllSeries implements OnInit {
     return nextBook || null;
   }
 
-  startNextBook(series: Series) {
+  startNextBook(series: SeriesDTO) {
     const nextBook = this.getNextBookToRead(series);
     if (nextBook) {
       // Update the book status to 'Reading'
@@ -201,18 +201,18 @@ export class AllSeries implements OnInit {
     this.selectedSeries = null;
   }
 
-  getCompletionPercentage(series: Series) {
+  getCompletionPercentage(series: SeriesDTO): number {
     return Math.round((series.readBooks / series.totalBooks) * 100);
   }
 
-  getProgressColor(series: Series) {
+  getProgressColor(series: SeriesDTO) {
     const pct = this.getCompletionPercentage(series);
     if (pct === 100) return 'bg-green-500';
     if (pct > 0) return 'bg-yellow-500';
     return 'bg-gray-400';
   }
 
-  getBookDotColor(book: SeriesBook) {
+  getBookDotColor(book: SeriesBookDTO) {
     switch (book.status) {
       case 'Finished':
         return 'bg-green-500';
@@ -234,7 +234,7 @@ export class AllSeries implements OnInit {
       list = list.filter(
         (s) =>
           s.title.toLowerCase().includes(q) ||
-          s.authors.some(author => author.name.toLowerCase().includes(q)) ||
+          s.authors.some(author => author.authorName.toLowerCase().includes(q)) ||
           (s.genres || []).some((genre) => genre.toLowerCase().includes(q))
       );
     }
@@ -257,8 +257,8 @@ export class AllSeries implements OnInit {
       list.sort((a, b) => a.title.localeCompare(b.title));
     } else if (this.sortOption === 'Author') {
       list.sort((a, b) => {
-        const aAuthor = a.authors[0]?.name || '';
-        const bAuthor = b.authors[0]?.name || '';
+        const aAuthor = a.authors[0]?.authorName || '';
+        const bAuthor = b.authors[0]?.authorName || '';
         return aAuthor.localeCompare(bAuthor);
       });
     }
@@ -270,9 +270,9 @@ export class AllSeries implements OnInit {
       (s) => s.readBooks === s.totalBooks
     ).length;
     const inProgress = this.seriesList.filter(
-      (s) => s.readBooks > 0 && s.readBooks < s.totalBooks
+      (s) => (s.readBooks || 0) > 0 && (s.readBooks || 0) < s.totalBooks
     ).length;
-    const notStarted = this.seriesList.filter((s) => s.readBooks === 0).length;
+    const notStarted = this.seriesList.filter((s) => (s.readBooks || 0) === 0).length;
     const newColor = this.layoutService.isDarkTheme() ? '#f2f3f4' : '#415B61';
 
     this.chartOptions = {
@@ -312,7 +312,7 @@ export class AllSeries implements OnInit {
     );
   }
 
-  markBookAsRead(book: SeriesBook) {
+  markBookAsRead(book: SeriesBookDTO) {
     book.status = 'Finished';
     this.selectedSeries!.readBooks = this.selectedSeries!.books.filter(
       (b) => b.status === 'Finished'
@@ -320,7 +320,7 @@ export class AllSeries implements OnInit {
     this.updateChart();
   }
 
-  markBookAsUnread(book: SeriesBook) {
+  markBookAsUnread(book: SeriesBookDTO) {
     book.status = 'Want to Read';
     this.selectedSeries!.readBooks = this.selectedSeries!.books.filter(
       (b) => b.status === 'Finished'
@@ -342,7 +342,7 @@ export class AllSeries implements OnInit {
 
   getTotalBooksRead(): number {
     return this.seriesList.reduce(
-      (total, series) => total + series.readBooks,
+      (total, series) => total + (series.readBooks || 0),
       0
     );
   }
@@ -358,12 +358,12 @@ export class AllSeries implements OnInit {
 
   getInProgressCount(): number {
     return this.seriesList.filter(
-      (s) => s.readBooks > 0 && s.readBooks < s.totalBooks
+      (s) => (s.readBooks || 0) > 0 && (s.readBooks || 0) < s.totalBooks
     ).length;
   }
 
   getNotStartedCount(): number {
-    return this.seriesList.filter((s) => s.readBooks === 0).length;
+    return this.seriesList.filter((s) => (s.readBooks || 0) === 0).length;
   }
 
   // Quick Stats Methods
@@ -411,7 +411,7 @@ export class AllSeries implements OnInit {
   }
 
   // Check if a series has currently reading books
-  hasCurrentlyReading(series: Series): boolean {
+  hasCurrentlyReading(series: SeriesDTO): boolean {
     return series.books.some((book) => book.status === 'Reading');
   }
 
@@ -455,10 +455,10 @@ export class AllSeries implements OnInit {
     this.sortOption = 'Completion';
   }
 
-  formatAuthors(series: Series): string {
+  formatAuthors(series: SeriesDTO): string {
     if (!series.authors || series.authors.length === 0) {
       return 'Unknown Author';
     }
-    return series.authors.map(a => a.name).join(', ');
+    return series.authors.map(a => a.authorName).join(', ');
   }
 }

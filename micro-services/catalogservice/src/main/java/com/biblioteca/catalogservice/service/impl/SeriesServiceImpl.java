@@ -14,6 +14,7 @@ import com.biblioteca.catalogservice.entity.*;
 import com.biblioteca.catalogservice.repository.*;
 import com.biblioteca.catalogservice.service.SeriesService;
 import com.biblioteca.catalogservice.util.exception.CustomException;
+import com.biblioteca.catalogservice.util.mapper.BookMapper;
 import com.biblioteca.catalogservice.util.mapper.SeriesAuthorMapper;
 import com.biblioteca.catalogservice.util.mapper.SeriesMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -119,7 +120,16 @@ public class SeriesServiceImpl implements SeriesService {
 
         Series series = findById(id);
 
-        return convertToDTO(series);
+        SeriesDTO seriesDTO = convertToDTO(series);
+
+        List<BookDTO> bookDTOs = series.getBookSeries().stream()
+                .map(BookSeries::getBook)
+                .map(this::toBookDTO)
+                .toList();
+
+        seriesDTO.setSeriesBooks(bookDTOs);
+
+        return seriesDTO;
     }
 
     @Override
@@ -220,6 +230,22 @@ public class SeriesServiceImpl implements SeriesService {
         return seriesDTOS;
     }
 
+    @Override
+    public List<SeriesDTO> searchSeries(String seriesName, HttpServletRequest request, Jwt jwt) {
+        log.info("searchSeries method in SeriesServiceImpl is called with seriesName: {}", seriesName);
+
+        List<Series> series = seriesRepository.findByNameContaining(seriesName);
+
+        List<SeriesDTO> seriesDTOS = series.stream().map(this::convertToDTO).toList();
+
+        return seriesDTOS;
+    }
+
+    @Override
+    public List<SeriesDTO> getSeriesByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt) {
+        return List.of();
+    }
+
     private Series findById(Integer id) {
         return seriesRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Series with id " + id + " not found", HttpStatus.NOT_FOUND.value()));
@@ -239,6 +265,10 @@ public class SeriesServiceImpl implements SeriesService {
 
     private SeriesAuthor fromSeriesAuthorCreateDTO(SeriesAuthorCreateDTO seriesAuthorCreateDTO) {
         return SeriesAuthorMapper.fromCreateDTO(seriesAuthorCreateDTO);
+    }
+
+    private BookDTO toBookDTO(Book book) {
+        return BookMapper.toDTO(book);
     }
 
     /**

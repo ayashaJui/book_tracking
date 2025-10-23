@@ -1,0 +1,34 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-ServiceregistryApplication<serviceregistry>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.biblioteca.serviceregistry.ServiceregistryApplication",
+      "projectName": "serviceregistry",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-ConfigserverApplication<configserver>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.biblioteca.configserver.ConfigserverApplication",
+      "projectName": "configserver",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-AuthserverApplication<authserver>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.biblioteca.authserver.AuthserverApplication",
+      "projectName": "authserver",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

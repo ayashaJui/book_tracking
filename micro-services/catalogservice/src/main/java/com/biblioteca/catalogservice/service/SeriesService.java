@@ -26,4 +26,8 @@ public interface SeriesService {
     List<SeriesDTO> getSeriesByAuthorId(Integer authorId, HttpServletRequest request, Jwt jwt);
 
     List<SeriesDTO> getSeriesByGenreId(Integer genreId, HttpServletRequest request, Jwt jwt);
+
+    List<SeriesDTO> searchSeries(String seriesName, HttpServletRequest request, Jwt jwt);
+
+    List<SeriesDTO> getSeriesByIds(List<Integer> ids, HttpServletRequest request, Jwt jwt);
 }
