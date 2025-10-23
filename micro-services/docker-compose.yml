@@ -17,27 +17,27 @@ services:
     ports:
       - "8081:8081"
     environment:
+      - GIT_TOKEN=${GIT_TOKEN}
       - SPRING_PROFILES_ACTIVE=git
-      - GIT_URI=https://github.com/<your-config-repo>
     networks:
       - micro-net
     depends_on:
       - service-registry
 
-  # 🐘 Local PostgreSQL (optional)
-  postgres:
-    image: postgres:17
-    container_name: postgres-db
-    environment:
-      POSTGRES_DB: bookdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+
+  # 🟪 API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
     ports:
-      - "5432:5432"
+      - "8080:8080"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
     networks:
       - micro-net
+    depends_on:
+      - config-server
+      - service-registry
 
   # 🟨 Auth Service
   auth-service:
@@ -46,7 +46,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
     networks:
       - micro-net
     depends_on:
@@ -60,21 +60,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    networks:
-      - micro-net
-    depends_on:
-      - config-server
-      - service-registry
-
-  # 🟪 API Gateway
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
     networks:
       - micro-net
     depends_on:
@@ -86,3 +72,4 @@ networks:
 
 volumes:
   pgdata:
+
