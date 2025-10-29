@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS publishers (
     name VARCHAR(255) NOT NULL UNIQUE,
     location VARCHAR(255),
     website VARCHAR(500),
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

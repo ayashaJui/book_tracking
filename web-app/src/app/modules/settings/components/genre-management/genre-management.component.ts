@@ -128,8 +128,6 @@ export class GenreManagementComponent implements OnInit {
 
         const formData = this.genreService.genreForm.value;
 
-        console.log('Form Data:', formData);
-
         if (this.isFromCatalog) {
             this.saveUserGenrePreference(formData);
         } else {
@@ -172,8 +170,6 @@ export class GenreManagementComponent implements OnInit {
             parentGenreId: formData.parentGenreId,
             isActive: formData.isActive ?? true
         };
-
-        console.log('New Catalog Genre Data:', newCatalogGenreData);
 
         this.genreService.createCatalogGenre(newCatalogGenreData).subscribe({
             next: (response) => {

@@ -22,7 +22,7 @@ export class AddSeries implements OnInit {
   catalogSearchPerformed = false;
   selectedCatalogSeries: CatalogSearchResult | null = null;
   isFromCatalog = false;
-  showForm = false;
+  showForm = true;
 
   // Genre options for dropdown - now handled by the unified component
   genreOptions: { label: string; value: number }[] = [];
@@ -70,8 +70,13 @@ export class AddSeries implements OnInit {
 
   ngOnInit() {
     // this.initializeForm();
-    this.loadGenreOptions();
+    // this.loadGenreOptions();
     this.setupFormValidation();
+
+    // Add one default author row
+    if (this.authorsArray.length === 0) {
+      this.addAuthor();
+    }
   }
 
   setupFormValidation() {
@@ -90,7 +95,7 @@ export class AddSeries implements OnInit {
   loadGenreOptions() {
     this.genreService.getAllCatalogGenres().subscribe((response) => {
       if (response.data) {
-       
+
         this.genreOptions = response.data.map((genre: any) => ({
           label: genre.name,
           value: genre.id,
@@ -102,8 +107,9 @@ export class AddSeries implements OnInit {
   }
 
   onGenreCreated(genreName: string) {
-    // Refresh genre options when a new genre is created
-    this.loadGenreOptions();
+    setTimeout(() => {
+      this.loadGenreOptions();
+    }, 500);
   }
 
   onCustomTagCreated(tagName: any) {
@@ -148,68 +154,13 @@ export class AddSeries implements OnInit {
       const selectedAuthor = Array.isArray(author) ? author[0] : author;
       if (selectedAuthor) {
         authorControl.patchValue({
-          author: selectedAuthor,
-          name: selectedAuthor.name,
-
+          authorId: selectedAuthor,
         });
       }
     }
   }
 
-  // addBook() {
-  //   const bookForm = this.fb.group({
-  //     title: ['', [Validators.required, Validators.minLength(2)]],
-  //     status: ['Want to Read', Validators.required],
-  //     pagesRead: [null, [Validators.min(0)]],
-  //     rating: [null, [Validators.min(1), Validators.max(5)]],
-  //     finishedDate: [''],
-  //     orderInSeries: [this.booksArray.length + 1, Validators.required],
-  //   });
 
-  //   this.booksArray.push(bookForm);
-  // }
-
-  // removeBook(index: number) {
-  //   if (this.booksArray.length > 1) {
-  //     this.booksArray.removeAt(index);
-  //     // Update order numbers
-  //     this.updateBookOrders();
-  //   } else {
-  //     this.messageService.add({
-  //       severity: 'warn',
-  //       summary: 'Warning',
-  //       detail: 'A series must have at least one book',
-  //     });
-  //   }
-  // }
-
-  // updateBookOrders() {
-  //   this.booksArray.controls.forEach((control, index) => {
-  //     control.get('orderInSeries')?.setValue(index + 1);
-  //   });
-  // }
-
-  // moveBookUp(index: number) {
-  //   if (index > 0) {
-  //     const book = this.booksArray.at(index);
-  //     this.booksArray.removeAt(index);
-  //     this.booksArray.insert(index - 1, book);
-  //     this.updateBookOrders();
-  //   }
-  // }
-
-  // moveBookDown(index: number) {
-  //   if (index < this.booksArray.length - 1) {
-  //     const book = this.booksArray.at(index);
-  //     this.booksArray.removeAt(index);
-  //     this.booksArray.insert(index + 1, book);
-  //     this.updateBookOrders();
-  //   }
-  // }
-
-  // togglePreview() {
-  //   this.previewMode = !this.previewMode;
-  // }
 
   onSubmit() {
     if (this.seriesService.seriesForm.valid) {
@@ -217,11 +168,13 @@ export class AddSeries implements OnInit {
 
       const formValue = this.seriesService.seriesForm.value;
 
+      console.log('Form Value on Submit:', formValue);
+
       // Transform authors from form format to SeriesAuthor format
       const authors: SeriesAuthorDTO[] = formValue.authors.map((authorForm: any) => ({
-        authorId: authorForm.author?.id,
-        name: authorForm.name || authorForm.author?.name,
-        role: authorForm.role
+        authorId: authorForm.authorId?.id,
+        name: authorForm.authorId?.name,
+        role: authorForm.authorRole
       }));
 
       const newSeries: SeriesDTO = {
@@ -254,7 +207,7 @@ export class AddSeries implements OnInit {
           summary: 'Success',
           detail: `Series "${newSeries.title}" has been added successfully!`,
         });
-        this.router.navigate(['/series']);
+        // this.router.navigate(['/series']);
         this.isSubmitting = false;
       }, 1000);
     } else {
@@ -290,70 +243,9 @@ export class AddSeries implements OnInit {
     console.log('Create series clicked');
     alert('Series creation functionality will be implemented here');
     // For now, just navigate back
-    this.router.navigate(['/series']);
+    // this.router.navigate(['/series']);
   }
 
-  getCompletedBooksCount(): number {
-    return this.booksArray.controls.filter(
-      (book) => book.get('status')?.value === 'Finished'
-    ).length;
-  }
-
-  // Helper method to get default status based on reading progress
-  getDefaultSeriesStatus(): string {
-    const booksRead = this.seriesService.seriesForm.get('booksRead')?.value || 0;
-    const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value || 0;
-
-    if (booksRead === 0) {
-      return 'Want to Read';
-    } else if (booksRead === totalBooks && totalBooks > 0) {
-      return 'Completed';
-    } else {
-      return 'Reading';
-    }
-  }
-
-  // Helper method to update series status when books change
-  updateSeriesStatusFromBooks(): void {
-    // Note: booksRead is now manual input, not auto-calculated
-    const currentStatus = this.seriesService.seriesForm.get('status')?.value;
-    // Only auto-update if the user hasn't manually set a specific status
-    if (!currentStatus || currentStatus === 'Want to Read') {
-      const suggestedStatus = this.getDefaultSeriesStatus();
-      this.seriesService.seriesForm.get('status')?.setValue(suggestedStatus);
-    }
-  }
-
-  // Helper method to check if books count matches expected total
-  getBooksCountMessage(): string {
-    const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value;
-    const addedBooks = this.booksArray.length;
-
-    if (!totalBooks) return '';
-
-    if (addedBooks < totalBooks) {
-      return `You have added ${addedBooks} out of ${totalBooks} expected books.`;
-    } else if (addedBooks > totalBooks) {
-      return `You have added ${addedBooks} books, but expected total is ${totalBooks}. Consider updating the total.`;
-    } else {
-      return `Perfect! You have added all ${totalBooks} expected books.`;
-    }
-  }
-
-  getCountMessageSeverity(): 'info' | 'warn' | 'success' {
-    const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value;
-    const addedBooks = this.booksArray.length;
-
-    if (!totalBooks) return 'info';
-
-    if (addedBooks < totalBooks) {
-      return 'info';
-    } else if (addedBooks > totalBooks) {
-      return 'warn';
-    } else {
-      return 'success';
-    }
-  }
 
   // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
@@ -361,10 +253,7 @@ export class AddSeries implements OnInit {
     return !!(field?.invalid && field?.touched);
   }
 
-  isBookFieldInvalid(index: number, fieldName: string): boolean {
-    const field = this.booksArray.at(index).get(fieldName);
-    return !!(field?.invalid && field?.touched);
-  }
+
 
   isAuthorFieldInvalid(index: number, fieldName: string): boolean {
     const field = this.authorsArray.at(index).get(fieldName);
@@ -387,18 +276,23 @@ export class AddSeries implements OnInit {
 
   private getFieldDisplayName(fieldName: string): string {
     const displayNames: { [key: string]: string } = {
-      'title': 'Title',
+      'name': 'Series Title',
+      'description': 'Description',
       'totalBooks': 'Total Books',
       'genres': 'Genres',
-      'isComplete': 'Series Completion Status',
+      'authors': 'Authors',
+      'isCompleted': 'Series Completion Status',
+
       'booksRead': 'Books Read',
-      'status': 'Series Status',
       'booksOwned': 'Books Owned',
+      'status': 'Series Status',
       'startDate': 'Start Date',
       'completionDate': 'Completion Date',
+      'isFavorite': 'Favorite',
       'readingOrderPreference': 'Reading Order Preference',
       'notes': 'Notes'
     };
+
     return displayNames[fieldName] || fieldName;
   }
 
@@ -412,15 +306,7 @@ export class AddSeries implements OnInit {
     }
   }
 
-  getBookFieldError(index: number, fieldName: string): string {
-    const field = this.booksArray.at(index).get(fieldName);
-    if (field?.errors?.['required']) return `${fieldName} is required`;
-    if (field?.errors?.['min'])
-      return `${fieldName} must be at least ${field.errors['min'].min}`;
-    if (field?.errors?.['max'])
-      return `${fieldName} must be at most ${field.errors['max'].max}`;
-    return '';
-  }
+
 
   getAuthorFieldError(index: number, fieldName: string): string {
     const field = this.authorsArray.at(index).get(fieldName);
@@ -521,4 +407,137 @@ export class AddSeries implements OnInit {
       });
     }
   }
+
+  // isBookFieldInvalid(index: number, fieldName: string): boolean {
+  //   const field = this.booksArray.at(index).get(fieldName);
+  //   return !!(field?.invalid && field?.touched);
+  // }
+
+  // getBookFieldError(index: number, fieldName: string): string {
+  //   const field = this.booksArray.at(index).get(fieldName);
+  //   if (field?.errors?.['required']) return `${fieldName} is required`;
+  //   if (field?.errors?.['min'])
+  //     return `${fieldName} must be at least ${field.errors['min'].min}`;
+  //   if (field?.errors?.['max'])
+  //     return `${fieldName} must be at most ${field.errors['max'].max}`;
+  //   return '';
+  // }
+
+  // getCompletedBooksCount(): number {
+  //   return this.booksArray.controls.filter(
+  //     (book) => book.get('status')?.value === 'Finished'
+  //   ).length;
+  // }
+
+  // Helper method to get default status based on reading progress
+  // getDefaultSeriesStatus(): string {
+  //   const booksRead = this.seriesService.seriesForm.get('booksRead')?.value || 0;
+  //   const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value || 0;
+
+  //   if (booksRead === 0) {
+  //     return 'Want to Read';
+  //   } else if (booksRead === totalBooks && totalBooks > 0) {
+  //     return 'Completed';
+  //   } else {
+  //     return 'Reading';
+  //   }
+  // }
+
+  // Helper method to update series status when books change
+  // updateSeriesStatusFromBooks(): void {
+  //   // Note: booksRead is now manual input, not auto-calculated
+  //   const currentStatus = this.seriesService.seriesForm.get('status')?.value;
+  //   // Only auto-update if the user hasn't manually set a specific status
+  //   if (!currentStatus || currentStatus === 'Want to Read') {
+  //     const suggestedStatus = this.getDefaultSeriesStatus();
+  //     this.seriesService.seriesForm.get('status')?.setValue(suggestedStatus);
+  //   }
+  // }
+
+  // Helper method to check if books count matches expected total
+  // getBooksCountMessage(): string {
+  //   const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value;
+  //   const addedBooks = this.booksArray.length;
+
+  //   if (!totalBooks) return '';
+
+  //   if (addedBooks < totalBooks) {
+  //     return `You have added ${addedBooks} out of ${totalBooks} expected books.`;
+  //   } else if (addedBooks > totalBooks) {
+  //     return `You have added ${addedBooks} books, but expected total is ${totalBooks}. Consider updating the total.`;
+  //   } else {
+  //     return `Perfect! You have added all ${totalBooks} expected books.`;
+  //   }
+  // }
+
+  // getCountMessageSeverity(): 'info' | 'warn' | 'success' {
+  //   const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value;
+  //   const addedBooks = this.booksArray.length;
+
+  //   if (!totalBooks) return 'info';
+
+  //   if (addedBooks < totalBooks) {
+  //     return 'info';
+  //   } else if (addedBooks > totalBooks) {
+  //     return 'warn';
+  //   } else {
+  //     return 'success';
+  //   }
+  // }
+
+  // addBook() {
+  //   const bookForm = this.fb.group({
+  //     title: ['', [Validators.required, Validators.minLength(2)]],
+  //     status: ['Want to Read', Validators.required],
+  //     pagesRead: [null, [Validators.min(0)]],
+  //     rating: [null, [Validators.min(1), Validators.max(5)]],
+  //     finishedDate: [''],
+  //     orderInSeries: [this.booksArray.length + 1, Validators.required],
+  //   });
+
+  //   this.booksArray.push(bookForm);
+  // }
+
+  // removeBook(index: number) {
+  //   if (this.booksArray.length > 1) {
+  //     this.booksArray.removeAt(index);
+  //     // Update order numbers
+  //     this.updateBookOrders();
+  //   } else {
+  //     this.messageService.add({
+  //       severity: 'warn',
+  //       summary: 'Warning',
+  //       detail: 'A series must have at least one book',
+  //     });
+  //   }
+  // }
+
+  // updateBookOrders() {
+  //   this.booksArray.controls.forEach((control, index) => {
+  //     control.get('orderInSeries')?.setValue(index + 1);
+  //   });
+  // }
+
+  // moveBookUp(index: number) {
+  //   if (index > 0) {
+  //     const book = this.booksArray.at(index);
+  //     this.booksArray.removeAt(index);
+  //     this.booksArray.insert(index - 1, book);
+  //     this.updateBookOrders();
+  //   }
+  // }
+
+  // moveBookDown(index: number) {
+  //   if (index < this.booksArray.length - 1) {
+  //     const book = this.booksArray.at(index);
+  //     this.booksArray.removeAt(index);
+  //     this.booksArray.insert(index + 1, book);
+  //     this.updateBookOrders();
+  //   }
+  // }
+
+  // togglePreview() {
+  //   this.previewMode = !this.previewMode;
+  // }
+
 }

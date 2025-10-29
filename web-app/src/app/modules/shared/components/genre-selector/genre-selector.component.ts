@@ -12,8 +12,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { GenreSelectorService } from '../../services/genre.selector.service';
 import { MessageService } from 'primeng/api';
 import { MultiSelect } from 'primeng/multiselect';
-import { Genre, CatalogGenre, UserGenrePreference } from '../../models/genre.model';
-import { CatalogGenreDTO } from '../../../settings/models/genre.model';
+import { Genre, CatalogGenre, UserGenrePreference, CatalogGenreCreateRequestDTO, UserGenrePreferenceCreateRequestDTO } from '../../models/genre.model';
+import { CatalogGenreDTO, UserGenrePreferenceDTO } from '../../../settings/models/genre.model';
+import { GenreService } from '../../../settings/services/genre.service';
+import { UiService } from '../../services/ui.service.service';
 
 @Component({
     selector: 'app-genre-selector',
@@ -34,7 +36,7 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
     @Input() userId: number = 1; // Current user ID (should come from auth service)
     @Input() hierarchical: boolean = false; // Whether to show hierarchical structure
     @Output() genreCreated = new EventEmitter<string>();
-    @Output() preferenceUpdated = new EventEmitter<UserGenrePreference>();
+    @Output() preferenceUpdated = new EventEmitter<UserGenrePreferenceDTO>();
     @ViewChild('multiSelectRef') multiSelectRef!: MultiSelect;
 
     value: string[] = [];
@@ -68,7 +70,8 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
 
     constructor(
         private genreSelectorService: GenreSelectorService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private uiService: UiService
     ) {
     }
 
@@ -123,22 +126,8 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
         console.log('Selected genres after update:', this.selectedGenres);
     }
 
-    openPreferenceDialog(genreId: string): void {
-        console.log('Opening preference dialog for genre:', genreId);
-        const genre = this.allGenres.find(g => g.id === +genreId);
-        console.log('Found genre option:', genre);
-        if (!genre) return;
-
-        this.selectedGenreForPreference = genre;
-        this.preferenceLevel = 3; // Default to neutral
-        this.isExcluded = false;
-        this.preferenceNotes = '';
-
-        this.showPreferenceDialog = true;
-        console.log('Dialog should be visible now, selectedGenreForPreference:', this.selectedGenreForPreference);
-    }
-
     showAddGenreForm(): void {
+        console.log('Showing add genre form');
         this.showAddForm = true;
         // Close the dropdown
         if (this.multiSelectRef) {
@@ -146,7 +135,16 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
         }
     }
 
-
+    cancelAddGenre(): void {
+        this.newGenreName = '';
+        this.newGenreDescription = '';
+        this.newGenreParentId = null;
+        this.isGenreActive = true;
+        this.preferenceLevel = 3;
+        this.isExcluded = false;
+        this.preferenceNotes = '';
+        this.showAddForm = false;
+    }
 
     canCreateGenre(): boolean {
         return !!(
@@ -160,7 +158,7 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
     }
 
     genreExists(name: string): boolean {
-        return this.genreSelectorService.genreExists(name);
+        return !!this.allGenres.find(g => g.name.toLowerCase() === name.toLowerCase());
     }
 
     createNewGenre(): void {
@@ -170,127 +168,53 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
 
         const trimmedName = this.newGenreName.trim();
 
-        try {
-            // Create catalog genre with all database fields
-            const newCatalogGenreData: Omit<CatalogGenre, 'id' | 'createdAt' | 'updatedAt'> = {
-                name: trimmedName,
-                description: this.newGenreDescription.trim() || undefined,
-                parentGenreId: this.newGenreParentId || undefined,
-                isActive: this.isGenreActive
-            };
+        const catalogGenreData: CatalogGenreCreateRequestDTO = {
+            name: trimmedName,
+            description: this.newGenreDescription.trim() || '',
+            parentGenreId: this.newGenreParentId || undefined,
+            isActive: this.isGenreActive
+        }
 
-            const newGenre = this.genreSelectorService.addCatalogGenre(newCatalogGenreData);
+        const userPreferenceData: UserGenrePreferenceCreateRequestDTO = {
+            userId: this.userId,
+            preferenceLevel: this.preferenceLevel,
+            isExcluded: this.isExcluded,
+            notes: this.preferenceNotes.trim() || '',
+            catalogGenreId: 0
+        }
 
-            // Create user preference with all fields
-            const userPreferenceData: Omit<UserGenrePreference, 'id' | 'createdAt' | 'updatedAt'> = {
-                userId: this.userId,
-                catalogGenreId: newGenre.id,
-                preferenceLevel: this.preferenceLevel,
-                isExcluded: this.isExcluded,
-                notes: this.preferenceNotes.trim() || undefined
-            };
+        this.genreSelectorService.createCatalogGenreSelector(catalogGenreData).subscribe((response) => {
+            if (response.data) {
+                const newGenre = response.data;
+                userPreferenceData.catalogGenreId = newGenre.id;
 
-            const userPreference = this.genreSelectorService.setUserGenrePreference(userPreferenceData);
+                this.genreSelectorService.createUserGenreSelectorPrefernece(userPreferenceData).subscribe((prefResponse) => {
+                    if (prefResponse.data) {
+                        this.uiService.setCustomSuccess("Success", "Genre Preference Created");
 
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Genre Created',
-                detail: `"${newGenre.name}" created with preference level ${this.preferenceLevel}/5`,
-                life: 3000,
-            });
+                    }
+                });
+                this.uiService.setCustomSuccess("Success", `Genre Created`);
 
-            // Add the new genre to selection
-            if (!this.value.includes(newGenre.name)) {
-                this.value = [...this.value, newGenre.name];
-                this.onChange(this.value);
+                // Refresh the genre options list
+                this.loadGenreOptions();
+
+                // Add the new genre to selection
+                if (!this.value.includes(newGenre.name)) {
+                    this.value = [...this.value, newGenre.name];
+                    this.onChange(this.value);
+                }
+
+                this.genreCreated.emit(newGenre.name);
+
+                // Emit preference update
+                this.preferenceUpdated.emit(userPreferenceData as UserGenrePreferenceDTO);
+
+                // Reset form
+                this.cancelAddGenre();
             }
-
-            this.genreCreated.emit(newGenre.name);
-
-            // Emit preference update
-            this.preferenceUpdated.emit(userPreference as UserGenrePreference);
-
-            // Reset form
-            this.cancelAddGenre();
-        } catch (error) {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to create genre',
-                life: 3000,
-            });
-        }
+        })
     }
-
-    cancelAddGenre(): void {
-        this.newGenreName = '';
-        this.newGenreDescription = '';
-        this.newGenreParentId = null;
-        this.isGenreActive = true;
-        this.preferenceLevel = 3; // Reset to default
-        this.isExcluded = false;
-        this.preferenceNotes = '';
-        this.showAddForm = false;
-    }
-
-    // New methods for preference management
-
-
-    savePreference(): void {
-        if (!this.selectedGenreForPreference) return;
-
-        try {
-            const preference = this.genreSelectorService.setUserGenrePreference({
-                userId: this.userId,
-                catalogGenreId: this.selectedGenreForPreference.id,
-                preferenceLevel: this.preferenceLevel,
-                isExcluded: this.isExcluded,
-                notes: this.preferenceNotes.trim() || undefined
-            });
-
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Preference for "${this.selectedGenreForPreference.name}" saved`,
-                life: 3000,
-            });
-
-            this.preferenceUpdated.emit(preference);
-            this.closePreferenceDialog();
-        } catch (error) {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to save preference',
-                life: 3000,
-            });
-        }
-    }
-
-    closePreferenceDialog(): void {
-        this.showPreferenceDialog = false;
-        this.selectedGenreForPreference = null;
-        this.preferenceLevel = 3;
-        this.isExcluded = false;
-        this.preferenceNotes = '';
-    }
-
-    getGenreIcon(genre: Genre): string {
-        if (genre.isExcluded) return 'pi pi-ban text-red-500';
-        if (genre.preferenceLevel === 5) return 'pi pi-heart-fill text-red-500';
-        if (genre.preferenceLevel === 4) return 'pi pi-heart text-pink-500';
-        if (genre.preferenceLevel === 1) return 'pi pi-thumbs-down text-gray-500';
-        return '';
-    }
-
-    getParentGenreOptions(): { label: string; value: number }[] {
-        const rootGenres = this.genreSelectorService.getCatalogGenres().filter(g => !g.parentGenreId && g.isActive);
-        return rootGenres.map(genre => ({
-            label: genre.name,
-            value: genre.id
-        }));
-    }
-
 
 
     // ControlValueAccessor implementation
@@ -314,12 +238,80 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
         this.onTouched = fn;
     }
 
-    setDisabledState(isDisabled: boolean): void {
-        // Handle disabled state if needed
-    }
-
     // TrackBy function for better performance
     trackByGenreName(index: number, item: { id: string; name: string; genre: any; icon?: string | null }): string {
         return item.id;
     }
+
+    // openPreferenceDialog(genreId: string): void {
+    //     console.log('Opening preference dialog for genre:', genreId);
+    //     const genre = this.allGenres.find(g => g.id === +genreId);
+    //     console.log('Found genre option:', genre);
+    //     if (!genre) return;
+
+    //     this.selectedGenreForPreference = genre;
+    //     this.preferenceLevel = 3; // Default to neutral
+    //     this.isExcluded = false;
+    //     this.preferenceNotes = '';
+
+    //     this.showPreferenceDialog = true;
+    //     console.log('Dialog should be visible now, selectedGenreForPreference:', this.selectedGenreForPreference);
+    // }
+
+    // savePreference(): void {
+    //     if (!this.selectedGenreForPreference) return;
+
+    //     try {
+    //         const preference = this.genreSelectorService.setUserGenrePreference({
+    //             userId: this.userId,
+    //             catalogGenreId: this.selectedGenreForPreference.id,
+    //             preferenceLevel: this.preferenceLevel,
+    //             isExcluded: this.isExcluded,
+    //             notes: this.preferenceNotes.trim() || undefined
+    //         });
+
+    //         this.messageService.add({
+    //             severity: 'success',
+    //             summary: 'Success',
+    //             detail: `Preference for "${this.selectedGenreForPreference.name}" saved`,
+    //             life: 3000,
+    //         });
+
+    //         // this.preferenceUpdated.emit(preference);
+    //         this.closePreferenceDialog();
+    //     } catch (error) {
+    //         this.messageService.add({
+    //             severity: 'error',
+    //             summary: 'Error',
+    //             detail: 'Failed to save preference',
+    //             life: 3000,
+    //         });
+    //     }
+    // }
+
+    // closePreferenceDialog(): void {
+    //     this.showPreferenceDialog = false;
+    //     this.selectedGenreForPreference = null;
+    //     this.preferenceLevel = 3;
+    //     this.isExcluded = false;
+    //     this.preferenceNotes = '';
+    // }
+
+
+    // getGenreIcon(genre: Genre): string {
+    //     if (genre.isExcluded) return 'pi pi-ban text-red-500';
+    //     if (genre.preferenceLevel === 5) return 'pi pi-heart-fill text-red-500';
+    //     if (genre.preferenceLevel === 4) return 'pi pi-heart text-pink-500';
+    //     if (genre.preferenceLevel === 1) return 'pi pi-thumbs-down text-gray-500';
+    //     return '';
+    // }
+
+    // getParentGenreOptions(): { label: string; value: number }[] {
+    //     const rootGenres = this.genreSelectorService.getCatalogGenres().filter(g => !g.parentGenreId && g.isActive);
+    //     return rootGenres.map(genre => ({
+    //         label: genre.name,
+    //         value: genre.id
+    //     }));
+    // }
+
 }

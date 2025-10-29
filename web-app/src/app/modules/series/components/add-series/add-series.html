@@ -318,18 +318,18 @@
               <div class="flex-1">
                 <app-author-selector
                   [placeholder]="'Select author...'"
-                  [formControl]="$any(author.get('author'))"
+                  [formControl]="$any(authorsArray.at(i).get('authorId'))"
                   [multiple]="false"
                   [showAddButton]="true"
                   [required]="true"
                   (authorSelected)="onAuthorSelected($event, i)"
                   class="w-full h-12"
-                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'author')"
+                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'authorId')"
                 ></app-author-selector>
               </div>
               <small
                 class="text-red-500"
-                *ngIf="isAuthorFieldInvalid(i, 'author')"
+                *ngIf="isAuthorFieldInvalid(i, 'authorId')"
               >
                 Author is required
               </small>
@@ -347,19 +347,19 @@
               </label>
               <div class="flex-1 w-full">
                 <p-select
-                  [formControl]="$any(author.get('role'))"
+                  [formControl]="$any(authorsArray.at(i).get('authorRole'))"
                   [options]="roleOptions"
                   placeholder="Select role"
                   class="w-full h-12"
-                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'role')"
+                  [class.ng-invalid]="isAuthorFieldInvalid(i, 'authorRole')"
                   style="height: 2.8rem !important; width: 100% !important"
                 ></p-select>
               </div>
               <small
                 class="text-red-500"
-                *ngIf="isAuthorFieldInvalid(i, 'role')"
+                *ngIf="isAuthorFieldInvalid(i, 'authorRole')"
               >
-                {{ getAuthorFieldError(i, "role") }}
+                {{ getAuthorFieldError(i, "authorRole") }}
               </small>
             </div>
 

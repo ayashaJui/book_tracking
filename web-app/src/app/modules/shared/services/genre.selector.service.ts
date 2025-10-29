@@ -16,7 +16,7 @@ import {
 } from '../models/genre.model';
 import { environment } from '../../../../environments/environment';
 import { CatalogAuthorHttpResponse } from '../../authors/models/response.model';
-import { CatalogGenreHttpResponse } from '../../settings/models/response.model';
+import { CatalogGenreHttpResponse, UserGenrePreferenceHttpResponse } from '../../settings/models/response.model';
 import { CatalogGenreDTO } from '../../settings/models/genre.model';
 
 // Export interfaces for backward compatibility
@@ -483,4 +483,18 @@ export class GenreSelectorService {
       // Keep default data if loading fails
     }
   }
+
+  // api calls to backend services
+  createCatalogGenreSelector(catalogData: CatalogGenreCreateRequestDTO): Observable<CatalogGenreHttpResponse> {
+    let url = `${environment.catalog_service_url}/genres`;
+
+    return this.http.post<CatalogGenreHttpResponse>(url, catalogData);
+  }
+
+  // api call to backend services
+  createUserGenreSelectorPrefernece(data: UserGenrePreferenceCreateRequestDTO): Observable<UserGenrePreferenceHttpResponse> {
+      let url = `${environment.user_library_service_url}/user_genre_preferences`;
+  
+      return this.http.post<UserGenrePreferenceHttpResponse>(url, data);
+    }
 }

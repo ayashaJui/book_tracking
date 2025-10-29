@@ -1,6 +1,7 @@
 package com.biblioteca.authserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -58,6 +59,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class AuthServerConfig {
     private final AuthUserService authUserService;
     
+    @Value("${spring.security.oauth2.authorizationserver.issuer:http://localhost:9072}")
+    private String issuer;
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -76,9 +80,7 @@ public class AuthServerConfig {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                // Optional: customize endpoints
-                // .authorizationEndpoint("/oauth2/authorize")
-                // .tokenEndpoint("/oauth2/token")
+                .issuer(issuer)
                 .build();
     }
 

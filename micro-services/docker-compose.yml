@@ -1,75 +1,92 @@
-version: '3.9'
+﻿version: '3.9'
 
 services:
-  # 🟩 Eureka Service Registry
+  # Eureka Service Registry
   service-registry:
-    build: ./service-registry
+    build: ./serviceregistry
     container_name: service-registry
     ports:
-      - "9070:9070"
+      - "9071:9071"
     networks:
       - micro-net
 
-  # 🟦 Config Server
+  # Config Server
   config-server:
-    build: ./config-server
+    build: ./configserver
     container_name: config-server
     ports:
-      - "8081:8081"
+      - "8082:8082"
     environment:
-      - GIT_TOKEN=${GIT_TOKEN}
+      - GIT_PASSWORD=${GIT_PASSWORD}
+      - GIT_USERNAME=${GIT_USERNAME}
+      - SECURITY_PASSWORD=${SECURITY_PASSWORD}
+      - SECURITY_USERNAME=${SECURITY_USERNAME}
       - SPRING_PROFILES_ACTIVE=git
     networks:
       - micro-net
     depends_on:
       - service-registry
 
-
-  # 🟪 API Gateway
+  # API Gateway
   api-gateway:
-    build: ./api-gateway
+    build: ./apigateway
     container_name: api-gateway
     ports:
-      - "8080:8080"
+      - "9073:9073"
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8082/
+      - SPRING_CLOUD_CONFIG_USERNAME=${SECURITY_USERNAME}
+      - SPRING_CLOUD_CONFIG_PASSWORD=${SECURITY_PASSWORD}
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_PROFILES_ACTIVE=development
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://biblioteca:biblioteca@service-registry:9071/eureka/
     networks:
       - micro-net
     depends_on:
       - config-server
       - service-registry
 
-  # 🟨 Auth Service
-  auth-service:
-    build: ./auth-service
-    container_name: auth-service
+  # Auth Server
+  auth-server:
+    build: ./authserver
+    container_name: auth-server
+    restart: on-failure:5
     ports:
-      - "8082:8082"
+      - "9072:9072"
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8082/
+      - SPRING_CLOUD_CONFIG_USERNAME=${SECURITY_USERNAME}
+      - SPRING_CLOUD_CONFIG_PASSWORD=${SECURITY_PASSWORD}
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_PROFILES_ACTIVE=development
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://biblioteca:biblioteca@service-registry:9071/eureka/
+      - SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER=http://localhost:9072
     networks:
       - micro-net
     depends_on:
       - config-server
       - service-registry
 
-  # 🟧 User Service
+  # User Service
   user-service:
-    build: ./user-service
+    build: ./userservice
     container_name: user-service
+    restart: on-failure:5
     ports:
-      - "8081:8081"
+      - "8087:8087"
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8082/
+      - SPRING_CLOUD_CONFIG_USERNAME=${SECURITY_USERNAME}
+      - SPRING_CLOUD_CONFIG_PASSWORD=${SECURITY_PASSWORD}
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_PROFILES_ACTIVE=development
+      - JWT_JWK_SET_URI=http://auth-server:9072/oauth2/jwks
     networks:
       - micro-net
     depends_on:
       - config-server
       - service-registry
+      - auth-server
 
 networks:
   micro-net:
-
-volumes:
-  pgdata:
-

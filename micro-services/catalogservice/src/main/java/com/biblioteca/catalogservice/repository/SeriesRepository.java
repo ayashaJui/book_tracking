@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface SeriesRepository extends JpaRepository<Series, Integer> {
-    Optional<Series> findByName(String name);
+    Optional<Series> findByNameIgnoreCase(String name);
 
     @Query("SELECT s FROM SeriesAuthor sa JOIN sa.series s " +
             "WHERE sa.author.id = :authorId ORDER BY sa.role")

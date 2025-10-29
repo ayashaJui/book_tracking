@@ -48,10 +48,10 @@ public class UserSeriesMapper {
     public static UserSeries fromUpdateDTO(UserSeriesUpdateDTO userSeriesUpdateDTO, UserSeries userSeries) {
         userSeries.setBooksRead(userSeriesUpdateDTO.getBooksRead());
         userSeries.setBooksOwned(userSeriesUpdateDTO.getBooksOwned());
-        userSeries.setCompletionPercentage(userSeriesUpdateDTO.getCompletionPercentage());
+//        userSeries.setCompletionPercentage(userSeriesUpdateDTO.getCompletionPercentage());
         userSeries.setStatus(userSeriesUpdateDTO.getStatus().name());
         userSeries.setStartDate(userSeriesUpdateDTO.getStartDate());
-//        userSeries.setCompletionDate(userSeriesUpdateDTO.getCompletionDate());
+        userSeries.setCompletionDate(userSeriesUpdateDTO.getCompletionDate());
         userSeries.setIsFavorite(userSeriesUpdateDTO.getIsFavorite());
         userSeries.setReadingOrderPreference(userSeriesUpdateDTO.getReadingOrderPreference());
         userSeries.setNotes(userSeriesUpdateDTO.getNotes());

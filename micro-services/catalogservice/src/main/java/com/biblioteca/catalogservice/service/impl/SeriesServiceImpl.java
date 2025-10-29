@@ -45,7 +45,7 @@ public class SeriesServiceImpl implements SeriesService {
     public SeriesDTO createSeries(SeriesCreateDTO seriesCreateDTO, HttpServletRequest request, Jwt jwt) {
         log.info("createSeries in SeriesServiceImpl is called with data: {} by user: {}", seriesCreateDTO, jwt.getSubject());
 
-        Optional<Series> existingSeries = seriesRepository.findByName(seriesCreateDTO.getName());
+        Optional<Series> existingSeries = seriesRepository.findByNameIgnoreCase(seriesCreateDTO.getName());
         if (existingSeries.isPresent()) {
             log.error("Series with name '{}' already exists", seriesCreateDTO.getName());
             throw new CustomException("Series with the same name already exists", HttpStatus.CONFLICT.value());
@@ -152,7 +152,7 @@ public class SeriesServiceImpl implements SeriesService {
 
         Series series = findById(seriesUpdateDTO.getId());
 
-        Optional<Series> seriesWithSameName = seriesRepository.findByName(seriesUpdateDTO.getName());
+        Optional<Series> seriesWithSameName = seriesRepository.findByNameIgnoreCase(seriesUpdateDTO.getName());
         if(seriesWithSameName.isPresent() && !seriesWithSameName.get().getId().equals(seriesUpdateDTO.getId())){
             log.error("Series with name '{}' already exists", seriesUpdateDTO.getName());
             throw new CustomException("Series with the same name already exists", HttpStatus.CONFLICT.value());

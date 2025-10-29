@@ -1,4 +1,4 @@
-const apiGatewayUrl = 'http://localhost:9071';
+const apiGatewayUrl = 'http://localhost:9073';
 
 export const environment = {
   production: false,

@@ -34,7 +34,8 @@ export class App implements OnInit {
     }
 
     this.email = localStorage.getItem('email') || '';
-    if (this.email) {
+    console.log("Retrieved email from localStorage:", this.email);
+    if (this.email && this.isAuthenticated) {
       console.log("Loading auth user for email:", this.email);
       this.loadAuthUser(this.email);
     }
