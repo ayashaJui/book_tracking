@@ -1,4 +1,4 @@
-﻿version: '3.9'
+﻿version: "3.9"
 
 services:
   # Eureka Service Registry
@@ -45,12 +45,16 @@ services:
     depends_on:
       - config-server
       - service-registry
+      - auth-server
+      - user-service
+    restart: on-failure:10
+    entrypoint: ["/bin/sh", "-c", "sleep 20 && java -jar app.jar"]
 
   # Auth Server
   auth-server:
     build: ./authserver
     container_name: auth-server
-    restart: on-failure:5
+    restart: on-failure:10
     ports:
       - "9072:9072"
     environment:
@@ -71,7 +75,7 @@ services:
   user-service:
     build: ./userservice
     container_name: user-service
-    restart: on-failure:5
+    restart: on-failure:10
     ports:
       - "8087:8087"
     environment:
