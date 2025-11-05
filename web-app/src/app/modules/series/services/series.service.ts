@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { SeriesDTO } from '../models/series.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { CatalogSeriesCreateRequestDTO, SeriesDTO, UserSeriesCreateRequestDTO } from '../models/series.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { CatalogSeriesHttpResponse, UserSeriesHttpResponse } from '../models/response.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -122,9 +124,9 @@ export class SeriesService {
       // User series related fields
       booksRead: [0, [Validators.min(0)]],
       booksOwned: [0, [Validators.min(0)]],
-      status: ['Want to Read', [Validators.required]],
-      startDate: [''],
-      completionDate: [''],
+      status: ['WANT_TO_READ', [Validators.required]],
+      startDate: [null],
+      completionDate: [null],
       isFavorite: [false],
       readingOrderPreference: ['Publication Order'],
       notes: [''],
@@ -179,5 +181,29 @@ export class SeriesService {
       series.totalBooks = series.books.length;
       this.updateSeries(series);
     }
+  }
+
+  // api calls to backend would go here
+  createCatalogSeries(data: CatalogSeriesCreateRequestDTO): Observable<CatalogSeriesHttpResponse> {
+    let url = `${environment.catalog_service_url}/series`;
+
+    return this.http.post<CatalogSeriesHttpResponse>(url, data);
+  }
+
+  createUserSeries(data: UserSeriesCreateRequestDTO): Observable<UserSeriesHttpResponse>{
+    let url = `${environment.user_library_service_url}/user_series`;
+
+    return this.http.post<UserSeriesHttpResponse>(url, data);
+  }
+
+  getSeriesByUserId(userId: number): Observable<UserSeriesHttpResponse[]> {
+    let url = `${environment.user_library_service_url}/user_series/user/${userId}`;
+    return this.http.get<UserSeriesHttpResponse[]>(url);
+  }
+
+  getCatalogSeriesByIds(catalogSeriesIds: number[]): Observable<CatalogSeriesHttpResponse[]> {
+    let params = catalogSeriesIds.map(id => `ids=${id}`).join('&');
+    let url = `${environment.catalog_service_url}/series/batch?${params}`;
+    return this.http.get<CatalogSeriesHttpResponse[]>(url);
   }
 }

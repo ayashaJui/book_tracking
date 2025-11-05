@@ -323,6 +323,16 @@
                           [name]="'author-role-' + i"
                         ></p-select>
                       </div>
+
+                      <!-- Delete Button -->
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-trash"
+                        class="p-button-rounded p-button-text p-button-danger"
+                        pTooltip="Remove author"
+                        (click)="removeAuthorFromBook(authorRole.authorId)"
+                      ></button>
                     </div>
                   </div>
                   <small class="text-gray-500 dark:text-gray-400">

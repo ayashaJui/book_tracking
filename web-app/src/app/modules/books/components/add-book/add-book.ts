@@ -177,12 +177,28 @@ export class AddBook implements OnInit {
     this.newBook.authors = this.selectedAuthorsWithRoles;
   }
 
+  removeAuthorFromBook(authorId: number) {
+    // Remove from selectedAuthors array
+    this.selectedAuthors = this.selectedAuthors.filter(author => author.id !== authorId);
+
+    // Remove from selectedAuthorsWithRoles array
+    this.selectedAuthorsWithRoles = this.selectedAuthorsWithRoles.filter(
+      authorRole => authorRole.authorId !== authorId
+    );
+
+    // Update the book's authorIds
+    this.newBook.authorIds = this.selectedAuthors.map(a => a.id!).filter(id => id !== undefined);
+
+    // Update the book's authors array
+    this.newBook.authors = this.selectedAuthorsWithRoles;
+  }
+
   onAddNewAuthor() {
     // Open the add author dialog
     this.showAddAuthorDialog = true;
   }
 
-  onViewAuthor(author: Author) {
+  onViewAuthor(author: CatalogAuthor) {
     // Navigate to author details page
     if (author.id) {
       this.router.navigate(['/authors', author.id]);

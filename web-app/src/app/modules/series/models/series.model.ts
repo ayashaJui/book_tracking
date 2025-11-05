@@ -1,15 +1,4 @@
-export interface SeriesAuthorDTO {
-  id?: number;
-  authorId?: number;
-  authorName: string;
-  authorRole: string; // e.g., "Author", "Co-Author", "Editor", "Illustrator", "Translator", etc.
-}
 
-export interface SeriesGenreDTO {
-  id: number;
-  genreId: number;
-  genreName: string;
-}
 
 export interface SeriesBookDTO {
   title: string;
@@ -45,18 +34,33 @@ export interface SeriesDTO {
   notes?: string;
 }
 
+
+// new
+export interface SeriesAuthorDTO {
+  id?: number;
+  authorId?: number;
+  authorName: string;
+  authorRole: string; // e.g., "Author", "Co-Author", "Editor", "Illustrator", "Translator", etc.
+}
+
+export interface SeriesGenreDTO {
+  id: number;
+  genreId: number;
+  genreName: string;
+}
+
 export interface CatalogSeriesCreateRequestDTO {
   name: string;
   description?: string;
   totalBooks?: number;
-  isComplete?: boolean;
-  seriesGenreCreateDTOS?: {genreId: number}[];
-  seriesAuthorCreateDTOS?: {authorId: number, authorRole: string}[];
+  isCompleted?: boolean;
+  seriesGenreCreateDTOS?: { genreId: number }[];
+  seriesAuthorCreateDTOS?: { authorId: number, authorRole: string }[];
 }
 
 export interface UserSeriesCreateRequestDTO {
   userId: number;
-  seriesId: number;
+  catalogSeriesId: number;
   seriesTotalBooks?: number;
   booksRead?: number;
   booksOwned?: number;
@@ -66,4 +70,35 @@ export interface UserSeriesCreateRequestDTO {
   isFavorite?: boolean;
   readingOrderPreference?: string;
   notes?: string;
+}
+
+export interface UserSeriesDTO {
+  id: number;
+  userId: number;
+  catalogSeriesId: number;
+  booksRead: number;
+  booksOwned: number;
+  completionPercentage: number;
+  status: string;
+  startDate: string;
+  completionDate: string;
+  isFavorite: boolean;
+  readingOrderPreference: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  catalogSeries?: CatalogSeriesDTO;
+}
+
+export interface CatalogSeriesDTO {
+  id: number;
+  name: string;
+  description: string;
+  totalBooks: number;
+  isCompleted: boolean;
+  seriesGenres: SeriesGenreDTO[];
+  seriesAuthors: SeriesAuthorDTO[];
+  // seriesBooks: SeriesBookDTO[];
+  createdAt: string;
+  updatedAt: string;
 }

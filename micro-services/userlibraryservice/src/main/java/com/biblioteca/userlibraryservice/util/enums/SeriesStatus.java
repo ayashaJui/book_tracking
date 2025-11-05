@@ -2,7 +2,7 @@ package com.biblioteca.userlibraryservice.util.enums;
 
 public enum SeriesStatus {
     WANT_TO_READ,
-    ACTIVE,
+    READING,
     COMPLETED,
     PAUSED,
     DROPPED

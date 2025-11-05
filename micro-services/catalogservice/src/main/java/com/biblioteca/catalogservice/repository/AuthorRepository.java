@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
     Optional<Author> findByNameIgnoreCase(String name);
 
-    List<Author> findByNameContaining(String name);
+    List<Author> findByNameContainingIgnoreCase(String name);
 }

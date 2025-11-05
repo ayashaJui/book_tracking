@@ -248,6 +248,14 @@
                       optionValue="value"
                       class="w-32"
                     ></p-select>
+                    <button
+                      type="button"
+                      pButton
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-text p-button-danger"
+                      pTooltip="Remove author"
+                      (click)="removeAuthorFromBook(author.authorId)"
+                    ></button>
                   </div>
                 </div>
               </div>

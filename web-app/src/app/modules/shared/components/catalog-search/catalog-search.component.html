@@ -16,6 +16,7 @@
         class="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500"
       />
       <button
+        type="button"
         *ngIf="searchQuery"
         (click)="clearSearch()"
         class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -53,6 +54,7 @@
 
       <div class="max-h-72 overflow-y-auto">
         <button
+          type="button"
           *ngFor="let item of searchResults"
           (click)="onItemClick(item)"
           class="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors duration-150 search-result-item"

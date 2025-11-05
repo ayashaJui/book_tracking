@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SeriesService } from '../../services/series.service';
-import { SeriesDTO, SeriesAuthorDTO, SeriesBookDTO } from '../../models/series.model';
-import { Author } from '../../../authors/models/author.model';
+import { CatalogSeriesCreateRequestDTO, UserSeriesCreateRequestDTO } from '../../models/series.model';
+import { CatalogAuthorDTO } from '../../../authors/models/author.model';
 import { CatalogSearchResult } from '../../../shared/models/catalog.model';
-import { GenreService } from '../../../settings/services/genre.service';
+import { UiService } from '../../../shared/services/ui.service.service';
 
 @Component({
   selector: 'app-add-series',
@@ -22,25 +22,15 @@ export class AddSeries implements OnInit {
   catalogSearchPerformed = false;
   selectedCatalogSeries: CatalogSearchResult | null = null;
   isFromCatalog = false;
-  showForm = true;
-
-  // Genre options for dropdown - now handled by the unified component
-  genreOptions: { label: string; value: number }[] = [];
-
-  // Status options for books
-  statusOptions = [
-    { label: 'Want to Read', value: 'Want to Read' },
-    { label: 'Reading', value: 'Reading' },
-    { label: 'Finished', value: 'Finished' },
-    { label: 'On Hold', value: 'On Hold' },
-  ];
+  showForm = false;
 
   // Status options for series
   seriesStatusOptions = [
-    { label: 'Want to Read', value: 'Want to Read' },
-    { label: 'Reading', value: 'Reading' },
-    { label: 'Completed', value: 'Completed' },
-    { label: 'On Hold', value: 'On Hold' },
+    { label: 'Want to Read', value: 'WANT_TO_READ' },
+    { label: 'Reading', value: 'READING' },
+    { label: 'Completed', value: 'COMPLETED' },
+    { label: 'Paused', value: 'PAUSED' },
+    {label: 'Dropped', value: 'DROPPED' },
   ];
 
   // Reading order preferences
@@ -52,12 +42,12 @@ export class AddSeries implements OnInit {
 
   // Role options for authors
   roleOptions = [
-    { label: 'Author', value: 'Author' },
-    { label: 'Co-Author', value: 'Co-Author' },
-    { label: 'Editor', value: 'Editor' },
-    { label: 'Illustrator', value: 'Illustrator' },
-    { label: 'Translator', value: 'Translator' },
-    { label: 'Contributor', value: 'Contributor' },
+    { label: 'Author', value: 'AUTHOR' },
+    { label: 'Co-Author', value: 'CO_AUTHOR' },
+    { label: 'Editor', value: 'EDITOR' },
+    { label: 'Illustrator', value: 'ILLUSTRATOR' },
+    { label: 'Translator', value: 'TRANSLATOR' },
+    { label: 'Contributor', value: 'CONTRIBUTOR' },
   ];
 
   constructor(
@@ -65,12 +55,10 @@ export class AddSeries implements OnInit {
     private router: Router,
     private messageService: MessageService,
     public seriesService: SeriesService,
-    private genreService: GenreService
+    private uiService: UiService
   ) { }
 
   ngOnInit() {
-    // this.initializeForm();
-    // this.loadGenreOptions();
     this.setupFormValidation();
 
     // Add one default author row
@@ -80,46 +68,17 @@ export class AddSeries implements OnInit {
   }
 
   setupFormValidation() {
-    // Watch status changes to manage completion date field
     this.seriesService.seriesForm.get('status')?.valueChanges.subscribe((status) => {
       const completionDateControl = this.seriesService.seriesForm.get('completionDate');
-      if (status === 'Completed') {
+      if (status == 'COMPLETED') {
         completionDateControl?.enable();
       } else {
-        completionDateControl?.setValue('');
+        completionDateControl?.setValue(null);
         completionDateControl?.disable();
       }
     });
   }
 
-  loadGenreOptions() {
-    this.genreService.getAllCatalogGenres().subscribe((response) => {
-      if (response.data) {
-
-        this.genreOptions = response.data.map((genre: any) => ({
-          label: genre.name,
-          value: genre.id,
-        }));
-
-        console.log('Fetched genres for dropdown:', this.genreOptions);
-      }
-    })
-  }
-
-  onGenreCreated(genreName: string) {
-    setTimeout(() => {
-      this.loadGenreOptions();
-    }, 500);
-  }
-
-  onCustomTagCreated(tagName: any) {
-    // Handle custom tag creation if needed
-    console.log('Custom tag created:', tagName);
-  }
-
-  get booksArray(): FormArray {
-    return this.seriesService.seriesForm.get('books') as FormArray;
-  }
 
   get authorsArray(): FormArray {
     return this.seriesService.seriesForm.get('authors') as FormArray;
@@ -127,12 +86,14 @@ export class AddSeries implements OnInit {
 
   addAuthor() {
     const authorForm = this.fb.group({
-      authorId: [null, [Validators.required]], // Store the complete Author object
-      // name: [''], // This will be set when author is selected
+      authorId: [null, [Validators.required]],
       authorRole: ['Author', Validators.required],
     });
 
     this.authorsArray.push(authorForm);
+
+    authorForm.markAsUntouched();
+    authorForm.markAsPristine();
   }
 
   removeAuthor(index: number) {
@@ -147,75 +108,93 @@ export class AddSeries implements OnInit {
     }
   }
 
-  onAuthorSelected(author: Author | Author[], index: number) {
+  onAuthorSelected(author: CatalogAuthorDTO | CatalogAuthorDTO[], index: number) {
     const authorControl = this.authorsArray.at(index);
     if (author && authorControl) {
-      // Since we're using single mode, author should be a single Author object
+
       const selectedAuthor = Array.isArray(author) ? author[0] : author;
       if (selectedAuthor) {
         authorControl.patchValue({
           authorId: selectedAuthor,
         });
+        // Mark the authorId field as touched and update validity
+        const authorIdControl = authorControl.get('authorId');
+        if (authorIdControl) {
+          authorIdControl.markAsTouched();
+          authorIdControl.updateValueAndValidity();
+        }
       }
     }
   }
 
-
-
   onSubmit() {
-    if (this.seriesService.seriesForm.valid) {
-      this.isSubmitting = true;
-
-      const formValue = this.seriesService.seriesForm.value;
-
-      console.log('Form Value on Submit:', formValue);
-
-      // Transform authors from form format to SeriesAuthor format
-      const authors: SeriesAuthorDTO[] = formValue.authors.map((authorForm: any) => ({
-        authorId: authorForm.authorId?.id,
-        name: authorForm.authorId?.name,
-        role: authorForm.authorRole
-      }));
-
-      const newSeries: SeriesDTO = {
-        // Catalog series fields
-        title: formValue.title,
-        authors: authors,
-        genres: formValue.genres,
-        description: formValue.description,
-        coverUrl: formValue.coverUrl || 'assets/images/product-not-found.png',
-        totalBooks: formValue.totalBooks, // Use the form value instead of calculating
-        readBooks: formValue.booksRead || 0,
-        books: formValue.books,
-        isComplete: formValue.isComplete || false,
-
-        // User series related fields
-        booksOwned: formValue.booksOwned || 0,
-        status: formValue.status,
-        startDate: formValue.startDate || null,
-        completionDate: formValue.completionDate || null,
-        isFavorite: formValue.isFavorite || false,
-        readingOrderPreference: formValue.readingOrderPreference,
-        notes: formValue.notes || '',
-      };
-
-      // Simulate API call
-      setTimeout(() => {
-        this.seriesService.addSeries(newSeries);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: `Series "${newSeries.title}" has been added successfully!`,
-        });
-        // this.router.navigate(['/series']);
-        this.isSubmitting = false;
-      }, 1000);
-    } else {
+    
+    if (!this.seriesService.seriesForm.valid) {
       this.markFormGroupTouched();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
         detail: 'Please fill in all required fields correctly',
+      });
+      return;
+    }
+
+    let formValue = this.seriesService.seriesForm.value;
+
+    const newCatalogAuthor: CatalogSeriesCreateRequestDTO = {
+      name: formValue.name,
+      description: formValue.description,
+      totalBooks: formValue.totalBooks,
+      isCompleted: formValue.isCompleted,
+      seriesGenreCreateDTOS: formValue.genres?.map((genreId: number) => ({ genreId })),
+      seriesAuthorCreateDTOS: formValue.authors?.map((authorForm: any) => ({
+        authorId: authorForm.authorId?.id,
+        authorRole: authorForm.authorRole,
+      })),
+    }
+
+    const userSeriesData: UserSeriesCreateRequestDTO = {
+      userId: localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')!) : 0,
+      catalogSeriesId: 0, // Will be set after catalog series creation
+      seriesTotalBooks: formValue.totalBooks,
+      booksRead: formValue.booksRead || 0,
+      booksOwned: formValue.booksOwned || 0,
+      status: formValue.status,
+      startDate: formValue.startDate ? new Date(formValue.startDate).toISOString() : undefined,
+      completionDate: formValue.completionDate ? new Date(formValue.completionDate).toISOString() : undefined,
+      isFavorite: formValue.isFavorite || false,
+      readingOrderPreference: formValue.readingOrderPreference,
+      notes: formValue.notes || '',
+    }
+
+    console.log('Catalog Series Data:', newCatalogAuthor);
+    console.log('User Series Data:', userSeriesData);
+
+    if (this.isFromCatalog && this.selectedCatalogSeries) {
+      userSeriesData.catalogSeriesId = this.selectedCatalogSeries.id!;
+
+      this.seriesService.createUserSeries(userSeriesData).subscribe(userSeriesResponse => {
+        if (userSeriesResponse.data) {
+          this.uiService.setCustomSuccess("Success", "User Series created successfully!");
+          this.seriesService.seriesForm.reset();
+          this.router.navigate(['/series']);
+        }
+      });
+    } else {
+      this.seriesService.createCatalogSeries(newCatalogAuthor).subscribe((response) => {
+        if (response.data) {
+          userSeriesData.catalogSeriesId = response.data.id;
+
+          this.seriesService.createUserSeries(userSeriesData).subscribe(userSeriesResponse => {
+            if (userSeriesResponse.data) {
+              this.uiService.setCustomSuccess("Success", "User Series created successfully!");
+            }
+          });
+
+          this.uiService.setCustomSuccess("Success", "Catalog Series created successfully!");
+          this.seriesService.seriesForm.reset();
+          this.router.navigate(['/series']);
+        }
       });
     }
   }
@@ -239,21 +218,10 @@ export class AddSeries implements OnInit {
     this.router.navigate(['/series']);
   }
 
-  createSeries() {
-    console.log('Create series clicked');
-    alert('Series creation functionality will be implemented here');
-    // For now, just navigate back
-    // this.router.navigate(['/series']);
-  }
-
-
-  // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.seriesService.seriesForm.get(fieldName);
     return !!(field?.invalid && field?.touched);
   }
-
-
 
   isAuthorFieldInvalid(index: number, fieldName: string): boolean {
     const field = this.authorsArray.at(index).get(fieldName);
@@ -296,16 +264,27 @@ export class AddSeries implements OnInit {
     return displayNames[fieldName] || fieldName;
   }
 
-  // Helper method to validate booksRead doesn't exceed totalBooks
-  validateBooksRead(): void {
+  validateBooksRead(): boolean {
     const booksRead = this.seriesService.seriesForm.get('booksRead')?.value || 0;
     const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value || 0;
 
     if (totalBooks > 0 && booksRead > totalBooks) {
       this.seriesService.seriesForm.get('booksRead')?.setErrors({ exceedsTotal: true });
+      return false;
     }
+    return true;
   }
 
+  validateBooksOwned(): boolean {
+    const booksOwned = this.seriesService.seriesForm.get('booksOwned')?.value || 0;
+    const totalBooks = this.seriesService.seriesForm.get('totalBooks')?.value || 0;
+
+    if (totalBooks > 0 && booksOwned > totalBooks) {
+      this.seriesService.seriesForm.get('booksOwned')?.setErrors({ exceedsTotal: true });
+      return false;
+    }
+    return true;
+  }
 
 
   getAuthorFieldError(index: number, fieldName: string): string {
@@ -317,33 +296,31 @@ export class AddSeries implements OnInit {
   }
 
   // Catalog search methods (following add-author pattern)
-  onCatalogSeriesSelected(series: CatalogSearchResult) {
+  onCatalogSeriesSelected(series: any) {
     if (series.type === 'series') {
       this.selectedCatalogSeries = series;
       this.isFromCatalog = true;
       this.showForm = true;
 
-      console.log('Selected catalog series:', series);
+      const genreIds = series.seriesGenres?.map((g: any) => {
+        // If genreId is an object with id property, use that
+        if (typeof g.genreId === 'object' && g.genreId !== null && g.genreId.id) {
+          return g.genreId.id.toString();
+        }
 
-      // Store current user preferences before updating catalog fields
-      const userPreferences = {
-        booksRead: this.seriesService.seriesForm.get('booksRead')?.value,
-        status: this.seriesService.seriesForm.get('status')?.value,
-        booksOwned: this.seriesService.seriesForm.get('booksOwned')?.value,
-        startDate: this.seriesService.seriesForm.get('startDate')?.value,
-        completionDate: this.seriesService.seriesForm.get('completionDate')?.value,
-        isFavorite: this.seriesService.seriesForm.get('isFavorite')?.value,
-        readingOrderPreference: this.seriesService.seriesForm.get('readingOrderPreference')?.value,
-        notes: this.seriesService.seriesForm.get('notes')?.value,
-      };
+        return g.genreId.toString();
+      }) || [];
 
       this.seriesService.seriesForm.patchValue({
-        title: series.name || series.title || '',
+        name: series.name ,
         description: series.description || '',
-        // Note: isComplete will need to be fetched from full series details
-        // For now, leave as default false - this can be updated when we integrate full catalog API
-        // Preserve user preferences
-        ...userPreferences
+        totalBooks: series.totalBooks || 0,
+        isCompleted: series.isCompleted || false,
+        genres: genreIds,
+        authors: series.seriesAuthors?.map((a: any) => ({
+          authorId: a.authorId,
+          authorRole: a.authorRole || 'Author',
+        })) || [],
       });
 
       this.updateFieldsEnabledState();
@@ -386,7 +363,7 @@ export class AddSeries implements OnInit {
       catalogFields.forEach(field => {
         const control = this.seriesService.seriesForm.get(field);
         if (control) {
-          control.disable();
+          control.disable({ emitEvent: false });
         }
       });
 
@@ -394,7 +371,7 @@ export class AddSeries implements OnInit {
       userFields.forEach(field => {
         const control = this.seriesService.seriesForm.get(field);
         if (control) {
-          control.enable();
+          control.enable({ emitEvent: false });
         }
       });
     } else {
@@ -402,11 +379,20 @@ export class AddSeries implements OnInit {
       [...catalogFields, ...userFields].forEach(field => {
         const control = this.seriesService.seriesForm.get(field);
         if (control) {
-          control.enable();
+          control.enable({ emitEvent: false });
         }
       });
     }
   }
+
+  // get booksArray(): FormArray {
+  //   return this.seriesService.seriesForm.get('books') as FormArray;
+  // }
+
+  // onCustomTagCreated(tagName: any) {
+  //   // Handle custom tag creation if needed
+  //   console.log('Custom tag created:', tagName);
+  // }
 
   // isBookFieldInvalid(index: number, fieldName: string): boolean {
   //   const field = this.booksArray.at(index).get(fieldName);

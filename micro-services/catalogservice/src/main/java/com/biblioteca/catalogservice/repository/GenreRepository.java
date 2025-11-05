@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
     Optional<Genre> findByNameIgnoreCase(String name);
 
-    List<Genre> findByNameContaining(String name);
+    List<Genre> findByNameContainingIgnoreCase(String name);
 }

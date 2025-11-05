@@ -1,204 +1,358 @@
-<div class="author-selector-container" [class.disabled]="disabled">
-  <!-- Single Selection Display -->
-  <div 
-    *ngIf="!multiple" 
-    class="author-selector-input"
-    [class.has-value]="selectedAuthors"
-    [class.disabled]="disabled"
-    (click)="toggleDropdown()"
+<div class="w-full">
+  <!-- Multiple Selection Mode -->
+  @if (multiple) {
+  <p-multiSelect
+    #multiSelectRef
+    [options]="authorOptions"
+    [(ngModel)]="selectedAuthorIds"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [filter]="filter"
+    [showClear]="showClear"
+    [maxSelectedLabels]="maxSelectedLabels"
+    class="w-full"
+    (onChange)="onSelectionChange($event)"
+    optionLabel="label"
+    optionValue="value"
+    [showHeader]="true"
   >
-    <div class="selected-value">
-      <ng-container *ngIf="getSingleAuthor(); else placeholderTemplate; let author">
-        <img 
-          *ngIf="author.photoUrl" 
-          [src]="author.photoUrl" 
-          [alt]="author.name"
-          class="author-avatar"
-        >
-        <span class="author-name">{{ author.name }}</span>
-        <button 
-          *ngIf="showClear && !disabled" 
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-between px-3 py-2 border-b">
+        <span class="font-medium">Select Authors</span>
+        @if (showAddButton) {
+        <button
           type="button"
-          class="clear-button"
-          (click)="onClear(); $event.stopPropagation()"
-          aria-label="Clear selection"
-        >
-          <i class="pi pi-times"></i>
-        </button>
-      </ng-container>
-      
-      <ng-template #placeholderTemplate>
-        <span class="placeholder">{{ placeholder }}</span>
-      </ng-template>
-    </div>
-    
-    <i class="pi pi-chevron-down dropdown-icon" [class.rotated]="showDropdown"></i>
-  </div>
-
-  <!-- Multiple Selection Display -->
-  <div 
-    *ngIf="multiple" 
-    class="author-selector-input multiple"
-    [class.has-value]="getSelectedAuthorsArray().length > 0"
-    [class.disabled]="disabled"
-    (click)="toggleDropdown()"
-  >
-    <div class="selected-chips" *ngIf="getSelectedAuthorsArray().length > 0; else multiplePlaceholder">
-      <span 
-        *ngFor="let author of getSelectedAuthorsArray().slice(0, maxSelectedLabels)" 
-        class="author-chip"
-      >
-        <img 
-          *ngIf="author.photoUrl" 
-          [src]="author.photoUrl" 
-          [alt]="author.name"
-          class="chip-avatar"
-        >
-        {{ author.name }}
-        <button 
-          *ngIf="!disabled"
-          type="button" 
-          class="chip-remove"
-          (click)="onAuthorRemove(author); $event.stopPropagation()"
-          aria-label="Remove author"
-        >
-          <i class="pi pi-times"></i>
-        </button>
-      </span>
-      
-      <span 
-        *ngIf="getSelectedAuthorsArray().length > maxSelectedLabels" 
-        class="more-indicator"
-      >
-        +{{ getSelectedAuthorsArray().length - maxSelectedLabels }} more
-      </span>
-    </div>
-    
-    <ng-template #multiplePlaceholder>
-      <span class="placeholder">{{ placeholder }}</span>
-    </ng-template>
-    
-    <div class="dropdown-controls">
-      <button 
-        *ngIf="showClear && getSelectedAuthorsArray().length > 0 && !disabled" 
-        type="button"
-        class="clear-button"
-        (click)="onClear(); $event.stopPropagation()"
-        aria-label="Clear all selections"
-      >
-        <i class="pi pi-times"></i>
-      </button>
-      <i class="pi pi-chevron-down dropdown-icon" [class.rotated]="showDropdown"></i>
-    </div>
-  </div>
-
-  <!-- Dropdown Panel -->
-  <div class="dropdown-panel" [class.show]="showDropdown" *ngIf="showDropdown">
-    <!-- Search Input -->
-    <div class="search-container" *ngIf="filter">
-      <input 
-        type="text"
-        class="search-input"
-        placeholder="Search authors..."
-        [value]="searchTerm"
-        (input)="onSearch($event)"
-        #searchInput
-      >
-      <i class="pi pi-search search-icon"></i>
-    </div>
-
-    <!-- Add New Author Button -->
-    <div class="add-author-container" *ngIf="showAddButton">
-      <button 
-        type="button" 
-        class="add-author-button"
-        (click)="onAddNewAuthor()"
-      >
-        <i class="pi pi-plus"></i>
-        Add New Author
-      </button>
-    </div>
-
-    <!-- Loading State -->
-    <div class="loading-container" *ngIf="loading">
-      <i class="pi pi-spinner pi-spin"></i>
-      Loading authors...
-    </div>
-
-    <!-- Authors List -->
-    <div class="authors-list" *ngIf="!loading">
-      <div 
-        *ngFor="let author of filteredAuthors; trackBy: trackByAuthorId"
-        class="author-item"
-        [class.selected]="isAuthorSelected(author)"
-        (click)="onAuthorSelect(author)"
-      >
-        <div class="author-info">
-          <img 
-            *ngIf="author.photoUrl" 
-            [src]="author.photoUrl" 
-            [alt]="author.name"
-            class="author-avatar"
-          >
-          <div class="author-placeholder-avatar" *ngIf="!author.photoUrl">
-            {{ author.name.charAt(0).toUpperCase() }}
-          </div>
-          
-          <div class="author-details">
-            <div class="author-name">{{ author.name }}</div>
-            <div class="author-meta" *ngIf="author.nationality || author.genres?.length">
-              <span *ngIf="author.nationality" class="nationality">{{ author.nationality }}</span>
-              <span *ngIf="author.genres?.length" class="genres">
-                {{ author.genres!.slice(0, 2).join(', ') }}
-                <span *ngIf="author.genres!.length > 2">...</span>
-              </span>
-            </div>
-            <div class="author-stats" *ngIf="author.totalBooks">
-              {{ author.totalBooks }} book{{ author.totalBooks === 1 ? '' : 's' }}
-              <span *ngIf="author.averageRating"> • ★ {{ author.averageRating.toFixed(1) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="author-actions">
-          <button 
-            type="button"
-            class="view-author-button"
-            (click)="onViewAuthor(author, $event)"
-            title="View author details"
-          >
-            <i class="pi pi-eye"></i>
-          </button>
-          
-          <i 
-            *ngIf="isAuthorSelected(author)" 
-            class="pi pi-check selected-indicator"
-            title="Selected"
-          ></i>
-        </div>
-      </div>
-
-      <!-- No Results -->
-      <div class="no-results" *ngIf="filteredAuthors.length === 0">
-        <i class="pi pi-search"></i>
-        <span>No authors found</span>
-        <button 
-          *ngIf="searchTerm && showAddButton" 
-          type="button"
-          class="add-author-button small"
+          class="text-blue-600 hover:text-blue-800 text-sm font-medium"
           (click)="onAddNewAuthor()"
         >
-          <i class="pi pi-plus"></i>
-          Add "{{ searchTerm }}"
+          + Add New
         </button>
+        }
+      </div>
+    </ng-template>
+  </p-multiSelect>
+  }
+
+  <!-- Single Selection Mode -->
+  @if (!multiple) {
+  <p-select
+    #dropdownRef
+    [options]="authorOptions"
+    [(ngModel)]="selectedAuthorIds"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [filter]="filter"
+    [showClear]="showClear"
+    class="w-full"
+    (onChange)="onSelectionChange($event)"
+    optionLabel="label"
+    optionValue="value"
+  >
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-between px-3 py-2 border-b">
+        <span class="font-medium">Select Author</span>
+        @if (showAddButton) {
+        <button
+          type="button"
+          class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          (click)="onAddNewAuthor()"
+        >
+          + Add New
+        </button>
+        }
+      </div>
+    </ng-template>
+  </p-select>
+  }
+</div>
+
+<!-- Add New Author Dialog -->
+<p-dialog
+  header="Add New Author"
+  [(visible)]="showAddAuthorDialog"
+  [modal]="true"
+  [style]="{ width: '650px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="authorService.authorForm" class="space-y-5">
+    <!-- Basic Information Section -->
+    <div class="space-y-3.5">
+      <div
+        class="flex items-center gap-2 pb-2 border-b border-surface-200 dark:border-surface-700"
+      >
+        <i class="pi pi-user text-primary-500 text-sm"></i>
+        <h3
+          class="text-base font-semibold text-surface-900 dark:text-surface-100"
+        >
+          Basic Information
+        </h3>
+      </div>
+
+      <div class="space-y-1.5">
+        <label
+          for="name"
+          class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+        >
+          Author Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          formControlName="name"
+          class="w-full"
+          placeholder="Enter full name"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label
+          for="bio"
+          class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+          >Biography</label
+        >
+        <textarea
+          id="bio"
+          pTextarea
+          formControlName="bio"
+          rows="3"
+          class="w-full resize-none"
+          placeholder="Brief description about the author..."
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <label
+            for="birthDate"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Birth Date</label
+          >
+          <p-datePicker
+            id="birthDate"
+            formControlName="birthDate" appendTo="body"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            styleClass="w-full"
+            placeholder="Select date"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="deathDate"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Death Date</label
+          >
+          <p-datePicker
+            id="deathDate"
+            formControlName="deathDate" appendTo="body"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            styleClass="w-full"
+            placeholder="Select date"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <label
+          for="nationality"
+          class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+          >Nationality</label
+        >
+        <input
+          id="nationality"
+          type="text"
+          pInputText
+          formControlName="nationality"
+          class="w-full"
+          placeholder="e.g., American, British"
+        />
       </div>
     </div>
-  </div>
 
-  <!-- Overlay for closing dropdown -->
-  <div 
-    class="dropdown-overlay" 
-    *ngIf="showDropdown"
-    (click)="showDropdown = false"
-  ></div>
-</div>
+    <!-- Social Links Section -->
+    <div class="space-y-3.5">
+      <div
+        class="flex items-center gap-2 pb-2 border-b border-surface-200 dark:border-surface-700"
+      >
+        <i class="pi pi-link text-primary-500 text-sm"></i>
+        <h3
+          class="text-base font-semibold text-surface-900 dark:text-surface-100"
+        >
+          Social Links
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <label
+            for="website"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Website</label
+          >
+          <input
+            id="website"
+            type="url"
+            pInputText
+            formControlName="website"
+            class="w-full"
+            placeholder="https://..."
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="instagramUrl"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Instagram</label
+          >
+          <input
+            id="instagramUrl"
+            type="text"
+            pInputText
+            formControlName="instagramUrl"
+            class="w-full"
+            placeholder="@username"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="goodreadUrl"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Goodreads</label
+          >
+          <input
+            id="goodreadUrl"
+            type="url"
+            pInputText
+            formControlName="goodreadUrl"
+            class="w-full"
+            placeholder="https://goodreads.com/..."
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="threadsUrl"
+            class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+            >Threads</label
+          >
+          <input
+            id="threadsUrl"
+            type="text"
+            pInputText
+            formControlName="threadsUrl"
+            class="w-full"
+            placeholder="@username"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Preferences Section -->
+    <div class="space-y-3.5">
+      <div
+        class="flex items-center gap-2 pb-2 border-b border-surface-200 dark:border-surface-700"
+      >
+        <i class="pi pi-heart text-primary-500 text-sm"></i>
+        <h3
+          class="text-base font-semibold text-surface-900 dark:text-surface-100"
+        >
+          Personal Preferences
+        </h3>
+      </div>
+
+      <div class="space-y-1.5">
+        <label
+          for="preferenceLevel"
+          class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+          >Preference Level</label
+        >
+        <p-select
+          id="preferenceLevel"
+          formControlName="preferenceLevel" appendTo="body"
+          [options]="preferenceLevelOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="How much do you like this author?"
+          styleClass="w-full"
+        />
+      </div>
+
+      <div class="flex gap-4">
+        <div
+          class="flex items-center gap-2.5 flex-1 px-3 py-2.5 bg-surface-50 dark:bg-surface-800/50 rounded-md border border-surface-200 dark:border-surface-700"
+        >
+          <p-checkbox
+            formControlName="isFavorite"
+            [binary]="true"
+            inputId="isFavorite"
+          />
+          <label
+            for="isFavorite"
+            class="text-sm font-medium text-surface-700 dark:text-surface-300 cursor-pointer flex items-center gap-1.5"
+          >
+            <i class="pi pi-star text-yellow-500 text-xs"></i>
+            <span>Favorite</span>
+          </label>
+        </div>
+
+        <div
+          class="flex items-center gap-2.5 flex-1 px-3 py-2.5 bg-surface-50 dark:bg-surface-800/50 rounded-md border border-surface-200 dark:border-surface-700"
+        >
+          <p-checkbox
+            formControlName="isExcluded"
+            [binary]="true"
+            inputId="isExcluded"
+          />
+          <label
+            for="isExcluded"
+            class="text-sm font-medium text-surface-700 dark:text-surface-300 cursor-pointer flex items-center gap-1.5"
+          >
+            <i class="pi pi-ban text-red-500 text-xs"></i>
+            <span>Exclude</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <label
+          for="personalNotes"
+          class="block text-xs font-semibold text-surface-700 dark:text-surface-300"
+          >Personal Notes</label
+        >
+        <textarea
+          id="personalNotes"
+          pTextarea
+          formControlName="personalNotes"
+          rows="3"
+          class="w-full resize-none"
+          placeholder="Add your thoughts about this author..."
+        ></textarea>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex gap-2 justify-end">
+      <button
+        pButton
+        label="Cancel"
+        (click)="onAddAuthorDialogCancel()"
+        class="p-button-text p-button-secondary"
+      ></button>
+      <button
+        pButton
+        label="Save Author"
+        icon="pi pi-check"
+        (click)="onAddAuthorDialogSave()"
+        [disabled]="authorService.authorForm.invalid"
+        class="p-button-primary"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

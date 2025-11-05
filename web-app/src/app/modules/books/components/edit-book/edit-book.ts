@@ -253,6 +253,22 @@ export class EditBook implements OnInit {
     this.selectedAuthorsWithRoles = newAuthorsWithRoles;
   }
 
+  removeAuthorFromBook(authorId: number) {
+    // Remove from selectedAuthors array
+    this.selectedAuthors = this.selectedAuthors.filter(author => author.id !== authorId);
+
+    // Remove from selectedAuthorsWithRoles array
+    this.selectedAuthorsWithRoles = this.selectedAuthorsWithRoles.filter(
+      author => author.authorId !== authorId
+    );
+
+    // Update the book's authorIds
+    this.book.authorIds = this.selectedAuthors.map(author => author.id || 0);
+
+    // Update the book's authors array
+    this.book.authors = this.selectedAuthorsWithRoles;
+  }
+
   onAuthorRoleChange(authorId: number, newRole: string) {
     const author = this.selectedAuthorsWithRoles.find(a => a.authorId === authorId);
     if (author) {

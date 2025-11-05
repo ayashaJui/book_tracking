@@ -21,5 +21,5 @@ public interface SeriesRepository extends JpaRepository<Series, Integer> {
             "WHERE sg.genre.id = :genreId")
     List<Series> findBySeriesGenres(@Param("genreId") Integer genreId);
 
-    List<Series> findByNameContaining(String name);
+    List<Series> findByNameContainingIgnoreCase(String name);
 }

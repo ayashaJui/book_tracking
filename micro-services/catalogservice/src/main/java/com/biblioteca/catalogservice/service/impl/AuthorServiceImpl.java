@@ -173,7 +173,7 @@ public class AuthorServiceImpl implements AuthorService {
     public List<AuthorDTO> searchAuthor(String authorName, HttpServletRequest request, Jwt jwt) {
         log.info("searchAuthor in AuthorServiceImpl is called with data: {} by user: {}", authorName, jwt.getSubject());
 
-        List<Author>  authors = authorRepository.findByNameContaining(authorName);
+        List<Author>  authors = authorRepository.findByNameContainingIgnoreCase(authorName);
         List<AuthorDTO> authorDTOS = authors.stream().map(this::convertToDTO).toList();
 
         return authorDTOS;

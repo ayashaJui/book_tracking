@@ -353,4 +353,9 @@ export class AuthorService {
 
     return this.http.put<CatalogAuthorHttpResponse>(url, catalogAuthorData);
   }
+
+  getAllCatalogAuthors(): Observable<CatalogAuthorHttpResponse> {
+    let url = `${environment.catalog_service_url}/authors`;
+    return this.http.get<CatalogAuthorHttpResponse>(url);
+  }
 }

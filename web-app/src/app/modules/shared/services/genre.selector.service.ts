@@ -60,107 +60,108 @@ export class GenreSelectorService {
   private userPreferencesStorageKey = 'bookTracking_userGenrePreferences';
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
-    this.genreForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      description: [''],
-      parentGenreId: [null],
-      isActive: [true],
+    // this.genreForm = this.fb.group({
+    //   name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    //   description: [''],
+    //   parentGenreId: [null],
+    //   isActive: [true],
 
-      // User preference fields
-      preferenceLevel: [3, [Validators.min(1), Validators.max(5)]],
-      isExcluded: [false],
-      notes: ['']
-    });
+    //   // User preference fields
+    //   preferenceLevel: [3, [Validators.min(1), Validators.max(5)]],
+    //   isExcluded: [false],
+    //   notes: ['']
+    // });
 
-    this.loadFromStorage();
-    this.combineGenresWithPreferences();
+    // this.loadFromStorage();
+    // this.combineGenresWithPreferences();
 
     // Subscribe to changes and recombine
-    this.catalogGenresSubject.subscribe(() => this.combineGenresWithPreferences());
-    this.userGenrePreferencesSubject.subscribe(() => this.combineGenresWithPreferences());
+    // this.catalogGenresSubject.subscribe(() => this.combineGenresWithPreferences());
+    // this.userGenrePreferencesSubject.subscribe(() => this.combineGenresWithPreferences());
   }
 
   // Private method to combine catalog genres with user preferences
-  private combineGenresWithPreferences(): void {
-    const catalogGenres = this.catalogGenresSubject.value;
-    const userPreferences = this.userGenrePreferencesSubject.value;
+  // private combineGenresWithPreferences(): void {
+  //   const catalogGenres = this.catalogGenresSubject.value;
+  //   const userPreferences = this.userGenrePreferencesSubject.value;
 
-    const combinedGenres: Genre[] = catalogGenres.map(catalogGenre => {
-      const userPref = userPreferences.find(pref => pref.catalogGenreId === catalogGenre.id);
+  //   const combinedGenres: Genre[] = catalogGenres.map(catalogGenre => {
+  //     const userPref = userPreferences.find(pref => pref.catalogGenreId === catalogGenre.id);
 
-      return {
-        id: catalogGenre.id,
-        name: catalogGenre.name,
-        description: catalogGenre.description,
-        parentGenreId: catalogGenre.parentGenreId,
-        isActive: catalogGenre.isActive,
-        createdAt: catalogGenre.createdAt,
-        updatedAt: catalogGenre.updatedAt,
+  //     return {
+  //       id: catalogGenre.id,
+  //       name: catalogGenre.name,
+  //       description: catalogGenre.description,
+  //       parentGenreId: catalogGenre.parentGenreId,
+  //       isActive: catalogGenre.isActive,
+  //       createdAt: catalogGenre.createdAt,
+  //       updatedAt: catalogGenre.updatedAt,
 
-        // User preference fields
-        preferenceLevel: userPref?.preferenceLevel,
-        isExcluded: userPref?.isExcluded || false,
-        notes: userPref?.notes,
-        hasPreference: !!userPref,
-        isFromCatalog: true
-      };
-    });
+  //       // User preference fields
+  //       preferenceLevel: userPref?.preferenceLevel,
+  //       isExcluded: userPref?.isExcluded || false,
+  //       notes: userPref?.notes,
+  //       hasPreference: !!userPref,
+  //       isFromCatalog: true
+  //     };
+  //   });
 
-    this.genresSubject.next(this.buildGenreHierarchy(combinedGenres));
-  }
+  //   this.genresSubject.next(this.buildGenreHierarchy(combinedGenres));
+  // }
 
   // Build hierarchical structure
-  private buildGenreHierarchy(genres: Genre[]): Genre[] {
-    const genreMap = new Map<number, Genre>();
-    const rootGenres: Genre[] = [];
+  // private buildGenreHierarchy(genres: Genre[]): Genre[] {
+  //   const genreMap = new Map<number, Genre>();
+  //   const rootGenres: Genre[] = [];
 
-    // First pass: create map and identify root genres
-    genres.forEach(genre => {
-      genreMap.set(genre.id, { ...genre, subGenres: [] });
-      if (!genre.parentGenreId) {
-        rootGenres.push(genreMap.get(genre.id)!);
-      }
-    });
+  //   // First pass: create map and identify root genres
+  //   genres.forEach(genre => {
+  //     genreMap.set(genre.id, { ...genre, subGenres: [] });
+  //     if (!genre.parentGenreId) {
+  //       rootGenres.push(genreMap.get(genre.id)!);
+  //     }
+  //   });
 
-    // Second pass: build parent-child relationships
-    genres.forEach(genre => {
-      if (genre.parentGenreId) {
-        const parent = genreMap.get(genre.parentGenreId);
-        const child = genreMap.get(genre.id);
-        if (parent && child) {
-          parent.subGenres = parent.subGenres || [];
-          parent.subGenres.push(child);
-          child.parentGenre = parent;
-        }
-      }
-    });
+  //   // Second pass: build parent-child relationships
+  //   genres.forEach(genre => {
+  //     if (genre.parentGenreId) {
+  //       const parent = genreMap.get(genre.parentGenreId);
+  //       const child = genreMap.get(genre.id);
+  //       if (parent && child) {
+  //         parent.subGenres = parent.subGenres || [];
+  //         parent.subGenres.push(child);
+  //         child.parentGenre = parent;
+  //       }
+  //     }
+  //   });
 
-    return Array.from(genreMap.values());
-  }
+  //   return Array.from(genreMap.values());
+  // }
 
   // Observable for components to subscribe to
-  get genres$(): Observable<Genre[]> {
-    return this.genresSubject.asObservable();
-  }
+  // get genres$(): Observable<Genre[]> {
+  //   return this.genresSubject.asObservable();
+  // }
 
-  get catalogGenres$(): Observable<CatalogGenre[]> {
-    return this.catalogGenresSubject.asObservable();
-  }
+  // get catalogGenres$(): Observable<CatalogGenre[]> {
+  //   return this.catalogGenresSubject.asObservable();
+  // }
 
-  get userGenrePreferences$(): Observable<UserGenrePreference[]> {
-    return this.userGenrePreferencesSubject.asObservable();
-  }
+  // get userGenrePreferences$(): Observable<UserGenrePreference[]> {
+  //   return this.userGenrePreferencesSubject.asObservable();
+  // }
 
   // Get current genres value
 
-  getCatalogGenres(): CatalogGenre[] {
-    return this.catalogGenresSubject.value;
-  }
+  // getCatalogGenres(): CatalogGenre[] {
+  //   return this.catalogGenresSubject.value;
+  // }
 
-  getUserGenrePreferences(): UserGenrePreference[] {
-    return this.userGenrePreferencesSubject.value;
-  }
+  // getUserGenrePreferences(): UserGenrePreference[] {
+  //   return this.userGenrePreferencesSubject.value;
+  // }
 
+  // Get genres from API
   getGenres(isActive: boolean = false): Observable<CatalogGenreDTO[]> {
     const url = `${environment.catalog_service_url}/genres`;
     return this.http.get<CatalogGenreHttpResponse>(url).pipe(
@@ -210,51 +211,50 @@ export class GenreSelectorService {
   }
 
   // Get genre by name
-  getGenreByName(name: string): Genre | undefined {
-    return this.genresSubject.value.find(
-      (genre) => genre.name.toLowerCase() === name.toLowerCase()
-    );
-  }
+  // getGenreByName(name: string): Genre | undefined {
+  //   return this.genresSubject.value.find(
+  //     (genre) => genre.name.toLowerCase() === name.toLowerCase()
+  //   );
+  // }
 
   // Get catalog genre by ID
-  getCatalogGenreById(id: number): CatalogGenre | undefined {
-    return this.catalogGenresSubject.value.find(genre => genre.id === id);
-  }
+  // getCatalogGenreById(id: number): CatalogGenre | undefined {
+  //   return this.catalogGenresSubject.value.find(genre => genre.id === id);
+  // }
 
   // Add new catalog genre
-  addCatalogGenre(genreData: Omit<CatalogGenre, 'id' | 'createdAt' | 'updatedAt'>): CatalogGenre {
-    const existingGenre = this.getCatalogGenreByName(genreData.name);
-    if (existingGenre) {
-      return existingGenre;
-    }
+  // addCatalogGenre(genreData: Omit<CatalogGenre, 'id' | 'createdAt' | 'updatedAt'>): CatalogGenre {
+  //   const existingGenre = this.getCatalogGenreByName(genreData.name);
+  //   if (existingGenre) {
+  //     return existingGenre;
+  //   }
 
-    const currentGenres = this.catalogGenresSubject.value;
-    const newId = Math.max(...currentGenres.map((g) => g.id), 0) + 1;
+  //   const currentGenres = this.catalogGenresSubject.value;
+  //   const newId = Math.max(...currentGenres.map((g) => g.id), 0) + 1;
 
-    const newGenre: CatalogGenre = {
-      id: newId,
-      ...genreData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  //   const newGenre: CatalogGenre = {
+  //     id: newId,
+  //     ...genreData,
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //   };
 
-    const updatedGenres = [...currentGenres, newGenre];
-    this.catalogGenresSubject.next(updatedGenres);
-    this.saveCatalogGenresToStorage();
+  //   const updatedGenres = [...currentGenres, newGenre];
+  //   this.catalogGenresSubject.next(updatedGenres);
+  //   this.saveCatalogGenresToStorage();
 
-    return newGenre;
-  }
+  //   return newGenre;
+  // }
 
   // Legacy method for backward compatibility
-  addGenre(name: string): Genre {
-    const catalogGenre = this.addCatalogGenre({
-      name: name.trim(),
-      isActive: true
-    });
+  // addGenre(name: string): Genre {
+  //   const catalogGenre = this.addCatalogGenre({
+  //     name: name.trim(),
+  //     isActive: true
+  //   });
 
-    // Return the combined genre
-    return this.getGenreByName(catalogGenre.name)!;
-  }
+  //   return this.getGenreByName(catalogGenre.name)!;
+  // }
 
   // Get catalog genre by name
   getCatalogGenreByName(name: string): CatalogGenre | undefined {
@@ -263,61 +263,59 @@ export class GenreSelectorService {
     );
   }
 
-  // Add or update user genre preference
-  setUserGenrePreference(preference: Omit<UserGenrePreference, 'id' | 'createdAt' | 'updatedAt'>): UserGenrePreference {
-    const currentPreferences = this.userGenrePreferencesSubject.value;
-    const existingIndex = currentPreferences.findIndex(
-      p => p.userId === preference.userId && p.catalogGenreId === preference.catalogGenreId
-    );
+  // Add or update user genre preference 
+  // setUserGenrePreference(preference: Omit<UserGenrePreference, 'id' | 'createdAt' | 'updatedAt'>): UserGenrePreference {
+  //   const currentPreferences = this.userGenrePreferencesSubject.value;
+  //   const existingIndex = currentPreferences.findIndex(
+  //     p => p.userId === preference.userId && p.catalogGenreId === preference.catalogGenreId
+  //   );
 
-    if (existingIndex >= 0) {
-      // Update existing preference
-      const updatedPreferences = [...currentPreferences];
-      updatedPreferences[existingIndex] = {
-        ...updatedPreferences[existingIndex],
-        ...preference,
-        updatedAt: new Date()
-      };
-      this.userGenrePreferencesSubject.next(updatedPreferences);
-      this.saveUserPreferencesToStorage();
-      return updatedPreferences[existingIndex];
-    } else {
-      // Create new preference
-      const newId = Math.max(...currentPreferences.map((p) => p.id || 0), 0) + 1;
-      const newPreference: UserGenrePreference = {
-        id: newId,
-        ...preference,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+  //   if (existingIndex >= 0) {
+  //     const updatedPreferences = [...currentPreferences];
+  //     updatedPreferences[existingIndex] = {
+  //       ...updatedPreferences[existingIndex],
+  //       ...preference,
+  //       updatedAt: new Date()
+  //     };
+  //     this.userGenrePreferencesSubject.next(updatedPreferences);
+  //     this.saveUserPreferencesToStorage();
+  //     return updatedPreferences[existingIndex];
+  //   } else {
+  //     const newId = Math.max(...currentPreferences.map((p) => p.id || 0), 0) + 1;
+  //     const newPreference: UserGenrePreference = {
+  //       id: newId,
+  //       ...preference,
+  //       createdAt: new Date(),
+  //       updatedAt: new Date(),
+  //     };
 
-      const updatedPreferences = [...currentPreferences, newPreference];
-      this.userGenrePreferencesSubject.next(updatedPreferences);
-      this.saveUserPreferencesToStorage();
-      return newPreference;
-    }
-  }
+  //     const updatedPreferences = [...currentPreferences, newPreference];
+  //     this.userGenrePreferencesSubject.next(updatedPreferences);
+  //     this.saveUserPreferencesToStorage();
+  //     return newPreference;
+  //   }
+  // }
 
   // Remove user genre preference
-  removeUserGenrePreference(userId: number, catalogGenreId: number): boolean {
-    const currentPreferences = this.userGenrePreferencesSubject.value;
-    const updatedPreferences = currentPreferences.filter(
-      p => !(p.userId === userId && p.catalogGenreId === catalogGenreId)
-    );
+  // removeUserGenrePreference(userId: number, catalogGenreId: number): boolean {
+  //   const currentPreferences = this.userGenrePreferencesSubject.value;
+  //   const updatedPreferences = currentPreferences.filter(
+  //     p => !(p.userId === userId && p.catalogGenreId === catalogGenreId)
+  //   );
 
-    if (updatedPreferences.length !== currentPreferences.length) {
-      this.userGenrePreferencesSubject.next(updatedPreferences);
-      this.saveUserPreferencesToStorage();
-      return true;
-    }
+  //   if (updatedPreferences.length !== currentPreferences.length) {
+  //     this.userGenrePreferencesSubject.next(updatedPreferences);
+  //     this.saveUserPreferencesToStorage();
+  //     return true;
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   // Check if genre exists
-  genreExists(name: string): boolean {
-    return this.getGenreByName(name) !== undefined;
-  }
+  // genreExists(name: string): boolean {
+  //   return this.getGenreByName(name) !== undefined;
+  // }
 
   catalogGenreExists(name: string): boolean {
     return this.getCatalogGenreByName(name) !== undefined;
@@ -330,7 +328,7 @@ export class GenreSelectorService {
 
     if (updatedGenres.length !== currentGenres.length) {
       this.catalogGenresSubject.next(updatedGenres);
-      this.saveCatalogGenresToStorage();
+      // this.saveCatalogGenresToStorage();
       return true;
     }
 
@@ -366,7 +364,7 @@ export class GenreSelectorService {
     };
 
     this.catalogGenresSubject.next(updatedGenres);
-    this.saveCatalogGenresToStorage();
+    // this.saveCatalogGenresToStorage();
     return true;
   }
 
@@ -431,58 +429,16 @@ export class GenreSelectorService {
   }
 
   // Private methods for persistence
-  private saveCatalogGenresToStorage(): void {
-    try {
-      localStorage.setItem(
-        this.catalogGenresStorageKey,
-        JSON.stringify(this.catalogGenresSubject.value)
-      );
-    } catch (error) {
-      console.error('Failed to save catalog genres to localStorage:', error);
-    }
-  }
-
-  private saveUserPreferencesToStorage(): void {
-    try {
-      localStorage.setItem(
-        this.userPreferencesStorageKey,
-        JSON.stringify(this.userGenrePreferencesSubject.value)
-      );
-    } catch (error) {
-      console.error('Failed to save user preferences to localStorage:', error);
-    }
-  }
-
-  private loadFromStorage(): void {
-    try {
-      // Load catalog genres
-      const storedCatalogGenres = localStorage.getItem(this.catalogGenresStorageKey);
-      if (storedCatalogGenres) {
-        const parsedGenres = JSON.parse(storedCatalogGenres);
-        const genresWithDates = parsedGenres.map((genre: any) => ({
-          ...genre,
-          createdAt: new Date(genre.createdAt),
-          updatedAt: new Date(genre.updatedAt),
-        }));
-        this.catalogGenresSubject.next(genresWithDates);
-      }
-
-      // Load user preferences
-      const storedPreferences = localStorage.getItem(this.userPreferencesStorageKey);
-      if (storedPreferences) {
-        const parsedPreferences = JSON.parse(storedPreferences);
-        const preferencesWithDates = parsedPreferences.map((pref: any) => ({
-          ...pref,
-          createdAt: new Date(pref.createdAt),
-          updatedAt: new Date(pref.updatedAt),
-        }));
-        this.userGenrePreferencesSubject.next(preferencesWithDates);
-      }
-    } catch (error) {
-      console.error('Failed to load genres from localStorage:', error);
-      // Keep default data if loading fails
-    }
-  }
+  // private saveCatalogGenresToStorage(): void {
+  //   try {
+  //     localStorage.setItem(
+  //       this.catalogGenresStorageKey,
+  //       JSON.stringify(this.catalogGenresSubject.value)
+  //     );
+  //   } catch (error) {
+  //     console.error('Failed to save catalog genres to localStorage:', error);
+  //   }
+  // }
 
   // api calls to backend services
   createCatalogGenreSelector(catalogData: CatalogGenreCreateRequestDTO): Observable<CatalogGenreHttpResponse> {

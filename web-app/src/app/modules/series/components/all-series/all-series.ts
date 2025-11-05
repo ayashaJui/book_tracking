@@ -424,29 +424,7 @@ export class AllSeries implements OnInit {
   }
 
   addSeries() {
-    console.log('Add Series button clicked!');
-    console.log('Current URL:', window.location.href);
-    console.log('Router:', this.router);
-
-    try {
-      // Try different navigation approaches
-      console.log('Attempting navigation to /series/add-series...');
-      this.router.navigate(['/series/add-series']).then(
-        (success) => {
-          console.log('Navigation result:', success);
-          if (success) {
-            console.log('Navigation successful!');
-          } else {
-            console.log('Navigation failed!');
-          }
-        },
-        (error) => {
-          console.error('Navigation error:', error);
-        }
-      );
-    } catch (error) {
-      console.error('Navigation exception:', error);
-    }
+    this.router.navigate(['/series/add-series'])
   }
 
   clearFilters() {

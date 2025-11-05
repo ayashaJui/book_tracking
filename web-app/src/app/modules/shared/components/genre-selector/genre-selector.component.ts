@@ -87,6 +87,8 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
             if (this.hierarchical) {
                 this.genreSelectorService.getHierarchicalGenreOptions().subscribe((options) => {
                     this.genreOptions = options;
+                    // Update selected genres after options are loaded
+                    this.updateSelectedGenres();
                 });
             } else {
                 this.genreOptions = genres.map(g => ({
@@ -94,6 +96,8 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
                     value: g.id.toString(),
                     level: 0
                 }));
+                // Update selected genres after options are loaded
+                this.updateSelectedGenres();
             }
         });
     }
@@ -198,12 +202,6 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
 
                 // Refresh the genre options list
                 this.loadGenreOptions();
-
-                // Add the new genre to selection
-                if (!this.value.includes(newGenre.name)) {
-                    this.value = [...this.value, newGenre.name];
-                    this.onChange(this.value);
-                }
 
                 this.genreCreated.emit(newGenre.name);
 

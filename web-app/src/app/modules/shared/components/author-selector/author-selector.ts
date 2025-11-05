@@ -1,8 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, forwardRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { Author } from '../../../authors/models/author.model';
+import { Author, AuthorCreateRequestDTO, CatalogAuthorCreateRequestDTO, CatalogAuthorDTO } from '../../../authors/models/author.model';
 import { AuthorService } from '../../../authors/services/author.service';
+import { MultiSelect } from 'primeng/multiselect';
+import { Select } from 'primeng/select';
+import { UiService } from '../../services/ui.service.service';
 
 @Component({
   selector: 'app-author-selector',
@@ -17,7 +19,7 @@ import { AuthorService } from '../../../authors/services/author.service';
     }
   ]
 })
-export class AuthorSelectorComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class AuthorSelectorComponent implements OnInit, ControlValueAccessor {
   @Input() placeholder: string = 'Select author...';
   @Input() multiple: boolean = false;
   @Input() showAddButton: boolean = true;
@@ -26,50 +28,75 @@ export class AuthorSelectorComponent implements OnInit, OnDestroy, ControlValueA
   @Input() showClear: boolean = true;
   @Input() filter: boolean = true;
   @Input() maxSelectedLabels: number = 3;
-  
-  @Output() authorSelected = new EventEmitter<Author | Author[]>();
+
+  @Output() authorSelected = new EventEmitter<CatalogAuthorDTO | CatalogAuthorDTO[]>();
   @Output() addNewAuthor = new EventEmitter<void>();
-  @Output() viewAuthor = new EventEmitter<Author>();
+  @Output() viewAuthor = new EventEmitter<CatalogAuthorDTO>();
 
-  authors: Author[] = [];
-  filteredAuthors: Author[] = [];
-  selectedAuthors: Author | Author[] | null = null;
-  searchTerm: string = '';
+  @ViewChild('multiSelectRef') multiSelectRef!: MultiSelect;
+  @ViewChild('dropdownRef') dropdownRef!: Select;
+
+  authors: CatalogAuthorDTO[] = [];
+  authorOptions: { label: string; value: number }[] = [];
+  selectedAuthorIds: number | number[] | null = null;
   loading: boolean = false;
-  showDropdown: boolean = false;
 
-  private destroy$ = new Subject<void>();
-  private searchSubject = new Subject<string>();
+  // Author dialog properties
+  showAddAuthorDialog: boolean = false;
+
+  // Preference level options for the dialog
+  preferenceLevelOptions = [
+    { label: '💤 Not for Me', value: 1 },
+    { label: '⚖️ Neutral', value: 2 },
+    { label: '🙂 Interested', value: 3 },
+    { label: '❤️ Favorite', value: 4 },
+    { label: '💎 Top Favorite', value: 5 }
+  ];
 
   // ControlValueAccessor properties
-  private onChange = (value: any) => {};
-  private onTouched = () => {};
+  private onChange = (value: any) => { };
+  private onTouched = () => { };
 
-  constructor(private authorService: AuthorService) {
-    // Setup search debouncing
-    this.searchSubject
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(searchTerm => {
-        this.filterAuthors(searchTerm);
-      });
-  }
+  constructor(public authorService: AuthorService, private uiService: UiService) { }
 
   ngOnInit(): void {
     this.loadAuthors();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  loadAuthors(callback?: () => void): void {
+    this.loading = true;
+
+    this.authorService.getAllCatalogAuthors().subscribe((response) => {
+      if (response.data) {
+        this.authors = response.data;
+        this.authorOptions = this.authors.map(author => ({
+          label: author.name,
+          value: author.id!
+        }));
+        this.loading = false;
+
+        // Execute callback if provided
+        if (callback) {
+          callback();
+        }
+      }
+    })
   }
 
   // ControlValueAccessor implementation
   writeValue(value: any): void {
-    this.selectedAuthors = value;
+    // Convert author objects to IDs
+    if (value) {
+      if (this.multiple && Array.isArray(value)) {
+        this.selectedAuthorIds = value.map(author =>
+          typeof author === 'number' ? author : author.id
+        );
+      } else if (!this.multiple) {
+        this.selectedAuthorIds = typeof value === 'number' ? value : value?.id;
+      }
+    } else {
+      this.selectedAuthorIds = this.multiple ? [] : null;
+    }
   }
 
   registerOnChange(fn: any): void {
@@ -84,141 +111,129 @@ export class AuthorSelectorComponent implements OnInit, OnDestroy, ControlValueA
     this.disabled = isDisabled;
   }
 
-  private loadAuthors(): void {
-    this.loading = true;
-    this.authorService.authors$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (authors: Author[]) => {
-          this.authors = authors;
-          this.filteredAuthors = [...authors];
-          this.loading = false;
-        },
-        error: (error: any) => {
-          console.error('Error loading authors:', error);
-          this.loading = false;
-        }
-      });
-  }
+  onSelectionChange(event: any): void {
+    this.selectedAuthorIds = event.value;
 
-  onSearch(event: any): void {
-    const searchTerm = event.target.value;
-    this.searchTerm = searchTerm;
-    this.searchSubject.next(searchTerm);
-  }
+    // Convert IDs back to author objects for the output event
+    let selectedAuthors: CatalogAuthorDTO | CatalogAuthorDTO[] | null;
 
-  private filterAuthors(searchTerm: string): void {
-    if (!searchTerm) {
-      this.filteredAuthors = [...this.authors];
-      return;
-    }
-
-    const term = searchTerm.toLowerCase();
-    this.filteredAuthors = this.authors.filter(author =>
-      author.name.toLowerCase().includes(term) ||
-      (author.biography && author.biography.toLowerCase().includes(term)) ||
-      (author.nationality && author.nationality.toLowerCase().includes(term)) ||
-      (author.genres && author.genres.some(genre => genre.toLowerCase().includes(term)))
-    );
-  }
-
-  onAuthorSelect(author: Author): void {
-    if (this.multiple) {
-      const currentSelection = Array.isArray(this.selectedAuthors) ? this.selectedAuthors : [];
-      const isSelected = currentSelection.some(a => a.id === author.id);
-      
-      if (!isSelected) {
-        this.selectedAuthors = [...currentSelection, author];
-      }
+    if (this.multiple && Array.isArray(this.selectedAuthorIds)) {
+      selectedAuthors = this.selectedAuthorIds
+        .map(id => this.authors.find(a => a.id === id))
+        .filter(a => a !== undefined) as CatalogAuthorDTO[];
+    } else if (!this.multiple && this.selectedAuthorIds !== null) {
+      selectedAuthors = this.authors.find(a => a.id === this.selectedAuthorIds) || null;
     } else {
-      this.selectedAuthors = author;
-      this.showDropdown = false;
+      selectedAuthors = this.multiple ? [] : null;
     }
 
-    this.onChange(this.selectedAuthors);
-    this.onTouched();
-    this.authorSelected.emit(this.selectedAuthors || undefined);
-  }
-
-  onAuthorRemove(author: Author): void {
-    if (this.multiple && Array.isArray(this.selectedAuthors)) {
-      this.selectedAuthors = this.selectedAuthors.filter(a => a.id !== author.id);
-      this.onChange(this.selectedAuthors);
-      this.authorSelected.emit(this.selectedAuthors || undefined);
-    }
-  }
-
-  onClear(): void {
-    this.selectedAuthors = this.multiple ? [] : null;
-    this.onChange(this.selectedAuthors);
-    this.authorSelected.emit(this.selectedAuthors || undefined);
+    this.onChange(selectedAuthors);
+    this.authorSelected.emit(selectedAuthors || undefined);
   }
 
   onAddNewAuthor(): void {
-    this.addNewAuthor.emit();
+    this.showAddAuthorDialog = true;
+
+    if (this.multiple && this.multiSelectRef) {
+      this.multiSelectRef.hide();
+    } else if (!this.multiple && this.dropdownRef) {
+      this.dropdownRef.hide();
+    }
   }
 
-  onViewAuthor(author: Author, event: Event): void {
-    event.stopPropagation();
-    this.viewAuthor.emit(author);
-  }
+  onAddAuthorDialogSave(): void {
+    if (!this.authorService.authorForm.valid) {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.authorService.authorForm.controls).forEach(key => {
+        this.authorService.authorForm.get(key)?.markAsTouched();
+      });
+      this.uiService.setCustomError("Validation Error", "Please fill out all required fields.");
+      return;
+    }
 
-  toggleDropdown(): void {
-    if (!this.disabled) {
-      this.showDropdown = !this.showDropdown;
-      if (this.showDropdown) {
-        this.onTouched();
+    const formValue = this.authorService.authorForm.value;
+
+    const newCatalogAuthor: CatalogAuthorCreateRequestDTO = {
+      name: formValue.name.trim(),
+      bio: formValue.bio || undefined,
+      birthDate: formValue.birthDate || undefined,
+      deathDate: formValue.deathDate || undefined,
+      nationality: formValue.nationality || undefined,
+      website: formValue.website || undefined,
+      instagramUrl: formValue.instagramUrl || undefined,
+      goodreadUrl: formValue.goodreadUrl || undefined,
+      threadsUrl: formValue.threadsUrl || undefined,
+    }
+
+    const newAuthorPref: AuthorCreateRequestDTO = {
+      userId: localStorage.getItem('userId') ? +localStorage.getItem('userId')! : 0,
+      catalogAuthorId: 0, // Will be set server-side  
+      preferenceLevel: formValue.preferenceLevel || 3,
+      isFavorite: formValue.isFavorite || false,
+      isExcluded: formValue.isExcluded || false,
+      personalNotes: formValue.personalNotes || undefined,
+    }
+    console.log('New Catalog Author:', newCatalogAuthor);
+    console.log('New Author Preference:', newAuthorPref);
+
+    this.authorService.createCatalogAuthor(newCatalogAuthor).subscribe((response) => {
+      if (response.data) {
+        const newAuthor = response.data;
+
+        newAuthorPref.catalogAuthorId = newAuthor.id!;
+        this.authorService.createUserAuthorPreference(newAuthorPref).subscribe((res) => {
+          if (res.data) {
+            this.uiService.setCustomSuccess("Success", "Author created successfully.");
+
+            // Close dialog and reset form
+            this.showAddAuthorDialog = false;
+            this.resetNewAuthorData();
+
+            // Reload authors and auto-select the newly created one
+            this.loadAuthors(() => {
+              if (newAuthor.id) {
+                if (this.multiple) {
+                  const currentSelection = Array.isArray(this.selectedAuthorIds) ? this.selectedAuthorIds : [];
+                  this.selectedAuthorIds = [...currentSelection, newAuthor.id];
+                } else {
+                  this.selectedAuthorIds = newAuthor.id;
+                }
+
+                // Convert IDs back to author objects for the output event
+                let selectedAuthors: CatalogAuthorDTO | CatalogAuthorDTO[] | null;
+                if (this.multiple && Array.isArray(this.selectedAuthorIds)) {
+                  selectedAuthors = this.selectedAuthorIds
+                    .map(id => this.authors.find(a => a.id === id))
+                    .filter(a => a !== undefined) as CatalogAuthorDTO[];
+                } else if (!this.multiple && this.selectedAuthorIds !== null) {
+                  selectedAuthors = this.authors.find(a => a.id === this.selectedAuthorIds) || null;
+                } else {
+                  selectedAuthors = this.multiple ? [] : null;
+                }
+
+                // Notify the form control and trigger validation
+                this.onChange(selectedAuthors);
+                this.onTouched();
+                this.authorSelected.emit(selectedAuthors || undefined);
+                this.addNewAuthor.emit();
+              }
+            });
+          }
+        });
       }
-    }
+    });
   }
 
-  getDisplayValue(): string {
-    if (!this.selectedAuthors) return '';
-
-    if (this.multiple && Array.isArray(this.selectedAuthors)) {
-      if (this.selectedAuthors.length === 0) return '';
-      if (this.selectedAuthors.length <= this.maxSelectedLabels) {
-        return this.selectedAuthors.map(a => a.name).join(', ');
-      }
-      return `${this.selectedAuthors.length} authors selected`;
-    }
-
-    if (!this.multiple && this.selectedAuthors && !Array.isArray(this.selectedAuthors)) {
-      return this.selectedAuthors.name;
-    }
-
-    return '';
+  onAddAuthorDialogCancel(): void {
+    this.showAddAuthorDialog = false;
+    this.resetNewAuthorData();
   }
 
-  getSelectedAuthorsArray(): Author[] {
-    if (this.multiple && Array.isArray(this.selectedAuthors)) {
-      return this.selectedAuthors;
-    }
-    return [];
+  private resetNewAuthorData(): void {
+    this.authorService.authorForm.reset()
   }
 
-  isAuthorSelected(author: Author): boolean {
-    if (this.multiple && Array.isArray(this.selectedAuthors)) {
-      return this.selectedAuthors.some(a => a.id === author.id);
-    }
-    if (!this.multiple && this.selectedAuthors && !Array.isArray(this.selectedAuthors)) {
-      return this.selectedAuthors.id === author.id;
-    }
-    return false;
-  }
-
-  trackByAuthorId(index: number, author: Author): number {
-    return author.id || index;
-  }
-
-  isArray(value: any): boolean {
-    return Array.isArray(value);
-  }
-
-  getSingleAuthor(): Author | null {
-    if (!this.multiple && this.selectedAuthors && !Array.isArray(this.selectedAuthors)) {
-      return this.selectedAuthors;
-    }
-    return null;
+  trackByAuthorId(index: number, option: { label: string; value: number }): number {
+    return option.value;
   }
 }

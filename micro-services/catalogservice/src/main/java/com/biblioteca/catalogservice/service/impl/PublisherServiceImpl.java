@@ -136,7 +136,7 @@ public class PublisherServiceImpl implements PublisherService {
     public List<PublisherDTO> searchPublisher(String publisherName, HttpServletRequest request, Jwt jwt) {
         log.info("searchPublisher in PublisherServiceImpl is called with data: {} by user: {}", publisherName, jwt.getSubject());
 
-        List<Publisher>  publishers = publisherRepository.findByNameContaining(publisherName);
+        List<Publisher>  publishers = publisherRepository.findByNameContainingIgnoreCase(publisherName);
         List<PublisherDTO> publisherDTOs = publishers.stream().map(this::convertToDTO).toList();
 
         return publisherDTOs;

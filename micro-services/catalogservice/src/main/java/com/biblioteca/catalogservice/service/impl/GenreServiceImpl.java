@@ -166,7 +166,7 @@ public class GenreServiceImpl implements GenreService {
     public List<GenreDTO> searchGenre(String genreName, HttpServletRequest request, Jwt jwt) {
         log.info("searchGenre in GenreServiceImpl is called with name: {}", genreName);
 
-        List<Genre> genres = genreRepository.findByNameContaining(genreName);
+        List<Genre> genres = genreRepository.findByNameContainingIgnoreCase(genreName);
 
         List<GenreDTO> dtos = genres.stream().map(this::convertToDTO).toList();
 

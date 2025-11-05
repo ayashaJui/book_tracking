@@ -234,7 +234,7 @@ public class SeriesServiceImpl implements SeriesService {
     public List<SeriesDTO> searchSeries(String seriesName, HttpServletRequest request, Jwt jwt) {
         log.info("searchSeries method in SeriesServiceImpl is called with seriesName: {}", seriesName);
 
-        List<Series> series = seriesRepository.findByNameContaining(seriesName);
+        List<Series> series = seriesRepository.findByNameContainingIgnoreCase(seriesName);
 
         List<SeriesDTO> seriesDTOS = series.stream().map(this::convertToDTO).toList();
 
