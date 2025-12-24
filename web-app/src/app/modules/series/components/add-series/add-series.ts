@@ -30,7 +30,7 @@ export class AddSeries implements OnInit {
     { label: 'Reading', value: 'READING' },
     { label: 'Completed', value: 'COMPLETED' },
     { label: 'Paused', value: 'PAUSED' },
-    {label: 'Dropped', value: 'DROPPED' },
+    { label: 'Dropped', value: 'DROPPED' },
   ];
 
   // Reading order preferences
@@ -128,7 +128,7 @@ export class AddSeries implements OnInit {
   }
 
   onSubmit() {
-    
+
     if (!this.seriesService.seriesForm.valid) {
       this.markFormGroupTouched();
       this.messageService.add({
@@ -139,7 +139,8 @@ export class AddSeries implements OnInit {
       return;
     }
 
-    let formValue = this.seriesService.seriesForm.value;
+    // Use getRawValue() to include disabled controls (when isFromCatalog is true)
+    let formValue = this.seriesService.seriesForm.getRawValue();
 
     const newCatalogAuthor: CatalogSeriesCreateRequestDTO = {
       name: formValue.name,
@@ -312,7 +313,7 @@ export class AddSeries implements OnInit {
       }) || [];
 
       this.seriesService.seriesForm.patchValue({
-        name: series.name ,
+        name: series.name,
         description: series.description || '',
         totalBooks: series.totalBooks || 0,
         isCompleted: series.isCompleted || false,

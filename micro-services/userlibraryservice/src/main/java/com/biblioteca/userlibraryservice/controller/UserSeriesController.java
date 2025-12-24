@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "1. User Series Controller", description = "User Series Related APIs")
+@Tag(name = "3. User Series Controller", description = "User Series Related APIs")
 @RequestMapping("/v1/user_series")
 public class UserSeriesController {
     private final UserSeriesService userSeriesService;

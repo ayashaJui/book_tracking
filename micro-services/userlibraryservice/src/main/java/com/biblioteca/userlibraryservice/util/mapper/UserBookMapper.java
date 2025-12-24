@@ -24,7 +24,6 @@ public class UserBookMapper {
                 .isFavorite(userBook.getIsFavorite())
                 .readingFormat(Format.valueOf(userBook.getReadingFormat()))
                 .notes(userBook.getNotes())
-                .privateNotes(userBook.getPrivateNotes())
                 .firstAcquisitionDate(userBook.getFirstAcquisitionDate())
                 .firstAcquisitionMethod(userBook.getFirstAcquisitionMethod())
                 .sourceType(userBook.getSourceType())
@@ -40,14 +39,14 @@ public class UserBookMapper {
 //                .catalogBookId(userBookCreateDTO.getCatalogBookId())
                 .status(userBookCreateDTO.getStatus().name())
                 .rating(userBookCreateDTO.getRating())
-                .progressPercentage(userBookCreateDTO.getProgressPercentage())
+//                .progressPercentage(userBookCreateDTO.getProgressPercentage())
                 .currentPage(userBookCreateDTO.getCurrentPage())
                 .startDate(userBookCreateDTO.getStartDate())
                 .finishDate(userBookCreateDTO.getFinishDate())
                 .isFavorite(userBookCreateDTO.getIsFavorite())
                 .readingFormat(userBookCreateDTO.getReadingFormat().name())
                 .notes(userBookCreateDTO.getNotes())
-                .privateNotes(userBookCreateDTO.getPrivateNotes())
+//                .privateNotes(userBookCreateDTO.getPrivateNotes())
                 .firstAcquisitionDate(userBookCreateDTO.getFirstAcquisitionDate())
                 .firstAcquisitionMethod(userBookCreateDTO.getFirstAcquisitionMethod())
                 .sourceType(userBookCreateDTO.getSourceType())
@@ -68,7 +67,7 @@ public class UserBookMapper {
         userBook.setIsFavorite(userBookUpdateDTO.getIsFavorite());
         userBook.setReadingFormat(userBookUpdateDTO.getReadingFormat().name());
         userBook.setNotes(userBookUpdateDTO.getNotes());
-        userBook.setPrivateNotes(userBookUpdateDTO.getPrivateNotes());
+//        userBook.setPrivateNotes(userBookUpdateDTO.getPrivateNotes());
         userBook.setFirstAcquisitionDate(userBookUpdateDTO.getFirstAcquisitionDate());
         userBook.setFirstAcquisitionMethod(userBookUpdateDTO.getFirstAcquisitionMethod());
         userBook.setSourceType(userBookUpdateDTO.getSourceType());

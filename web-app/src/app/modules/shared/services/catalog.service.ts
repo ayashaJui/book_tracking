@@ -44,20 +44,12 @@ export class CatalogService {
     }
 
     // Search for books specifically
-    searchBooks(title: string, authorNames?: string[]): Observable<CatalogBook[]> {
+    searchBooks(title: string): Observable<CatalogBook[]> {
         let params = new HttpParams().set('title', title);
 
-        if (authorNames && authorNames.length > 0) {
-            params = params.set('authors', authorNames.join(','));
-        }
+        let url = `${environment.catalog_service_url}/books/search`;
 
-        return this.http.get<CatalogBook[]>(`${this.catalogApiUrl}/books/search`, { params })
-            .pipe(
-                catchError(error => {
-                    console.error('Error searching books:', error);
-                    return of([]);
-                })
-            );
+        return this.http.get<CatalogBook[]>(url, { params });
     }
 
     // Search for authors
@@ -86,33 +78,33 @@ export class CatalogService {
     searchSeries(name: string): Observable<any> {
         // Mock catalog series data for demonstration
         const mockCatalogSeries = [
-            { 
-                id: 1, 
-                name: 'The Lord of the Rings', 
+            {
+                id: 1,
+                name: 'The Lord of the Rings',
                 description: 'Epic fantasy trilogy by J.R.R. Tolkien',
                 totalBooks: 3,
                 isCompleted: true,
                 type: 'series'
             },
-            { 
-                id: 2, 
-                name: 'Harry Potter', 
+            {
+                id: 2,
+                name: 'Harry Potter',
                 description: 'Beloved wizarding series by J.K. Rowling',
                 totalBooks: 7,
                 isCompleted: true,
                 type: 'series'
             },
-            { 
-                id: 3, 
-                name: 'The Chronicles of Narnia', 
+            {
+                id: 3,
+                name: 'The Chronicles of Narnia',
                 description: 'Fantasy series by C.S. Lewis',
                 totalBooks: 7,
                 isCompleted: true,
                 type: 'series'
             },
-            { 
-                id: 4, 
-                name: 'A Song of Ice and Fire', 
+            {
+                id: 4,
+                name: 'A Song of Ice and Fire',
                 description: 'Fantasy series by George R.R. Martin',
                 totalBooks: 7,
                 isCompleted: false,
@@ -121,7 +113,7 @@ export class CatalogService {
         ];
 
         // Filter series based on search query
-        const filteredSeries = mockCatalogSeries.filter(series => 
+        const filteredSeries = mockCatalogSeries.filter(series =>
             series.name.toLowerCase().includes(name.toLowerCase())
         );
 

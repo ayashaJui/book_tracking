@@ -30,7 +30,8 @@ public class UserBookCreateDTO {
     @Max(value = 5, message = "Rating can not be greater than 5")
     private Integer rating;
 
-    private BigDecimal progressPercentage;
+//    private BigDecimal progressPercentage;
+    private Integer bookPageCount;
 
     private Integer currentPage;
 
@@ -43,8 +44,6 @@ public class UserBookCreateDTO {
     private Format readingFormat;
 
     private String notes;
-
-    private String privateNotes;
 
     private LocalDate firstAcquisitionDate;
 

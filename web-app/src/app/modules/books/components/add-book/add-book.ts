@@ -112,7 +112,11 @@ export class AddBook implements OnInit {
   showCatalogSearch: boolean = true;
   catalogSearchPerformed: boolean = false;
   selectedCatalogBook: CatalogSearchResult | null = null;
-  showCreateNewForm: boolean = false;
+  showCreateNewForm: boolean = true;
+  
+  // Form visibility and catalog state
+  showForm: boolean = false;
+  isFromCatalog: boolean = false;
 
   // Duplicate detection
   showDuplicateDialog: boolean = false;
@@ -120,7 +124,7 @@ export class AddBook implements OnInit {
   searchTerm: string = '';
 
   // Step-by-step flow
-  currentStep: 'search' | 'duplicate_check' | 'create_new' | 'add_to_library' = 'search';
+  // currentStep: 'search' | 'duplicate_check' | 'create_new' | 'add_to_library' = 'search';
 
   // Enhanced author search
   catalogAuthors: CatalogAuthor[] = [];
@@ -139,12 +143,7 @@ export class AddBook implements OnInit {
 
   ngOnInit() {
     this.loadSeriesOptions();
-    this.loadGenreOptions();
     this.loadPublisherOptions();
-  }
-
-  loadGenreOptions() {
-    // this.genreOptions = this.genreService.getGenreOptions();
   }
 
   loadPublisherOptions() {
@@ -252,11 +251,6 @@ export class AddBook implements OnInit {
     };
   }
 
-  onGenreCreated(genreName: string) {
-    // Refresh genre options when a new genre is created
-    this.loadGenreOptions();
-  }
-
   onCustomTagCreated(tagName: string) {
     // Handle custom tag creation
     console.log('Custom tag created:', tagName);
@@ -334,13 +328,14 @@ export class AddBook implements OnInit {
   }
 
   toggleCreateNewSeries() {
-    this.showCreateNewSeries = !this.showCreateNewSeries;
-    if (this.showCreateNewSeries) {
-      // Pre-fill with current book's first author
-      if (this.selectedAuthors.length > 0) {
-        this.newSeriesData.author = this.selectedAuthors[0].name;
-      }
-    }
+    // this.showCreateNewSeries = !this.showCreateNewSeries;
+    // if (this.showCreateNewSeries) {
+    //   // Pre-fill with current book's first author
+    //   if (this.selectedAuthors.length > 0) {
+    //     this.newSeriesData.author = this.selectedAuthors[0].name;
+    //   }
+    // }
+    this.router.navigate(['/series/add-series'])
   }
 
   createNewSeries() {
@@ -387,68 +382,85 @@ export class AddBook implements OnInit {
   // Handle catalog search results
   onCatalogBookSelected(result: CatalogSearchResult) {
     this.selectedCatalogBook = result;
-    this.currentStep = 'add_to_library';
-    this.showCatalogSearch = false;
+    this.isFromCatalog = true;
+    this.showForm = true;
+    
+    // Pre-fill form with catalog data
+    this.newBook.title = result.title || result.name || '';
+    
+    // If the catalog book has author IDs, load them
+    if ((result as any).authorIds && (result as any).authorIds.length > 0) {
+      // Load catalog authors
+      // TODO: Implement loading authors from catalog
+    }
+    
+    // If catalog has genres, set them
+    if ((result as any).genres && (result as any).genres.length > 0) {
+      this.newBook.genres = (result as any).genres;
+    }
   }
 
   // Handle "create new" from catalog search
   onCreateNewFromCatalog(searchTerm: string) {
     this.searchTerm = searchTerm;
     this.newBook.title = searchTerm;
-    this.checkForDuplicatesBeforeCreate();
+    this.isFromCatalog = false;
+    this.showForm = true;
+    this.showCreateNewForm = true;
+    // this.checkForDuplicatesBeforeCreate();
   }
 
   // Check for duplicates before creating new book
-  checkForDuplicatesBeforeCreate() {
-    if (!this.newBook.title.trim()) {
-      this.showCreateNewForm = true;
-      return;
-    }
+  // checkForDuplicatesBeforeCreate() {
+  //   if (!this.newBook.title.trim()) {
+  //     this.showCreateNewForm = true;
+  //     return;
+  //   }
 
-    const catalogBookData: Partial<CatalogBook> = {
-      title: this.newBook.title,
-      authorIds: this.selectedAuthors.map(a => a.id!),
-      genres: this.newBook.genres
-    };
+  //   const catalogBookData: Partial<CatalogBook> = {
+  //     title: this.newBook.title,
+  //     authorIds: this.selectedAuthors.map(a => a.id!),
+  //     genres: this.newBook.genres
+  //   };
 
-    this.bookService.checkForDuplicates(catalogBookData).subscribe({
-      next: (result) => {
-        this.duplicateResult = result;
+  //   this.bookService.checkForDuplicates(catalogBookData).subscribe({
+  //     next: (result) => {
+  //       this.duplicateResult = result;
 
-        if (result.hasMatches && (result.confidence === 'high' || result.confidence === 'medium')) {
-          this.showDuplicateDialog = true;
-          this.currentStep = 'duplicate_check';
-        } else {
-          this.showCreateNewForm = true;
-          this.currentStep = 'create_new';
-        }
-      },
-      error: (error) => {
-        console.error('Error checking duplicates:', error);
-        this.showCreateNewForm = true;
-        this.currentStep = 'create_new';
-      }
-    });
-  }
+  //       if (result.hasMatches && (result.confidence === 'high' || result.confidence === 'medium')) {
+  //         this.showDuplicateDialog = true;
+  //         this.currentStep = 'duplicate_check';
+  //       } else {
+  //         this.showCreateNewForm = true;
+  //         this.currentStep = 'create_new';
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error checking duplicates:', error);
+  //       this.showCreateNewForm = true;
+  //       this.currentStep = 'create_new';
+  //     }
+  //   });
+  // }
 
   // Handle duplicate dialog actions
-  onDuplicateAction(action: DuplicateDialogAction) {
-    this.showDuplicateDialog = false;
+  // onDuplicateAction(action: DuplicateDialogAction) {
+  //   this.showDuplicateDialog = false;
 
-    switch (action.action) {
-      case 'use_existing':
-        this.selectedCatalogBook = action.selectedItem || null;
-        this.currentStep = 'add_to_library';
-        break;
-      case 'create_new':
-        this.showCreateNewForm = true;
-        this.currentStep = 'create_new';
-        break;
-      case 'cancel':
-        this.resetToSearch();
-        break;
-    }
-  }
+  //   switch (action.action) {
+  //     case 'use_existing':
+  //       this.selectedCatalogBook = action.selectedItem || null;
+  //       this.currentStep = 'add_to_library';
+  //       break;
+  //     case 'create_new':
+  //       this.showCreateNewForm = true;
+  //       this.currentStep = 'create_new';
+  //       break;
+  //     case 'cancel':
+  //       this.resetToSearch();
+  //       break;
+  //   }
+  // }
 
   // Enhanced author search with catalog
   onAuthorSearch(query: string) {
@@ -596,7 +608,7 @@ export class AddBook implements OnInit {
 
   // Helper methods
   resetToSearch() {
-    this.currentStep = 'search';
+    // this.currentStep = 'search';
     this.showCatalogSearch = true;
     this.showCreateNewForm = false;
     this.selectedCatalogBook = null;

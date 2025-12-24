@@ -126,8 +126,6 @@ export class GenreSelectorComponent implements ControlValueAccessor, OnChanges {
                 icon: null // Will implement icon logic separately if needed
             };
         });
-
-        console.log('Selected genres after update:', this.selectedGenres);
     }
 
     showAddGenreForm(): void {

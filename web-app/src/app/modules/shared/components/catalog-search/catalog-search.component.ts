@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 import { CatalogService } from '../../services/catalog.service';
-import { CatalogSearchResult, CatalogSearchQuery, CatalogAuthor, CatalogBook, CatalogSeries, CatalogPublisher, CatalogGenre } from '../../models/catalog.model';
+import { CatalogSearchResult } from '../../models/catalog.model';
 import { CatalogApiService } from '../../services/catalog.api.service';
 
 @Component({
@@ -11,7 +11,8 @@ import { CatalogApiService } from '../../services/catalog.api.service';
     standalone: false
 })
 export class CatalogSearchComponent implements OnInit, OnDestroy {
-    @Input() searchType: 'book' | 'author' | 'publisher' | 'series' | 'genre' | 'edition' | 'all' = 'all';
+    @Input() searchType: 'book' | 'author' | 'series' | 'genre' | 'edition' | 'all' = 'all'; 
+    // edition, all are not done yet
     @Input() placeholder: string = 'Search catalog...';
     @Input() showCreateNew: boolean = true;
     @Input() minCharacters: number = 2;
@@ -43,7 +44,6 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
         switch (this.searchType) {
             case 'book': return 'Search for books...';
             case 'author': return 'Search for authors...';
-            case 'publisher': return 'Search for publishers...';
             case 'series': return 'Search for book series...';
             case 'genre': return 'Search for genres...';
             case 'edition': return 'Search for editions...';
@@ -83,16 +83,11 @@ export class CatalogSearchComponent implements OnInit, OnDestroy {
                         case 'genre':
                             return this.catalogApiService.searchGenres(query);
 
-                        case 'publisher':
-                            return this.catalogApiService.searchPublishers(query);
-
                         case 'book':
                             return this.catalogService.searchBooks(query);
 
                         case 'series':
                             return this.catalogApiService.searchSeries(query);
-
-                        
 
                         default:
 

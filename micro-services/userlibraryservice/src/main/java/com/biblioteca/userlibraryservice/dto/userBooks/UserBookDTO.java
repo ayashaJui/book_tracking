@@ -39,8 +39,6 @@ public class UserBookDTO {
 
     private String notes;
 
-    private String privateNotes;
-
     private LocalDate firstAcquisitionDate;
 
     private String firstAcquisitionMethod;

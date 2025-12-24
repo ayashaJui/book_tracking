@@ -57,9 +57,6 @@ public class UserBook {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "private_notes", columnDefinition = "TEXT")
-    private String privateNotes;
-
     @Column(name = "first_acquisition_date")
     private LocalDate firstAcquisitionDate;
 

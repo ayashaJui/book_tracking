@@ -16,6 +16,7 @@ import {
   BookCreateFromCatalogRequest,
   DuplicateDetectionResult
 } from '../../shared/models/catalog.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -23,14 +24,27 @@ import {
 export class BookService {
   private readonly STORAGE_KEY = 'book_tracking_books';
   private booksSubject = new BehaviorSubject<Book[]>([]);
+  bookForm!: FormGroup;
 
   constructor(
     private authorService: AuthorService,
     private publisherService: PublisherService,
     private editionService: EditionService,
-    private catalogService: CatalogService
+    private catalogService: CatalogService, private fb: FormBuilder
   ) {
     this.loadBooksFromStorage();
+    this.bookForm = this.fb.group({
+      title: ['', Validators.required],
+      publisherId: [''],
+      authors: this.fb.array([]),
+      series: this.fb.array([]),
+      genres: [[]],
+      pageCount: [''],
+
+
+      status: ['', Validators.required],
+
+    })
   }
 
   // Observable for components to subscribe to

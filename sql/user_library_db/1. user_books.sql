@@ -14,7 +14,7 @@ CREATE TABLE user_books (
     is_favorite BOOLEAN DEFAULT false,
     reading_format VARCHAR(50) DEFAULT 'PHYSICAL', -- PHYSICAL, DIGITAL
     notes TEXT, -- General reading notes about the work
-    private_notes TEXT, -- Private thoughts about the work
+    -- private_notes TEXT, -- Private thoughts about the work
     
     -- Work-level acquisition tracking (when user first got ANY edition)
     first_acquisition_date DATE,

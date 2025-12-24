@@ -300,6 +300,8 @@ export class AddAuthorComponent implements OnInit {
       this.isFromCatalog = true;
       this.showForm = true;
 
+      
+
       this.authorService.authorForm.patchValue({
         ...author,
         birthDate: author.birthDate ? new Date(author.birthDate) : null,
